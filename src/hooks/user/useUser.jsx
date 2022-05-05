@@ -1,16 +1,11 @@
-import { useEffect, useState } from "react"
-import userService from "../../services/userService"
+import { useSelector } from "react-redux"
+
+export const clearUser = () => localStorage.removeItem('user')
+export const getUserFromStorage = () => JSON.parse(localStorage.getItem('user')) || {}
+export const saveUserInStorage = (user) => localStorage.setItem('user', JSON.stringify(user))
 
 const useUser = () => {
-    const [user, setUser] = useState()
-
-    useEffect(() => {
-        const getUser = () => {
-            userService.GetUser()
-                .then(res => setUser(res))
-        }
-        getUser()
-    }, [])
+    const user = useSelector(store => store.user)
 
     return {
         user

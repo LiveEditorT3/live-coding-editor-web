@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-import { Button, Checkbox, Grid, Paper, TextField, Typography } from "@material-ui/core";
-import { Save } from "@material-ui/icons";
+import { useEffect, useState } from "react";
 import Dropdown from "../../components/inputs/dropdown";
 import useRepos from "../../hooks/repos/useRepos"
 import useUser from "../../hooks/user/useUser";
 import useStyles from './styles'
 import Dialog from "../../components/dialog";
+import { Button, Checkbox, Grid, Paper, TextField, Typography } from "@mui/material";
+import { Save } from "@mui/icons-material";
+import CodeMirror from '@uiw/react-codemirror'
+import { python } from '@codemirror/lang-python'
 
 const Home = () => {
     const { user } = useUser()
@@ -22,12 +24,12 @@ const Home = () => {
         path: 'untitled.py',
         message: '',
     })
-    const codeRef = useRef(null)
 
     useEffect(() => {
         if (!repo && !!repos && !!repos.length)
             setRepo(repos[0].name)
     }, [repos, open, messageOpen, repo])
+
     const handleCreate = (event) => {
         createRepo(name, isPrivate)
         setSent(true)
@@ -45,12 +47,6 @@ const Home = () => {
         if (!!selected) setRepo(selected)
     }
 
-    const handleKeyDown = (event) => {
-        if (event.key === 'Tab' && !event.shiftKey)
-            setCommit({ ...commit, content: commit.content.concat('\t')})
-    }
-
-    console.log(repo)
     return(
         <>
             <Dialog open={open} title='Create Repo' onClose={() => setOpen(false)} onAccept={handleCreate}>
@@ -117,19 +113,15 @@ const Home = () => {
                 </Grid>
                 <Grid item container xs={12} justifyContent='flex-end'>
                     <Grid item xs={12}>
-                        <TextField className={classes.inputField}
-                            variant="outlined" 
-                            multiline
-                            fullWidth
-                            minRows={30}
-                            ref={codeRef    }
-                            value={commit.content} 
-                            onChange={(event) => setCommit({ ...commit, content: event.target.value} )} 
-                            onKeyDown={handleKeyDown}
+                        <CodeMirror
+                            height="70vh"
+                            extensions={[python()]}
+                            onChange={(value, viewUpdate) => setCommit({ ...commit, content: value} )}
+                            theme='dark'
                         />
                     </Grid>
                     <Grid item>
-                        <Button color="secondary" endIcon={<Save/>} onClick={() => setMessageOpen(true)}>Save</Button>
+                        <Button color="secondary" endIcon={<Save/>} onClick={() => console.log(commit)}>Save</Button>
                     </Grid>
                 </Grid>
             </Grid>

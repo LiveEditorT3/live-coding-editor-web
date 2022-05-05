@@ -1,5 +1,5 @@
-import { Avatar, ListItem, ListItemAvatar, ListItemText, MenuItem, TextField } from "@material-ui/core"
-import { Add } from "@material-ui/icons"
+import { Add } from "@mui/icons-material"
+import { Avatar, ListItem, ListItemAvatar, ListItemText, MenuItem, TextField } from "@mui/material"
 
 const Dropdown = ({ options, getOptionLabel, getOptionValue, onAdd, ...rest }) => {
     return(

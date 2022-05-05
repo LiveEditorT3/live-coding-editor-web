@@ -1,5 +1,5 @@
-import { Button, DialogActions, DialogContent, DialogTitle } from "@material-ui/core"
-import MuiDialog  from "@material-ui/core/Dialog"
+import { Button, DialogActions, DialogContent, DialogTitle } from "@mui/material"
+import MuiDialog  from "@mui/material/Dialog"
 
 const Dialog = ({title, open, onClose, onAccept, children}) => {
     return(

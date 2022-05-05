@@ -1,6 +1,6 @@
-import { AppBar, Container, Grid, IconButton, Toolbar, Typography } from "@material-ui/core"
-import { ExitToApp } from "@material-ui/icons"
-import { clearToken } from "../../hooks/login"
+import { ExitToApp } from "@mui/icons-material"
+import { AppBar, Container, IconButton, Toolbar, Typography } from "@mui/material"
+import { signOut } from "../../hooks/login"
 import useStyles from './styles'
 
 const Layout = ({ children }) => {
@@ -8,14 +8,14 @@ const Layout = ({ children }) => {
 
     return(
         <div className={classes.root}>
-            <AppBar position="fixed">
+            <AppBar color="primary" position="fixed">
                 <Toolbar>
-                    <Grid container justifyContent="space-between">
-                        <Typography><strong>Live Editor</strong></Typography>
-                        <IconButton onClick={() => clearToken()}> 
+                    <Typography variant="h6" noWrap>Live Coding Editor</Typography>
+                    <section className={classes.rightToolbar}>
+                        <IconButton onClick={() => signOut()}> 
                             <ExitToApp style={{ color: 'white' }}/>
                         </IconButton>
-                    </Grid>
+                    </section>
                 </Toolbar>
             </AppBar>
             <div className={classes.main}>
