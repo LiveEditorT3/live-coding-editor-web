@@ -3,7 +3,11 @@ import { makeStyles } from "@mui/styles";
 export default makeStyles(theme => ({
     root: {
         display: 'flex',
-        width: '100%'
+        width: '100%',
+        height: '100vh',
+    },
+    appBar: {
+        backgroundColor: '#083168',
     },
     main: {
         flexGrow: 1

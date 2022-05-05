@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@codemirror/autocomplete": "^0.20.0",
     "@codemirror/lang-python": "^0.20.0",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",

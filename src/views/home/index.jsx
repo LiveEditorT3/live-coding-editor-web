@@ -5,12 +5,13 @@ import useUser from "../../hooks/user/useUser";
 import useStyles from './styles'
 import Dialog from "../../components/dialog";
 import { Button, Checkbox, Grid, Paper, TextField, Typography } from "@mui/material";
-import { Save } from "@mui/icons-material";
+import { Lock, LockOpen, Save } from "@mui/icons-material";
 import CodeMirror from '@uiw/react-codemirror'
 import { python } from '@codemirror/lang-python'
+import { autocompletion } from '@codemirror/autocomplete'
 
 const Home = () => {
-    const { user } = useUser()
+    const user = useUser()
     const classes = useStyles()
     const [sent, setSent] = useState(false)
     const { repos, createRepo, commitFile } = useRepos(sent);
@@ -74,22 +75,20 @@ const Home = () => {
             <Grid container direction='column' spacing={1}>
                 <Grid item xs={12} >
                     <Paper className={classes.paper}>
-                        <Grid container spacing={1} direction='column'>
-                            <Grid item xs={12}>
-                                <Typography variant="subtitle1"><strong>{user?.login}</strong></Typography>
-                            </Grid>
-                            <Grid item xs={12}>
+                        <Grid container spacing={1} alignItems='center'>
+                            <Grid item xs={3}>
                                 <Dropdown
+                                    size='small'
                                     fullWidth
                                     options={repos}
                                     value={repo || ''}
                                     getOptionLabel={(option) => 
                                         <Grid container spacing={1} alignItems='center'>
                                             <Grid item>
-                                                <Typography variant="body1"><strong>{option?.name}</strong></Typography>
+                                                { option.private ? <Lock/> : <LockOpen/>}
                                             </Grid>
                                             <Grid item>
-                                                <Typography variant="caption"><i>{option?.visibility}</i></Typography>
+                                                <Typography variant="body1"><strong>{option?.name}</strong></Typography>
                                             </Grid>
                                         </Grid>
                                     }
@@ -98,30 +97,31 @@ const Home = () => {
                                     onAdd={() => setOpen(true)}
                                 />
                             </Grid>
+                            <Grid item xs={9}>
+                                <TextField variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    value={commit.path}
+                                    onChange={(event) => setCommit({ ...commit, path: event.target.value} )}
+                                    style={{
+                                        fontWeight: 'bold',
+                                    }}
+                                />
+                            </Grid>
                         </Grid>
                     </Paper>
                 </Grid>
-                <Grid item xs={12}>
-                    <TextField variant="outlined"
-                        fullWidth
-                        value={commit.path}
-                        onChange={(event) => setCommit({ ...commit, path: event.target.value} )}
-                        style={{
-                            fontWeight: 'bold',
-                        }}
-                    />
-                </Grid>
-                <Grid item container xs={12} justifyContent='flex-end'>
+                <Grid item container xs={12} spacing={1} justifyContent='flex-end'>
                     <Grid item xs={12}>
                         <CodeMirror
                             height="70vh"
-                            extensions={[python()]}
+                            extensions={[python(), autocompletion()]}
                             onChange={(value, viewUpdate) => setCommit({ ...commit, content: value} )}
                             theme='dark'
                         />
                     </Grid>
                     <Grid item>
-                        <Button color="secondary" endIcon={<Save/>} onClick={() => console.log(commit)}>Save</Button>
+                        <Button endIcon={<Save/>} onClick={() => console.log(user)}>Save</Button>
                     </Grid>
                 </Grid>
             </Grid>

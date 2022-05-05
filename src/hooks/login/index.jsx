@@ -31,7 +31,7 @@ export const saveTokenInStorage = (token, key = TOKEN_KEY) =>
 
 export const LoginProvider = ({ children }) => {
     const [loggedIn, setLoggedIn] = useState(!!getTokenInStorage())
-    const { login } = useSelector(store => store.user.login)
+    const { login } = useSelector(store => store.user.user.login)
     const classes = useStyles()
     const dispatch = useDispatch()
 

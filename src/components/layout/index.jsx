@@ -1,6 +1,5 @@
-import { ExitToApp } from "@mui/icons-material"
-import { AppBar, Container, IconButton, Toolbar, Typography } from "@mui/material"
-import { signOut } from "../../hooks/login"
+import { AppBar, Container, Toolbar, Typography } from "@mui/material"
+import UserMenu from './userMenu'
 import useStyles from './styles'
 
 const Layout = ({ children }) => {
@@ -8,13 +7,11 @@ const Layout = ({ children }) => {
 
     return(
         <div className={classes.root}>
-            <AppBar color="primary" position="fixed">
+            <AppBar className={classes.appBar} position="fixed">
                 <Toolbar>
                     <Typography variant="h6" noWrap>Live Coding Editor</Typography>
                     <section className={classes.rightToolbar}>
-                        <IconButton onClick={() => signOut()}> 
-                            <ExitToApp style={{ color: 'white' }}/>
-                        </IconButton>
+                        <UserMenu/>
                     </section>
                 </Toolbar>
             </AppBar>
