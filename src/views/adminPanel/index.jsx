@@ -6,25 +6,18 @@ import useStyles from './styles'
 import Dialog from "../../components/dialog";
 import { Button, Checkbox, Grid, Paper, TextField, Typography } from "@mui/material";
 import { Lock, LockOpen, Save } from "@mui/icons-material";
-import CodeMirror from '@uiw/react-codemirror'
-import { python } from '@codemirror/lang-python'
-import { autocompletion } from '@codemirror/autocomplete'
+import { useRepo } from "../../contexts/repoContext";
 
-const Home = () => {
+const AdminPanel = () => {
     const user = useUser()
+    const { name, isPrivate, commit, setRepoName, setRepoPrivate, setFileName, setCommitMessage } = useRepo()
     const classes = useStyles()
     const [sent, setSent] = useState(false)
     const { repos, createRepo, commitFile } = useRepos(sent);
     const [repo, setRepo] = useState()
-    const [name, setName] = useState('')
-    const [isPrivate, setPrivate] = useState(true)
     const [open, setOpen] = useState(false)
     const [messageOpen, setMessageOpen] = useState(false)
-    const [commit, setCommit] = useState({
-        content: '',
-        path: 'untitled.py',
-        message: '',
-    })
+    
 
     useEffect(() => {
         if (!repo && !!repos && !!repos.length)
@@ -56,11 +49,11 @@ const Home = () => {
                         <TextField
                             fullWidth
                             value={name}
-                            onChange={(event) => setName(event.target.value)}
+                            onChange={(event) => setRepoName(event.target.value)}
                         />
                     </Grid>
                     <Grid item xs={3}>
-                        <Checkbox checked={isPrivate} onChange={(event) => setPrivate(event.target.checked)}/>
+                        <Checkbox checked={isPrivate} onChange={(event) => setRepoPrivate(event.target.checked)}/>
                         <Typography variant="caption">Private</Typography>
                     </Grid>
                 </Grid>
@@ -69,7 +62,7 @@ const Home = () => {
                 <TextField
                     fullWidth
                     value={commit.message}
-                    onChange={(event) => setCommit({ ...commit, message: event.target.value })}
+                    onChange={(event) => setCommitMessage(event.target.value)}
                 />
             </Dialog>
             <Grid container direction='column' spacing={1}>
@@ -97,36 +90,33 @@ const Home = () => {
                                     onAdd={() => setOpen(true)}
                                 />
                             </Grid>
-                            <Grid item xs={9}>
+                            <Grid item xs={8}>
                                 <TextField variant="outlined"
                                     size="small"
                                     fullWidth
                                     value={commit.path}
-                                    onChange={(event) => setCommit({ ...commit, path: event.target.value} )}
+                                    onChange={(event) => setFileName(event.target.value)}
                                     style={{
                                         fontWeight: 'bold',
                                     }}
                                 />
                             </Grid>
+                            <Grid item xs={1}>
+                                <Button 
+                                    variant="outlined" 
+                                    fullWidth 
+                                    endIcon={<Save/>} 
+                                    onClick={() => console.log(name, isPrivate, commit)}
+                                >
+                                    Save
+                                </Button>
+                            </Grid>
                         </Grid>
                     </Paper>
-                </Grid>
-                <Grid item container xs={12} spacing={1} justifyContent='flex-end'>
-                    <Grid item xs={12}>
-                        <CodeMirror
-                            height="70vh"
-                            extensions={[python(), autocompletion()]}
-                            onChange={(value, viewUpdate) => setCommit({ ...commit, content: value} )}
-                            theme='dark'
-                        />
-                    </Grid>
-                    <Grid item>
-                        <Button endIcon={<Save/>} onClick={() => console.log(user)}>Save</Button>
-                    </Grid>
                 </Grid>
             </Grid>
         </>
     )
 }
 
-export default Home
+export default AdminPanel

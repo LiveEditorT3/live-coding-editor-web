@@ -8,6 +8,7 @@ import { LoginProvider } from "./hooks/login";
 import Router from "./router/routes";
 import { getTheme } from "./theme";
 import { CssBaseline, StyledEngineProvider, ThemeProvider } from '@mui/material';
+import RepoProvider from './contexts/repoContext';
 
 const App = () => {
 
@@ -17,7 +18,9 @@ const App = () => {
       <StyledEngineProvider injectFirst>
         <LoginProvider>
           <Layout>
-            <Router/>
+            <RepoProvider>
+              <Router/>
+            </RepoProvider>
           </Layout>
         </LoginProvider>
       </StyledEngineProvider>

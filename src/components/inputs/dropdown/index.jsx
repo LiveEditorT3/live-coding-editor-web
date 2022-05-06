@@ -29,7 +29,7 @@ const Dropdown = ({ options, getOptionLabel, getOptionValue, onAdd, ...rest }) =
                             <Add/>
                         </Avatar>
                     </ListItemAvatar>
-                    <ListItemText><strong>Add</strong></ListItemText>
+                    <ListItemText><strong>Create Repo</strong></ListItemText>
                 </ListItem>
             }
         </TextField>

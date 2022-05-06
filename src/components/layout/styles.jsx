@@ -3,7 +3,6 @@ import { makeStyles } from "@mui/styles";
 export default makeStyles(theme => ({
     root: {
         display: 'flex',
-        width: '100%',
         height: '100vh',
     },
     appBar: {
@@ -15,7 +14,7 @@ export default makeStyles(theme => ({
     container: {
         padding: theme.spacing(2),
         overflow: 'auto',
-        height: 'calc(100vh - 72px)'
+        height: 'calc(100vh - 72px)',
     },
     toolbar: {
         ...theme.mixins.toolbar,

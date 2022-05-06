@@ -17,7 +17,7 @@ const Layout = ({ children }) => {
             </AppBar>
             <div className={classes.main}>
                 <div className={classes.toolbar} />
-                <Container maxWidth='xl' className={classes.container}>
+                <Container maxWidth='false' className={classes.container}>
                     {children}
                 </Container>
             </div>
