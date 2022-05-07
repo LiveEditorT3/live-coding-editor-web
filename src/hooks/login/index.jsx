@@ -1,12 +1,9 @@
-import { GitHub } from "@mui/icons-material"
-import { Button } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import Configuration from "../../config"
+import { v4 } from "uuid"
 import userService from "../../services/userService"
 import { setUser } from "../../stores/user.state"
 import { clearUser, getUserFromStorage, saveUserInStorage } from "../user/useUser"
-import useStyles from "./styles"
 
 export const TOKEN_KEY = 'x-token'
 
@@ -23,6 +20,10 @@ const getCode = () => {
     const params = new URLSearchParams(window.location.search)
     return params.get('code')
 }
+
+export const loggedIn = () =>
+    !!getTokenInStorage()
+
 export const getTokenInStorage = () =>
     localStorage && localStorage.getItem(TOKEN_KEY)
 
@@ -32,7 +33,6 @@ export const saveTokenInStorage = (token, key = TOKEN_KEY) =>
 export const LoginProvider = ({ children }) => {
     const [loggedIn, setLoggedIn] = useState(!!getTokenInStorage())
     const { login } = useSelector(store => store.user.user.login)
-    const classes = useStyles()
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -43,7 +43,7 @@ export const LoginProvider = ({ children }) => {
                     .then(res => {
                         setLoggedIn(!!res.access_token)
                         saveTokenInStorage(res.access_token)
-                        window.location.replace(window.location.origin)
+                        window.location.replace(`${window.location.origin}/${v4()}`)
                     })
             }
         }
@@ -72,15 +72,7 @@ export const LoginProvider = ({ children }) => {
 
     return(
         <>
-            { 
-                loggedIn ? 
-                children : 
-                <div className={classes.root}>
-                    <a href={`https://github.com/login/oauth/authorize?client_id=${Configuration.GH_CLIENT_ID}&redirect_uri=${Configuration.GH_REDIRECT_URL}?path=${Configuration.PATH}&scope=user:email%20repo`}>
-                        <Button variant='contained' endIcon={<GitHub/>}>LOG IN WITH GITHUB</Button> 
-                    </a>
-                </div>
-            }
+            { children }
         </>
     )
 }

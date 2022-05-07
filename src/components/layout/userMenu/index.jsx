@@ -19,7 +19,7 @@ const UserMenu = () => {
                 ref={anchorEl}
                 onClick={handleOpen}
             >
-                <Avatar src={avatar_url} alt={""}/>  
+                <Avatar variant='square' src={avatar_url} alt={""}/>  
             </IconButton>
             <Menu
                 anchorEl={anchorEl}
@@ -37,7 +37,7 @@ const UserMenu = () => {
             >
                 <ListItem divider>
                     <ListItemAvatar>
-                        <Avatar src={avatar_url} alt={""}/>  
+                        <Avatar variant='square' src={avatar_url} alt={""}/>  
                     </ListItemAvatar>
                     <ListItemText primary={name} secondary={login} />
                 </ListItem>
@@ -46,7 +46,7 @@ const UserMenu = () => {
                         <ExitToApp/>
                     </ListItemIcon>
                     <ListItemText>
-                        Log Out
+                        Exit
                     </ListItemText>
                 </MenuItem>
             </Menu>
