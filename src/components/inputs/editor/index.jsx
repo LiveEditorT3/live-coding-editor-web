@@ -38,6 +38,7 @@ const Editor = (props) => {
         // Next update the React state with the values from the textarea
         storeSelectionInReact();
         setText(newText);
+        setContent(newText);
         
         console.log(textareaElement, newText, newCaretPosition, oldText, oldSelectionStart, oldSelectionEnd)
         // Finally update the SharedString with the values after deducing what type of change it was.
@@ -85,13 +86,14 @@ const Editor = (props) => {
         const handleTextChanged = (event) => {
             const newText = sharedStringHelper.getText();
             setText(newText);
+            setContent(newText);
         };
 
         sharedStringHelper.on("textChanged", handleTextChanged);
         return () => {
         sharedStringHelper.off("textChanged", handleTextChanged);
         };
-    }, [sharedStringHelper]);
+    }, [sharedStringHelper, setContent]);
 
     return (
         //<CodeMirror

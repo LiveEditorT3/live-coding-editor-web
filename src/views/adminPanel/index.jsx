@@ -106,7 +106,7 @@ const AdminPanel = () => {
                                     variant="outlined" 
                                     fullWidth 
                                     endIcon={<Save/>} 
-                                    onClick={() => console.log(name, isPrivate, commit)}
+                                    onClick={() => setMessageOpen(true)}
                                 >
                                     Save
                                 </Button>
