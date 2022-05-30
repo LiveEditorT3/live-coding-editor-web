@@ -15,16 +15,24 @@ import {
 import { Lock, LockOpen, Save } from "@mui/icons-material";
 import { useRepo } from "../../contexts/repoContext";
 
+const modes = [
+  { label: 'Go', value: 'go' },
+  { label: 'Javascript', value: 'javascript' },
+  { label: 'Python', value: 'python' },
+]
+
 const AdminPanel = () => {
   const user = useUser();
   const {
     name,
     isPrivate,
     commit,
+    mode,
     setRepoName,
     setRepoPrivate,
     setFileName,
     setCommitMessage,
+    setEditorMode
   } = useRepo();
   const classes = useStyles();
   const [sent, setSent] = useState(false);
@@ -117,7 +125,7 @@ const AdminPanel = () => {
                   onAdd={() => setOpen(true)}
                 />
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={6}>
                 <TextField
                   variant="outlined"
                   size="small"
@@ -127,6 +135,17 @@ const AdminPanel = () => {
                   style={{
                     fontWeight: "bold",
                   }}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <Dropdown
+                  size="small"
+                  fullWidth
+                  options={modes}
+                  value={mode || ""}
+                  getOptionLabel={(option) => option?.label}
+                  getOptionValue={(option) => option?.value}
+                  onChange={(event) => setEditorMode(event.target.value)}
                 />
               </Grid>
               <Grid item xs={1}>

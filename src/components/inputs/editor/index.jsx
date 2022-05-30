@@ -1,97 +1,69 @@
-import CodeMirror from "@uiw/react-codemirror";
-import { python } from "@codemirror/lang-python";
-import { autocompletion } from "@codemirror/autocomplete";
 import { useRepo } from "../../../contexts/repoContext";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import CodeMirror from "codemirror";
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/python/python'
+import 'codemirror/theme/material-ocean.css'
+import 'codemirror/mode/javascript/javascript'
+import 'codemirror/mode/clike/clike'
+import 'codemirror/mode/go/go'
+import 'codemirror/keymap/sublime'
 
 const Editor = (props) => {
   const sharedStringHelper = props.sharedStringHelper;
-  const { setContent } = useRepo();
-  const textareaRef = useRef(null);
-  const selectionStartRef = useRef(0);
-  const selectionEndRef = useRef(0);
+  const { mode, setContent } = useRepo();
+  const editorRef = useRef(null);
 
-  const [text, setText] = useState(sharedStringHelper.getText());
+  const isEmpty = (list) =>
+    !list || !list.length || (list.length === 1 && list.every(v => !v))
 
-  /**
-   * There's been a local change to the textarea content (e.g. user did some typing)
-   * This means the most-recent state (text and selection) is in the textarea, and we need to
-   * 1. Store the text and selection state in React
-   * 2. Store the text state in the SharedString
-   */
-  const handleChange = (value) => {
-    // First get and stash the new textarea state
-    if (!textareaRef.current) {
-      throw new Error("Handling change without current textarea ref?");
-    }
-    const textareaElement = textareaRef.current;
-    const newText = textareaElement.value;
-    // After a change to the textarea content we assume the selection is gone (just a caret)
-    // This is a bad assumption (e.g. performing undo will select the re-added content).
-    const newCaretPosition = textareaElement.selectionStart;
+  const getStringText = (lines) => 
+    lines.join('\n')
 
-    // Next get and stash the old React state
-    const oldText = text;
-    const oldSelectionStart = selectionStartRef.current;
-    const oldSelectionEnd = selectionEndRef.current;
+  const getToPosition = (changeObj) =>{
+    const to = editorRef.current.indexFromPos(changeObj.to)
+    return to < editorRef.current.getValue().length ? to : to + getStringText(changeObj.removed).length
+  }
 
-    // Next update the React state with the values from the textarea
-    storeSelectionInReact();
-    setText(newText);
+  useEffect(() => {
+    if (!!editorRef.current)
+      return
+    const editorComponent = CodeMirror.fromTextArea(document.getElementById('code'), {
+      lineNumbers: true,
+      keyMap: 'sublime',
+      theme: 'material-ocean',
+      mode: 'python',
+    })
+    editorComponent.on('change', handleChange)
+    editorRef.current = editorComponent
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    editorRef.current.setOption('mode', mode)
+  }, [mode])
+
+  const handleChange = (instance, changeObj) => {
+    console.log(changeObj)
+    if (changeObj.origin === 'setValue')
+      return
+
+    const newText = instance.getValue()
     setContent(newText);
 
-    console.log(
-      textareaElement,
-      newText,
-      newCaretPosition,
-      oldText,
-      oldSelectionStart,
-      oldSelectionEnd
-    );
-    // Finally update the SharedString with the values after deducing what type of change it was.
-    // If the caret moves to the right of the prior left bound of the selection, we assume an insert occurred
-    // This is also a bad assumption, in the undo case.
-    const isTextInserted = newCaretPosition - oldSelectionStart > 0;
-    if (isTextInserted) {
-      const insertedText = newText.substring(
-        oldSelectionStart,
-        newCaretPosition
-      );
-      const isTextReplaced = oldSelectionEnd - oldSelectionStart > 0;
-      if (!isTextReplaced) {
-        sharedStringHelper.insertText(insertedText, oldSelectionStart);
-      } else {
-        sharedStringHelper.replaceText(
-          insertedText,
-          oldSelectionStart,
-          oldSelectionEnd
-        );
-      }
-    } else {
-      // Text was removed
-      const charactersDeleted = oldText.length - newText.length;
-      sharedStringHelper.removeText(
-        newCaretPosition,
-        newCaretPosition + charactersDeleted
-      );
-    }
-  };
-  /**
-   * Take the current selection from the DOM textarea and store it in our React ref.
-   */
-  const storeSelectionInReact = () => {
-    console.log("storeSelectionInReact");
-    if (!textareaRef.current) {
-      throw new Error(
-        "Trying to remember selection without current textarea ref?"
-      );
-    }
-    const textareaElement = textareaRef.current;
+    const from = instance.indexFromPos(changeObj.from)
+    const to = getToPosition(changeObj)
 
-    const textareaSelectionStart = textareaElement.selectionStart;
-    const textareaSelectionEnd = textareaElement.selectionEnd;
-    selectionStartRef.current = textareaSelectionStart;
-    selectionEndRef.current = textareaSelectionEnd;
+    console.log(`FROM: ${from} TO: ${to}`)
+    if (!isEmpty(changeObj.text)) {
+      if (isEmpty(changeObj.removed))
+        sharedStringHelper.insertText(getStringText(changeObj.text), from);
+      else
+        sharedStringHelper.replaceText(getStringText(changeObj.text), from, to);
+    } 
+    else if (!isEmpty(changeObj.removed)) {
+      sharedStringHelper.removeText(from, to);
+    }
   };
 
   useEffect(() => {
@@ -102,9 +74,13 @@ const Editor = (props) => {
      * 2. If the change came from a remote source, it may have moved our selection.  Compute it, update
      *    the textarea, and store it in React
      */
+
     const handleTextChanged = (event) => {
       const newText = sharedStringHelper.getText();
-      setText(newText);
+      const cursorPosition = editorRef.current.getCursor()
+      editorRef.current.setValue(newText)
+      editorRef.current.setCursor(cursorPosition)
+
       setContent(newText);
     };
 
@@ -115,21 +91,9 @@ const Editor = (props) => {
   }, [sharedStringHelper, setContent]);
 
   return (
-    //<CodeMirror
-    <textarea
-      rows={20}
-      cols={50}
-      height="70vh"
-      extensions={[python(), autocompletion()]}
-      onChange={handleChange}
-      theme="dark"
-      value={text}
-      ref={textareaRef}
-      onBeforeInput={storeSelectionInReact}
-      onKeyDown={storeSelectionInReact}
-      onClick={storeSelectionInReact}
-      onContextMenu={storeSelectionInReact}
-    />
+    <div>
+      <textarea id="code"/>
+    </div>
   );
 };
 

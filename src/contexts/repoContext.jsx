@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from "react";
 const RepoContext = createContext({});
 
 export const useRepo = () => {
-  const { name, isPrivate, commit, setName, setPrivate, setCommit } =
+  const { name, isPrivate, commit, mode, setName, setPrivate, setCommit, setMode } =
     useContext(RepoContext);
 
   const setRepoName = (name) => setName(name);
@@ -16,15 +16,19 @@ export const useRepo = () => {
 
   const setFileName = (path) => setCommit({ ...commit, path });
 
+  const setEditorMode = (mode) => setMode(mode)
+
   return {
     name,
     isPrivate,
     commit,
+    mode,
     setRepoName,
     setRepoPrivate,
     setContent,
     setCommitMessage,
     setFileName,
+    setEditorMode
   };
 };
 
@@ -36,10 +40,11 @@ const RepoProvider = ({ children }) => {
     path: "untitled.py",
     message: "",
   });
+  const [mode, setMode] = useState('python')
 
   return (
     <RepoContext.Provider
-      value={{ name, isPrivate, commit, setName, setPrivate, setCommit }}
+      value={{ name, isPrivate, commit, mode, setName, setPrivate, setCommit, setMode }}
     >
       {children}
     </RepoContext.Provider>
