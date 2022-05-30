@@ -1,13 +1,13 @@
 import { useRepo } from "../../../contexts/repoContext";
 import { useEffect, useRef } from "react";
 import CodeMirror from "codemirror";
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/python/python'
-import 'codemirror/theme/material-ocean.css'
-import 'codemirror/mode/javascript/javascript'
-import 'codemirror/mode/clike/clike'
-import 'codemirror/mode/go/go'
-import 'codemirror/keymap/sublime'
+import "codemirror/lib/codemirror.css";
+import "codemirror/mode/python/python";
+import "codemirror/theme/material-ocean.css";
+import "codemirror/mode/javascript/javascript";
+import "codemirror/mode/clike/clike";
+import "codemirror/mode/go/go";
+import "codemirror/keymap/sublime";
 
 const Editor = (props) => {
   const sharedStringHelper = props.sharedStringHelper;
@@ -15,53 +15,55 @@ const Editor = (props) => {
   const editorRef = useRef(null);
 
   const isEmpty = (list) =>
-    !list || !list.length || (list.length === 1 && list.every(v => !v))
+    !list || !list.length || (list.length === 1 && list.every((v) => !v));
 
-  const getStringText = (lines) => 
-    lines.join('\n')
+  const getStringText = (lines) => lines.join("\n");
 
-  const getToPosition = (changeObj) =>{
-    const to = editorRef.current.indexFromPos(changeObj.to)
-    return to < editorRef.current.getValue().length ? to : to + getStringText(changeObj.removed).length
-  }
-
-  useEffect(() => {
-    if (!!editorRef.current)
-      return
-    const editorComponent = CodeMirror.fromTextArea(document.getElementById('code'), {
-      lineNumbers: true,
-      keyMap: 'sublime',
-      theme: 'material-ocean',
-      mode: 'python',
-    })
-    editorComponent.on('change', handleChange)
-    editorRef.current = editorComponent
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const getToPosition = (changeObj) => {
+    const to = editorRef.current.indexFromPos(changeObj.to);
+    return to < editorRef.current.getValue().length
+      ? to
+      : to + getStringText(changeObj.removed).length;
+  };
 
   useEffect(() => {
-    editorRef.current.setOption('mode', mode)
-  }, [mode])
+    if (!!editorRef.current) return;
+    const editorComponent = CodeMirror.fromTextArea(
+      document.getElementById("code"),
+      {
+        lineNumbers: true,
+        keyMap: "sublime",
+        theme: "material-ocean",
+        mode: "python",
+      }
+    );
+    editorComponent.on("change", handleChange);
+    editorComponent.setValue(sharedStringHelper.getText());
+    editorRef.current = editorComponent;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    editorRef.current.setOption("mode", mode);
+  }, [mode]);
 
   const handleChange = (instance, changeObj) => {
-    console.log(changeObj)
-    if (changeObj.origin === 'setValue')
-      return
+    console.log(changeObj);
+    if (changeObj.origin === "setValue") return;
 
-    const newText = instance.getValue()
+    const newText = instance.getValue();
     setContent(newText);
 
-    const from = instance.indexFromPos(changeObj.from)
-    const to = getToPosition(changeObj)
+    const from = instance.indexFromPos(changeObj.from);
+    const to = getToPosition(changeObj);
 
-    console.log(`FROM: ${from} TO: ${to}`)
+    console.log(`FROM: ${from} TO: ${to}`);
     if (!isEmpty(changeObj.text)) {
       if (isEmpty(changeObj.removed))
         sharedStringHelper.insertText(getStringText(changeObj.text), from);
       else
         sharedStringHelper.replaceText(getStringText(changeObj.text), from, to);
-    } 
-    else if (!isEmpty(changeObj.removed)) {
+    } else if (!isEmpty(changeObj.removed)) {
       sharedStringHelper.removeText(from, to);
     }
   };
@@ -77,9 +79,9 @@ const Editor = (props) => {
 
     const handleTextChanged = (event) => {
       const newText = sharedStringHelper.getText();
-      const cursorPosition = editorRef.current.getCursor()
-      editorRef.current.setValue(newText)
-      editorRef.current.setCursor(cursorPosition)
+      const cursorPosition = editorRef.current.getCursor();
+      editorRef.current.setValue(newText);
+      editorRef.current.setCursor(cursorPosition);
 
       setContent(newText);
     };
@@ -92,7 +94,7 @@ const Editor = (props) => {
 
   return (
     <div>
-      <textarea id="code"/>
+      <textarea id="code" />
     </div>
   );
 };
