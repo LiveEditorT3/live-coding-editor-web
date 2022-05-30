@@ -16,10 +16,10 @@ import { Lock, LockOpen, Save } from "@mui/icons-material";
 import { useRepo } from "../../contexts/repoContext";
 
 const modes = [
-  { label: 'Go', value: 'go' },
-  { label: 'Javascript', value: 'javascript' },
-  { label: 'Python', value: 'python' },
-]
+  { label: "Go", value: "go" },
+  { label: "Javascript", value: "javascript" },
+  { label: "Python", value: "python" },
+];
 
 const AdminPanel = () => {
   const user = useUser();
@@ -32,7 +32,7 @@ const AdminPanel = () => {
     setRepoPrivate,
     setFileName,
     setCommitMessage,
-    setEditorMode
+    setEditorMode,
   } = useRepo();
   const classes = useStyles();
   const [sent, setSent] = useState(false);
