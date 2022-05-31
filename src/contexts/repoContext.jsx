@@ -6,11 +6,15 @@ export const useRepo = () => {
   const {
     name,
     isPrivate,
-    commit,
+    fileContent,
+    path,
+    message,
     mode,
     setName,
     setPrivate,
-    setCommit,
+    setFileContent,
+    setPath,
+    setMessage,
     setMode,
   } = useContext(RepoContext);
 
@@ -18,24 +22,29 @@ export const useRepo = () => {
 
   const setRepoPrivate = (value) => setPrivate(value);
 
-  const setContent = (content) => setCommit({ ...commit, content });
+  const setContent = (content) => setFileContent(content);
 
-  const setCommitMessage = (message) => setCommit({ ...commit, message });
+  const setCommitMessage = (message) => setMessage(message);
 
-  const setFileName = (path) => setCommit({ ...commit, path });
+  const setFileName = (name) => setPath({ ...path, name });
+
+  const setFileExtension = (extension) => setPath({ ...path, extension });
 
   const setEditorMode = (mode) => setMode(mode);
 
   return {
     name,
     isPrivate,
-    commit,
+    fileContent,
+    path,
+    message,
     mode,
     setRepoName,
     setRepoPrivate,
     setContent,
     setCommitMessage,
     setFileName,
+    setFileExtension,
     setEditorMode,
   };
 };
@@ -43,11 +52,13 @@ export const useRepo = () => {
 const RepoProvider = ({ children }) => {
   const [name, setName] = useState("");
   const [isPrivate, setPrivate] = useState(true);
-  const [commit, setCommit] = useState({
-    content: "",
-    path: "untitled.py",
-    message: "",
+  const [fileContent, setFileContent] = useState("");
+  const [path, setPath] = useState({
+    name: "untitled",
+    extension: ".py"
   });
+  const [message, setMessage] = useState("");
+
   const [mode, setMode] = useState("python");
 
   return (
@@ -55,11 +66,15 @@ const RepoProvider = ({ children }) => {
       value={{
         name,
         isPrivate,
-        commit,
+        fileContent,
+        path,
+        message,
         mode,
         setName,
         setPrivate,
-        setCommit,
+        setFileContent,
+        setPath,
+        setMessage,
         setMode,
       }}
     >

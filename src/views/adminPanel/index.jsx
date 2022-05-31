@@ -14,23 +14,21 @@ import {
 } from "@mui/material";
 import { Lock, LockOpen, Save } from "@mui/icons-material";
 import { useRepo } from "../../contexts/repoContext";
-
-const modes = [
-  { label: "Go", value: "go" },
-  { label: "Javascript", value: "javascript" },
-  { label: "Python", value: "python" },
-];
+import { modes, modesForSelect } from "../../models/languageModes";
 
 const AdminPanel = () => {
   const user = useUser();
   const {
     name,
     isPrivate,
-    commit,
+    fileContent,
+    path,
+    message,
     mode,
     setRepoName,
     setRepoPrivate,
     setFileName,
+    setFileExtension,
     setCommitMessage,
     setEditorMode,
   } = useRepo();
@@ -53,7 +51,7 @@ const AdminPanel = () => {
   };
 
   const handleCommit = (event) => {
-    commitFile(user.login, repo, commit).then(() => setMessageOpen(false));
+    commitFile(user.login, repo, { content: fileContent, path: path.name + path.extension, message }).then(() => setMessageOpen(false));
   };
 
   const handleChangeRepo = (event) => {
@@ -61,6 +59,11 @@ const AdminPanel = () => {
     if (!!selected) setRepo(selected);
   };
 
+  const handleChangeFileExtension = (event) => {
+    const mode = event.target.value
+    setEditorMode(mode)
+    setFileExtension(modes[mode])
+  }
   return (
     <>
       <Dialog
@@ -94,7 +97,7 @@ const AdminPanel = () => {
       >
         <TextField
           fullWidth
-          value={commit.message}
+          value={message}
           onChange={(event) => setCommitMessage(event.target.value)}
         />
       </Dialog>
@@ -130,7 +133,7 @@ const AdminPanel = () => {
                   variant="outlined"
                   size="small"
                   fullWidth
-                  value={commit.path}
+                  value={path.name}
                   onChange={(event) => setFileName(event.target.value)}
                   style={{
                     fontWeight: "bold",
@@ -141,11 +144,11 @@ const AdminPanel = () => {
                 <Dropdown
                   size="small"
                   fullWidth
-                  options={modes}
+                  options={modesForSelect}
                   value={mode || ""}
                   getOptionLabel={(option) => option?.label}
                   getOptionValue={(option) => option?.value}
-                  onChange={(event) => setEditorMode(event.target.value)}
+                  onChange={handleChangeFileExtension}
                 />
               </Grid>
               <Grid item xs={1}>

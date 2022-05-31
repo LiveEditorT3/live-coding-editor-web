@@ -21,6 +21,7 @@ const Editor = (props) => {
 
   const getToPosition = (changeObj) => {
     const to = editorRef.current.indexFromPos(changeObj.to);
+    console.log(to)
     return to < editorRef.current.getValue().length
       ? to
       : to + getStringText(changeObj.removed).length;
@@ -57,7 +58,6 @@ const Editor = (props) => {
     const from = instance.indexFromPos(changeObj.from);
     const to = getToPosition(changeObj);
 
-    console.log(`FROM: ${from} TO: ${to}`);
     if (!isEmpty(changeObj.text)) {
       if (isEmpty(changeObj.removed))
         sharedStringHelper.insertText(getStringText(changeObj.text), from);
