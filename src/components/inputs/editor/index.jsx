@@ -14,17 +14,32 @@ const Editor = (props) => {
   const { mode, setContent } = useRepo();
   const editorRef = useRef(null);
 
-  const isEmpty = (list) =>
-    !list || !list.length || (list.length === 1 && list.every((v) => !v));
-
   const getStringText = (lines) => lines.join("\n");
 
-  const getToPosition = (changeObj) => {
-    const to = editorRef.current.indexFromPos(changeObj.to);
-    console.log(to)
-    return to < editorRef.current.getValue().length
-      ? to
-      : to + getStringText(changeObj.removed).length;
+  const updateSharedString = (instance, changeObj) => {
+    const from = instance.indexFromPos(changeObj.from);
+    const to = instance.indexFromPos(changeObj.to);
+
+    switch (changeObj.origin) {
+      case "+input":
+      case "undo":
+      case "paste":
+        sharedStringHelper.insertText(getStringText(changeObj.text), from);
+        break;
+      case "+delete":
+      case "cut":
+        // Move the to pointer to the original position before deletion.
+        sharedStringHelper.removeText(
+          from,
+          to + getStringText(changeObj.removed).length
+        );
+        break;
+      case "replace":
+        sharedStringHelper.replaceText(getStringText(changeObj.text), from, to);
+        break;
+      default:
+        throw Error(`Unexpected origin of change event: ${changeObj.origin}`);
+    }
   };
 
   useEffect(() => {
@@ -49,23 +64,12 @@ const Editor = (props) => {
   }, [mode]);
 
   const handleChange = (instance, changeObj) => {
-    console.log(changeObj);
     if (changeObj.origin === "setValue") return;
 
     const newText = instance.getValue();
     setContent(newText);
 
-    const from = instance.indexFromPos(changeObj.from);
-    const to = getToPosition(changeObj);
-
-    if (!isEmpty(changeObj.text)) {
-      if (isEmpty(changeObj.removed))
-        sharedStringHelper.insertText(getStringText(changeObj.text), from);
-      else
-        sharedStringHelper.replaceText(getStringText(changeObj.text), from, to);
-    } else if (!isEmpty(changeObj.removed)) {
-      sharedStringHelper.removeText(from, to);
-    }
+    updateSharedString(instance, changeObj);
   };
 
   useEffect(() => {
