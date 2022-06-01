@@ -15,6 +15,12 @@ const Editor = (props) => {
   const editorRef = useRef(null);
 
   const getStringText = (lines) => lines.join("\n");
+  const isEmpty = (list) =>
+    !list || !list.length || (list.length === 1 && list.every((v) => !v));
+
+  const isEqualArrays = (array1, array2) =>
+    array1.length === array2.length &&
+    array1.every((value, index) => value === array2[index]);
 
   const updateSharedString = (instance, changeObj) => {
     const from = instance.indexFromPos(changeObj.from);
@@ -22,9 +28,16 @@ const Editor = (props) => {
 
     switch (changeObj.origin) {
       case "+input":
-      case "undo":
       case "paste":
-        sharedStringHelper.insertText(getStringText(changeObj.text), from);
+        if (isEmpty(changeObj.removed)) {
+          sharedStringHelper.insertText(getStringText(changeObj.text), from);
+        } else {
+          sharedStringHelper.replaceText(
+            getStringText(changeObj.text),
+            from,
+            to
+          );
+        }
         break;
       case "+delete":
       case "cut":
@@ -34,8 +47,20 @@ const Editor = (props) => {
           to + getStringText(changeObj.removed).length
         );
         break;
-      case "replace":
-        sharedStringHelper.replaceText(getStringText(changeObj.text), from, to);
+      case "undo":
+        // Undo generates a first event where nothing needs to be done.
+        if (isEqualArrays(changeObj.removed, changeObj.text)) break;
+        // The second event is the important one.
+        // Undo could be an insertion or a deletion.
+        if (isEmpty(changeObj.removed)) {
+          sharedStringHelper.insertText(getStringText(changeObj.text), from);
+        } else {
+          // Move the to pointer to the original position before deletion.
+          sharedStringHelper.removeText(
+            from,
+            to + getStringText(changeObj.removed).length
+          );
+        }
         break;
       default:
         throw Error(`Unexpected origin of change event: ${changeObj.origin}`);
