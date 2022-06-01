@@ -48,10 +48,11 @@ const Editor = (props) => {
         );
         break;
       case "undo":
+      case "redo":
         // Undo generates a first event where nothing needs to be done.
         if (isEqualArrays(changeObj.removed, changeObj.text)) break;
-        // The second event is the important one.
-        // Undo could be an insertion or a deletion.
+        // The second event for undo is the important one.
+        // Undo/Redo could be an insertion or a deletion.
         if (isEmpty(changeObj.removed)) {
           sharedStringHelper.insertText(getStringText(changeObj.text), from);
         } else {
