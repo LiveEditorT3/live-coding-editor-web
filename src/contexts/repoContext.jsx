@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from "react";
 
 const RepoContext = createContext({});
 
-export const useRepo = () => {
+export const useRepoContext = () => {
   const {
     name,
     isPrivate,
@@ -54,7 +54,7 @@ const RepoProvider = ({ children }) => {
   const [isPrivate, setPrivate] = useState(true);
   const [fileContent, setFileContent] = useState("");
   const [path, setPath] = useState({
-    name: "untitled",
+    name: "",
     extension: ".py"
   });
   const [message, setMessage] = useState("");

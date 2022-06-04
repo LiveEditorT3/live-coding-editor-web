@@ -8,14 +8,14 @@ import { SharedStringHelper } from "@fluid-experimental/react-inputs";
 const Session = () => {
   const sharedString = useSharedString();
   return (
-    <Grid container spacing={1} direction="column">
+    <Grid container spacing={1}>
       {loggedIn() && (
-        <Grid item xs={12}>
+        <Grid item xs={3}>
           <AdminPanel />
         </Grid>
       )}
       {sharedString && (
-        <Grid item xs={12}>
+        <Grid item xs={9}>
           <Editor sharedStringHelper={new SharedStringHelper(sharedString)} />
         </Grid>
       )}

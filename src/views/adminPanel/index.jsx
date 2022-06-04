@@ -13,10 +13,12 @@ import {
   Typography,
 } from "@mui/material";
 import { Lock, LockOpen, Save } from "@mui/icons-material";
-import { useRepo } from "../../contexts/repoContext";
+import { useRepoContext } from "../../contexts/repoContext";
 import { modes, modesForSelect } from "../../models/languageModes";
+import useRepo from "../../hooks/repos/useRepo";
 
-const AdminPanel = () => {
+const AdminPanel = (props) => {
+  const sharedStringHelper = props.sharedStringHelper;
   const user = useUser();
   const {
     name,
@@ -31,13 +33,15 @@ const AdminPanel = () => {
     setFileExtension,
     setCommitMessage,
     setEditorMode,
-  } = useRepo();
+    setContent
+  } = useRepoContext();
   const classes = useStyles();
   const [sent, setSent] = useState(false);
   const { repos, createRepo, commitFile } = useRepos(sent);
   const [repo, setRepo] = useState();
   const [open, setOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
+  const { files, getFile } = useRepo(repo, user.login)
 
   useEffect(() => {
     if (!repo && !!repos && !!repos.length) setRepo(repos[0].name);
@@ -59,10 +63,16 @@ const AdminPanel = () => {
     if (!!selected) setRepo(selected);
   };
 
-  const handleChangeFileExtension = (event) => {
-    const mode = event.target.value
-    setEditorMode(mode)
-    setFileExtension(modes[mode])
+  const handleChangeFile = (event) => {
+    const file = event.target.value
+    const parts = file.split('.')
+    getFile(file)
+      .then(res => {
+        setFileName(file)
+        setFileExtension(modes[parts[1]])
+        const text = sharedStringHelper.getText()
+        sharedStringHelper.replaceText(res.content, 0, text.length)
+      })
   }
   return (
     <>
@@ -101,70 +111,55 @@ const AdminPanel = () => {
           onChange={(event) => setCommitMessage(event.target.value)}
         />
       </Dialog>
-      <Grid container direction="column" spacing={1}>
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <Grid container spacing={1} alignItems="center">
-              <Grid item xs={3}>
-                <Dropdown
-                  size="small"
-                  fullWidth
-                  options={repos}
-                  value={repo || ""}
-                  getOptionLabel={(option) => (
-                    <Grid container spacing={1} alignItems="center">
-                      <Grid item>
-                        {option.private ? <Lock /> : <LockOpen />}
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body1">
-                          <strong>{option?.name}</strong>
-                        </Typography>
-                      </Grid>
+        <Paper className={classes.paper}>
+          <Grid container direction="column" spacing={1} columns={1}>
+            <Grid item>
+              <Dropdown
+                size="small"
+                fullWidth
+                options={repos}
+                value={repo || ""}
+                getOptionLabel={(option) => (
+                  <Grid container spacing={1} alignItems="center">
+                    <Grid item>
+                      {option.private ? <Lock /> : <LockOpen />}
                     </Grid>
-                  )}
-                  getOptionValue={(option) => option?.name}
-                  onChange={handleChangeRepo}
-                  onAdd={() => setOpen(true)}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  value={path.name}
-                  onChange={(event) => setFileName(event.target.value)}
-                  style={{
-                    fontWeight: "bold",
-                  }}
-                />
-              </Grid>
-              <Grid item xs={2}>
-                <Dropdown
-                  size="small"
-                  fullWidth
-                  options={modesForSelect}
-                  value={mode || ""}
-                  getOptionLabel={(option) => option?.label}
-                  getOptionValue={(option) => option?.value}
-                  onChange={handleChangeFileExtension}
-                />
-              </Grid>
-              <Grid item xs={1}>
-                <Button
-                  variant="outlined"
-                  fullWidth
-                  endIcon={<Save />}
-                  onClick={() => setMessageOpen(true)}
-                >
-                  Save
-                </Button>
-              </Grid>
+                    <Grid item>
+                      <Typography variant="body1">
+                        <strong>{option?.name}</strong>
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                )}
+                getOptionValue={(option) => option?.name}
+                onChange={handleChangeRepo}
+                onAdd={() => setOpen(true)}
+              />
             </Grid>
-          </Paper>
-        </Grid>
-      </Grid>
+            <Grid item>
+              <Dropdown
+                variant="outlined"
+                size="small"
+                fullWidth
+                options={files}
+                value={path.name || ""}
+                onChange={handleChangeFile}
+                getOptionLabel={(option) => option?.name}
+                getOptionValue={(option) => option?.path}
+              />
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                fullWidth
+                endIcon={<Save />}
+                onClick={() => setMessageOpen(true)}
+              >
+                Save
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
     </>
   );
 };

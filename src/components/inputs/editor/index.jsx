@@ -1,4 +1,4 @@
-import { useRepo } from "../../../contexts/repoContext";
+import { useRepoContext } from "../../../contexts/repoContext";
 import { useEffect, useRef } from "react";
 import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
@@ -11,7 +11,7 @@ import "codemirror/keymap/sublime";
 
 const Editor = (props) => {
   const sharedStringHelper = props.sharedStringHelper;
-  const { mode, setContent } = useRepo();
+  const { mode, fileContent, setContent } = useRepoContext();
   const editorRef = useRef(null);
 
   const getStringText = (lines) => lines.join("\n");
