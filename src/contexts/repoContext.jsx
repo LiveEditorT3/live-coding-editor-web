@@ -7,12 +7,14 @@ export const useRepoContext = () => {
     name,
     isPrivate,
     fileContent,
+    sha,
     path,
     message,
     mode,
     setName,
     setPrivate,
     setFileContent,
+    setSha,
     setPath,
     setMessage,
     setMode,
@@ -22,44 +24,56 @@ export const useRepoContext = () => {
 
   const setRepoPrivate = (value) => setPrivate(value);
 
-  const setContent = (content) => setFileContent(content);
+  const setContent = (content, refresh = false) => setFileContent({ content, refresh });
 
   const setCommitMessage = (message) => setMessage(message);
 
-  const setFileName = (name) => setPath({ ...path, name });
-
-  const setFileExtension = (extension) => setPath({ ...path, extension });
+  const setFile = (name) => setPath(name);
 
   const setEditorMode = (mode) => setMode(mode);
+
+  const setFileSha = (sha) => setSha(sha);
+
+  const clearFile = () => {
+    setPath("");
+    setMessage("");
+    setMode("");
+    setSha("");
+    setFileContent({ content: "", refresh: true })
+  }
 
   return {
     name,
     isPrivate,
     fileContent,
+    sha,
     path,
     message,
     mode,
     setRepoName,
     setRepoPrivate,
     setContent,
+    setFileSha,
     setCommitMessage,
-    setFileName,
-    setFileExtension,
+    setFile,
     setEditorMode,
+    clearFile
   };
 };
 
 const RepoProvider = ({ children }) => {
   const [name, setName] = useState("");
   const [isPrivate, setPrivate] = useState(true);
-  const [fileContent, setFileContent] = useState("");
-  const [path, setPath] = useState({
-    name: "",
-    extension: ".py"
+  const [fileContent, setFileContent] = useState({
+    content: "",
+    refresh: false
   });
+  const [path, setPath] = useState("");
   const [message, setMessage] = useState("");
 
   const [mode, setMode] = useState("python");
+
+  const [sha, setSha] = useState("")
 
   return (
     <RepoContext.Provider
@@ -67,12 +81,14 @@ const RepoProvider = ({ children }) => {
         name,
         isPrivate,
         fileContent,
+        sha,
         path,
         message,
         mode,
         setName,
         setPrivate,
         setFileContent,
+        setSha,
         setPath,
         setMessage,
         setMode,

@@ -16,6 +16,7 @@ const useRepos = (sent) => {
   };
 
   const commitFile = (user, repo, commit) =>
+    // console.log(user, repo, commit)
     reposService.Commit(user, repo, commit).catch((err) => console.error(err));
 
   return {

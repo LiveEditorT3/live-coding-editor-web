@@ -14,26 +14,26 @@ import {
 } from "@mui/material";
 import { Lock, LockOpen, Save } from "@mui/icons-material";
 import { useRepoContext } from "../../contexts/repoContext";
-import { modes, modesForSelect } from "../../models/languageModes";
+import { modes } from "../../models/languageModes";
 import useRepo from "../../hooks/repos/useRepo";
+import FileSelector from "../../components/inputs/fileSelector";
 
-const AdminPanel = (props) => {
-  const sharedStringHelper = props.sharedStringHelper;
+const AdminPanel = () => {
   const user = useUser();
   const {
     name,
     isPrivate,
     fileContent,
+    sha,
     path,
     message,
-    mode,
     setRepoName,
     setRepoPrivate,
-    setFileName,
-    setFileExtension,
+    setFile,
     setCommitMessage,
     setEditorMode,
-    setContent
+    setContent,
+    setFileSha
   } = useRepoContext();
   const classes = useStyles();
   const [sent, setSent] = useState(false);
@@ -55,7 +55,7 @@ const AdminPanel = (props) => {
   };
 
   const handleCommit = (event) => {
-    commitFile(user.login, repo, { content: fileContent, path: path.name + path.extension, message }).then(() => setMessageOpen(false));
+    commitFile(user.login, repo, { content: fileContent.content, path, message, sha }).then(() => setMessageOpen(false));
   };
 
   const handleChangeRepo = (event) => {
@@ -63,17 +63,25 @@ const AdminPanel = (props) => {
     if (!!selected) setRepo(selected);
   };
 
-  const handleChangeFile = (event) => {
-    const file = event.target.value
-    const parts = file.split('.')
-    getFile(file)
+  const handleChangeFile = (file) => {
+    const parts = file.name.split('.')
+    getFile(file.name)
       .then(res => {
-        setFileName(file)
-        setFileExtension(modes[parts[1]])
-        const text = sharedStringHelper.getText()
-        sharedStringHelper.replaceText(res.content, 0, text.length)
+        setFile(res.path)
+        setEditorMode(modes[parts[parts.length - 1]])
+        setContent(res.content, true)
+        setFileSha(res.sha)
       })
   }
+
+  const handleAddFile = (name) => {
+    const parts = name.split('.')
+    setFile(name)
+    setEditorMode(modes[parts[parts.length - 1]])
+    setContent("", true)
+    setFileSha("")
+  }
+
   return (
     <>
       <Dialog
@@ -137,16 +145,7 @@ const AdminPanel = (props) => {
               />
             </Grid>
             <Grid item>
-              <Dropdown
-                variant="outlined"
-                size="small"
-                fullWidth
-                options={files}
-                value={path.name || ""}
-                onChange={handleChangeFile}
-                getOptionLabel={(option) => option?.name}
-                getOptionValue={(option) => option?.path}
-              />
+              <FileSelector files={files} onSelect={handleChangeFile} onAddFile={handleAddFile}/>
             </Grid>
             <Grid item>
               <Button

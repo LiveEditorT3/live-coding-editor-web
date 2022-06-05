@@ -99,6 +99,16 @@ const Editor = (props) => {
   };
 
   useEffect(() => {
+    if (fileContent.refresh) {
+      const text = sharedStringHelper.getText();
+      editorRef.current.setValue(fileContent.content);
+      if (!!fileContent.content)
+        sharedStringHelper.replaceText(fileContent.content, 0, text.length)
+      else(sharedStringHelper.removeText(0, text.length))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }}, [fileContent])
+
+  useEffect(() => {
     /**
      * There's been a change to the SharedString's data.  This means the most recent state of the text
      * is in the SharedString, and we need to
