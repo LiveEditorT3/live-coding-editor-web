@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { Lock, LockOpen, Save } from "@mui/icons-material";
 import { useRepoContext } from "../../contexts/repoContext";
-import { modes } from "../../models/languageModes";
+import { selectEditorMode } from "../../models/languageModes";
 import useRepo from "../../hooks/repos/useRepo";
 import FileSelector from "../../components/inputs/fileSelector";
 
@@ -69,19 +69,17 @@ const AdminPanel = () => {
   };
 
   const handleChangeFile = (file) => {
-    const parts = file.name.split(".");
     getFile(file.name).then((res) => {
       setFile(res.path);
-      setEditorMode(modes[parts[parts.length - 1]]);
+      setEditorMode(selectEditorMode(file.name));
       setContent(res.content, true);
       setFileSha(res.sha);
     });
   };
 
   const handleAddFile = (name) => {
-    const parts = name.split(".");
     setFile(name);
-    setEditorMode(modes[parts[parts.length - 1]]);
+    setEditorMode(selectEditorMode(name));
     setContent("", true);
     setFileSha("");
   };
