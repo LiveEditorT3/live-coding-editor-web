@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { selectEditorMode } from "../../models/languageModes";
 
 const RepoContext = createContext({});
 
@@ -31,7 +32,7 @@ export const useRepoContext = () => {
 
   const setFile = (name) => setPath(name);
 
-  const setEditorMode = (mode) => setMode(mode);
+  const setEditorMode = (mode) => setMode(selectEditorMode(mode));
 
   const setFileSha = (sha) => setSha(sha);
 
