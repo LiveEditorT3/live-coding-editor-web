@@ -103,10 +103,11 @@ const Editor = (props) => {
       const text = sharedStringHelper.getText();
       editorRef.current.setValue(fileContent.content);
       if (!!fileContent.content)
-        sharedStringHelper.replaceText(fileContent.content, 0, text.length)
-      else(sharedStringHelper.removeText(0, text.length))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }}, [fileContent])
+        sharedStringHelper.replaceText(fileContent.content, 0, text.length);
+      else sharedStringHelper.removeText(0, text.length);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }
+  }, [fileContent]);
 
   useEffect(() => {
     /**

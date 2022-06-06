@@ -33,7 +33,7 @@ const AdminPanel = () => {
     setCommitMessage,
     setEditorMode,
     setContent,
-    setFileSha
+    setFileSha,
   } = useRepoContext();
   const classes = useStyles();
   const [sent, setSent] = useState(false);
@@ -41,7 +41,7 @@ const AdminPanel = () => {
   const [repo, setRepo] = useState();
   const [open, setOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
-  const { files, getFile } = useRepo(repo, user.login)
+  const { files, getFile } = useRepo(repo, user.login);
 
   useEffect(() => {
     if (!repo && !!repos && !!repos.length) setRepo(repos[0].name);
@@ -55,7 +55,12 @@ const AdminPanel = () => {
   };
 
   const handleCommit = (event) => {
-    commitFile(user.login, repo, { content: fileContent.content, path, message, sha }).then(() => setMessageOpen(false));
+    commitFile(user.login, repo, {
+      content: fileContent.content,
+      path,
+      message,
+      sha,
+    }).then(() => setMessageOpen(false));
   };
 
   const handleChangeRepo = (event) => {
@@ -64,23 +69,22 @@ const AdminPanel = () => {
   };
 
   const handleChangeFile = (file) => {
-    const parts = file.name.split('.')
-    getFile(file.name)
-      .then(res => {
-        setFile(res.path)
-        setEditorMode(modes[parts[parts.length - 1]])
-        setContent(res.content, true)
-        setFileSha(res.sha)
-      })
-  }
+    const parts = file.name.split(".");
+    getFile(file.name).then((res) => {
+      setFile(res.path);
+      setEditorMode(modes[parts[parts.length - 1]]);
+      setContent(res.content, true);
+      setFileSha(res.sha);
+    });
+  };
 
   const handleAddFile = (name) => {
-    const parts = name.split('.')
-    setFile(name)
-    setEditorMode(modes[parts[parts.length - 1]])
-    setContent("", true)
-    setFileSha("")
-  }
+    const parts = name.split(".");
+    setFile(name);
+    setEditorMode(modes[parts[parts.length - 1]]);
+    setContent("", true);
+    setFileSha("");
+  };
 
   return (
     <>
@@ -119,46 +123,48 @@ const AdminPanel = () => {
           onChange={(event) => setCommitMessage(event.target.value)}
         />
       </Dialog>
-        <Paper className={classes.paper}>
-          <Grid container direction="column" spacing={1} columns={1}>
-            <Grid item>
-              <Dropdown
-                size="small"
-                fullWidth
-                options={repos}
-                value={repo || ""}
-                getOptionLabel={(option) => (
-                  <Grid container spacing={1} alignItems="center">
-                    <Grid item>
-                      {option.private ? <Lock /> : <LockOpen />}
-                    </Grid>
-                    <Grid item>
-                      <Typography variant="body1">
-                        <strong>{option?.name}</strong>
-                      </Typography>
-                    </Grid>
+      <Paper className={classes.paper}>
+        <Grid container direction="column" spacing={1} columns={1}>
+          <Grid item>
+            <Dropdown
+              size="small"
+              fullWidth
+              options={repos}
+              value={repo || ""}
+              getOptionLabel={(option) => (
+                <Grid container spacing={1} alignItems="center">
+                  <Grid item>{option.private ? <Lock /> : <LockOpen />}</Grid>
+                  <Grid item>
+                    <Typography variant="body1">
+                      <strong>{option?.name}</strong>
+                    </Typography>
                   </Grid>
-                )}
-                getOptionValue={(option) => option?.name}
-                onChange={handleChangeRepo}
-                onAdd={() => setOpen(true)}
-              />
-            </Grid>
-            <Grid item>
-              <FileSelector files={files} onSelect={handleChangeFile} onAddFile={handleAddFile}/>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                fullWidth
-                endIcon={<Save />}
-                onClick={() => setMessageOpen(true)}
-              >
-                Save
-              </Button>
-            </Grid>
+                </Grid>
+              )}
+              getOptionValue={(option) => option?.name}
+              onChange={handleChangeRepo}
+              onAdd={() => setOpen(true)}
+            />
           </Grid>
-        </Paper>
+          <Grid item>
+            <FileSelector
+              files={files}
+              onSelect={handleChangeFile}
+              onAddFile={handleAddFile}
+            />
+          </Grid>
+          <Grid item>
+            <Button
+              variant="outlined"
+              fullWidth
+              endIcon={<Save />}
+              onClick={() => setMessageOpen(true)}
+            >
+              Save
+            </Button>
+          </Grid>
+        </Grid>
+      </Paper>
     </>
   );
 };

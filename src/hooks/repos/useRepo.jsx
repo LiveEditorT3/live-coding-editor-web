@@ -6,20 +6,16 @@ const useRepo = (name, user) => {
 
   useEffect(() => {
     const getFiles = async () => {
-      reposService
-        .GetFiles(user, name)
-        .then((res) => setFiles(res));
+      reposService.GetFiles(user, name).then((res) => setFiles(res));
     };
-    if (!!user && !!name)
-        getFiles();
+    if (!!user && !!name) getFiles();
   }, [name, user]);
 
-  const getFile = (path) => 
-    reposService.GetFile(user, name, path)
+  const getFile = (path) => reposService.GetFile(user, name, path);
 
   return {
     files,
-    getFile
+    getFile,
   };
 };
 

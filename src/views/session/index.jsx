@@ -18,12 +18,11 @@ const Session = () => {
       )}
       {(sharedString || !!path) && (
         <Grid item container spacing={1} xs={9}>
-          {
-            loggedIn() && !!path &&
+          {loggedIn() && !!path && (
             <Grid item xs={12}>
-              <Chip label={path} onDelete={() => clearFile()}/>
+              <Chip label={path} onDelete={() => clearFile()} />
             </Grid>
-          }
+          )}
           <Grid item xs={12}>
             <Editor sharedStringHelper={new SharedStringHelper(sharedString)} />
           </Grid>

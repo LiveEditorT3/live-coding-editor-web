@@ -24,7 +24,8 @@ export const useRepoContext = () => {
 
   const setRepoPrivate = (value) => setPrivate(value);
 
-  const setContent = (content, refresh = false) => setFileContent({ content, refresh });
+  const setContent = (content, refresh = false) =>
+    setFileContent({ content, refresh });
 
   const setCommitMessage = (message) => setMessage(message);
 
@@ -39,8 +40,8 @@ export const useRepoContext = () => {
     setMessage("");
     setMode("");
     setSha("");
-    setFileContent({ content: "", refresh: true })
-  }
+    setFileContent({ content: "", refresh: true });
+  };
 
   return {
     name,
@@ -57,7 +58,7 @@ export const useRepoContext = () => {
     setCommitMessage,
     setFile,
     setEditorMode,
-    clearFile
+    clearFile,
   };
 };
 
@@ -66,14 +67,14 @@ const RepoProvider = ({ children }) => {
   const [isPrivate, setPrivate] = useState(true);
   const [fileContent, setFileContent] = useState({
     content: "",
-    refresh: false
+    refresh: false,
   });
   const [path, setPath] = useState("");
   const [message, setMessage] = useState("");
 
   const [mode, setMode] = useState("python");
 
-  const [sha, setSha] = useState("")
+  const [sha, setSha] = useState("");
 
   return (
     <RepoContext.Provider
