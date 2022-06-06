@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { selectEditorMode } from "../../models/languageModes";
+import { selectEditorMode } from "../models/languageModes";
 
 const RepoContext = createContext({});
 
