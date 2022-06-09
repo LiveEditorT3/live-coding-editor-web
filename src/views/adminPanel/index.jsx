@@ -16,6 +16,8 @@ import { Lock, LockOpen, Save } from "@mui/icons-material";
 import { useRepoContext } from "../../contexts/repoContext";
 import useRepo from "../../hooks/repos/useRepo";
 import FileSelector from "../../components/inputs/fileSelector";
+import { useFluidContext } from "../../contexts/fluidContext";
+import { selectEditorMode } from "../../models/languageModes";
 
 const AdminPanel = () => {
   const user = useUser();
@@ -30,10 +32,11 @@ const AdminPanel = () => {
     setRepoPrivate,
     setFile,
     setCommitMessage,
-    setEditorMode,
     setContent,
     setFileSha,
   } = useRepoContext();
+
+  const { sharedMap } = useFluidContext();
   const classes = useStyles();
   const [sent, setSent] = useState(false);
   const { repos, createRepo, commitFile } = useRepos(sent);
@@ -70,7 +73,7 @@ const AdminPanel = () => {
   const handleChangeFile = (file) => {
     getFile(file.name).then((res) => {
       setFile(res.path);
-      setEditorMode(file.name);
+      sharedMap.set("mode", selectEditorMode(file.name))
       setContent(res.content, true);
       setFileSha(res.sha);
     });
@@ -78,7 +81,7 @@ const AdminPanel = () => {
 
   const handleAddFile = (name) => {
     setFile(name);
-    setEditorMode(name);
+    sharedMap.set("mode", selectEditorMode(name))
     setContent("", true);
     setFileSha("");
   };

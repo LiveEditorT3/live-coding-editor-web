@@ -8,10 +8,13 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/clike/clike";
 import "codemirror/mode/go/go";
 import "codemirror/keymap/sublime";
+import { useFluidContext } from "../../../contexts/fluidContext";
 
 const Editor = (props) => {
   const sharedStringHelper = props.sharedStringHelper;
   const { mode, fileContent, setContent } = useRepoContext();
+  const { sharedMap } = useFluidContext();
+  
   const editorRef = useRef(null);
 
   const getStringText = (lines) => lines.join("\n");
@@ -89,6 +92,19 @@ const Editor = (props) => {
     editorRef.current.setOption("mode", mode);
   }, [mode]);
 
+  useEffect(() => {
+    if (sharedMap !== undefined) {
+      
+      const syncView = () => editorRef.current.setOption("mode", sharedMap.get("mode") || "python");
+      
+      syncView();
+      sharedMap.on("valueChanged", syncView);
+      // turn off listener when component is unmounted
+      return () => { sharedMap.off("valueChanged", syncView) }
+    }
+  
+  }, [sharedMap])
+  
   const handleChange = (instance, changeObj) => {
     if (changeObj.origin === "setValue") return;
 
@@ -105,8 +121,8 @@ const Editor = (props) => {
       if (!!fileContent.content)
         sharedStringHelper.replaceText(fileContent.content, 0, text.length);
       else sharedStringHelper.removeText(0, text.length);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileContent]);
 
   useEffect(() => {

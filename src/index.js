@@ -13,6 +13,7 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import RepoProvider from "./contexts/repoContext";
+import FluidProvider from "./contexts/fluidContext";
 
 const App = () => {
   return (
@@ -21,9 +22,11 @@ const App = () => {
       <StyledEngineProvider injectFirst>
         <LoginProvider>
           <Layout>
-            <RepoProvider>
-              <Router />
-            </RepoProvider>
+            <FluidProvider>
+              <RepoProvider>
+                <Router />
+              </RepoProvider>
+            </FluidProvider>
           </Layout>
         </LoginProvider>
       </StyledEngineProvider>
