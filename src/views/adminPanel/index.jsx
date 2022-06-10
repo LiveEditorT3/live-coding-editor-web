@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Dropdown from "../../components/inputs/dropdown";
 import useRepos from "../../hooks/repos/useRepos";
 import useUser from "../../hooks/user/useUser";
 import useStyles from "./styles";
@@ -10,14 +9,14 @@ import {
   Grid,
   Paper,
   TextField,
-  Typography,
 } from "@mui/material";
 import { Lock, LockOpen, Save } from "@mui/icons-material";
 import { useRepoContext } from "../../contexts/repoContext";
 import useRepo from "../../hooks/repos/useRepo";
-import FileSelector from "../../components/inputs/fileSelector";
+import FileSelector from "../../components/inputs/selectors/fileSelector";
 import { useFluidContext } from "../../contexts/fluidContext";
 import { selectEditorMode } from "../../models/languageModes";
+import RepoSelector from "../../components/inputs/selectors/repoSelector";
 
 const AdminPanel = () => {
   const user = useUser();
@@ -95,30 +94,35 @@ const AdminPanel = () => {
         onAccept={handleCreate}
       >
         <Grid container spacing={1}>
-          <Grid item xs={9}>
+          <Grid item xs={11}>
             <TextField
+              label="Name"
+              placeholder="Repository name"
               fullWidth
               value={name}
               onChange={(event) => setRepoName(event.target.value)}
             />
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={1}>
             <Checkbox
               checked={isPrivate}
+              icon={<LockOpen/>}
+              checkedIcon={<Lock/>}
               onChange={(event) => setRepoPrivate(event.target.checked)}
             />
-            <Typography variant="caption">Private</Typography>
           </Grid>
         </Grid>
       </Dialog>
       <Dialog
         open={messageOpen}
-        title="Commit Message"
+        title="Commit Changes"
         onClose={() => setMessageOpen(false)}
         onAccept={handleCommit}
       >
         <TextField
           fullWidth
+          label="Message"
+          placeholder="Enter a commit message"
           value={message}
           onChange={(event) => setCommitMessage(event.target.value)}
         />
@@ -126,24 +130,11 @@ const AdminPanel = () => {
       <Paper className={classes.paper}>
         <Grid container direction="column" spacing={1} columns={1}>
           <Grid item>
-            <Dropdown
-              size="small"
-              fullWidth
-              options={repos}
-              value={repo || ""}
-              getOptionLabel={(option) => (
-                <Grid container spacing={1} alignItems="center">
-                  <Grid item>{option.private ? <Lock /> : <LockOpen />}</Grid>
-                  <Grid item>
-                    <Typography variant="body1">
-                      <strong>{option?.name}</strong>
-                    </Typography>
-                  </Grid>
-                </Grid>
-              )}
-              getOptionValue={(option) => option?.name}
-              onChange={handleChangeRepo}
+            <RepoSelector
+              repo={repo}
+              repos={repos}
               onAdd={() => setOpen(true)}
+              onChange={handleChangeRepo}
             />
           </Grid>
           <Grid item>

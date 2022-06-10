@@ -3,17 +3,20 @@ import { useEffect, useRef } from "react";
 import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/mode/python/python";
-import "codemirror/theme/material-ocean.css";
+import "codemirror/theme/eclipse.css";
+import "codemirror/theme/colorforth.css";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/clike/clike";
 import "codemirror/mode/go/go";
 import "codemirror/keymap/sublime";
 import { useFluidContext } from "../../../contexts/fluidContext";
+import useTheme from "../../../hooks/theme/useLightTheme";
 
 const Editor = (props) => {
   const sharedStringHelper = props.sharedStringHelper;
   const { mode, fileContent, setContent } = useRepoContext();
   const { sharedMap } = useFluidContext();
+  const { lightTheme } = useTheme();
   
   const editorRef = useRef(null);
 
@@ -78,12 +81,12 @@ const Editor = (props) => {
       {
         lineNumbers: true,
         keyMap: "sublime",
-        theme: "material-ocean",
         mode: "python",
       }
     );
     editorComponent.on("change", handleChange);
     editorComponent.setValue(sharedStringHelper.getText());
+    editorComponent.setSize("100%", "100%")
     editorRef.current = editorComponent;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -91,6 +94,10 @@ const Editor = (props) => {
   useEffect(() => {
     editorRef.current.setOption("mode", mode);
   }, [mode]);
+
+  useEffect(() => {
+    editorRef.current.setOption("theme", lightTheme ? "eclipse" : "colorforth");
+  }, [lightTheme]);
 
   useEffect(() => {
     if (sharedMap !== undefined) {

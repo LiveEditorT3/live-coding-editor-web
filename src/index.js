@@ -14,10 +14,12 @@ import {
 } from "@mui/material";
 import RepoProvider from "./contexts/repoContext";
 import FluidProvider from "./contexts/fluidContext";
+import useTheme from "./hooks/theme/useLightTheme";
 
 const App = () => {
+  const { lightTheme } = useTheme();
   return (
-    <ThemeProvider theme={getTheme()}>
+    <ThemeProvider theme={getTheme(lightTheme)}>
       <CssBaseline enableColorScheme />
       <StyledEngineProvider injectFirst>
         <LoginProvider>
