@@ -56,13 +56,16 @@ const Session = () => {
 
   return (
     <>
-      <MarkdownDialog 
-        open={editMarkdownOpen} 
-        file={markdownFile} 
-        user={user.login}
-        repo={name}
-        onClose={() => setEditMarkdownOpen(false)} 
-      />
+      {
+        loggedIn() &&
+        <MarkdownDialog 
+          open={editMarkdownOpen} 
+          file={markdownFile} 
+          user={user.login}
+          repo={name}
+          onClose={() => setEditMarkdownOpen(false)} 
+        />
+      }
       <Grid container spacing={1} sx={{ height: "100%" }}>
         {loggedIn() && (
           <Grid item xs={12} sm={4} lg={3} xl={2}>
