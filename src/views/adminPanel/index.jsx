@@ -2,21 +2,20 @@ import { useEffect, useState } from "react";
 import useRepos from "../../hooks/repos/useRepos";
 import useUser from "../../hooks/user/useUser";
 import useStyles from "./styles";
-import Dialog from "../../components/dialog";
 import {
   Button,
-  Checkbox,
   Grid,
   Paper,
-  TextField,
 } from "@mui/material";
-import { Lock, LockOpen, Save } from "@mui/icons-material";
+import { Save } from "@mui/icons-material";
 import { useRepoContext } from "../../contexts/repoContext";
 import useRepo from "../../hooks/repos/useRepo";
 import FileSelector from "../../components/inputs/selectors/fileSelector";
 import { useFluidContext } from "../../contexts/fluidContext";
 import { selectEditorMode } from "../../models/languageModes";
 import RepoSelector from "../../components/inputs/selectors/repoSelector";
+import CreateRepoDialog from "../../components/dialog/createRepo";
+import CommitDialog from "../../components/dialog/commit";
 
 const AdminPanel = () => {
   const user = useUser();
@@ -28,9 +27,7 @@ const AdminPanel = () => {
     path,
     message,
     setRepoName,
-    setRepoPrivate,
     setFile,
-    setCommitMessage,
     setContent,
     setFileSha,
   } = useRepoContext();
@@ -45,8 +42,11 @@ const AdminPanel = () => {
   const { files, getFile } = useRepo(repo, user.login);
 
   useEffect(() => {
-    if (!repo && !!repos && !!repos.length) setRepo(repos[0].name);
-  }, [repos, open, messageOpen, repo]);
+    if (!repo && !!repos && !!repos.length) {
+      setRepo(repos[0].name);
+      setRepoName(repos[0].name)
+    }
+  }, [repos, open, messageOpen, repo, setRepoName]);
 
   const handleCreate = (event) => {
     createRepo(name, isPrivate);
@@ -67,12 +67,15 @@ const AdminPanel = () => {
   const handleChangeRepo = (event) => {
     const selected = event.target.value;
     if (!!selected) setRepo(selected);
+    setRepoName(selected);
+    sharedMap.set("markdown", "");
   };
 
   const handleChangeFile = (file) => {
     getFile(file.name).then((res) => {
       setFile(res.path);
-      sharedMap.set("mode", selectEditorMode(file.name))
+      sharedMap.set("mode", selectEditorMode(file.name));
+      sharedMap.set("file", file.name);
       setContent(res.content, true);
       setFileSha(res.sha);
     });
@@ -81,52 +84,15 @@ const AdminPanel = () => {
   const handleAddFile = (name) => {
     setFile(name);
     sharedMap.set("mode", selectEditorMode(name))
+    sharedMap.set("file", name);
     setContent("", true);
     setFileSha("");
   };
 
   return (
     <>
-      <Dialog
-        open={open}
-        title="Create Repo"
-        onClose={() => setOpen(false)}
-        onAccept={handleCreate}
-      >
-        <Grid container spacing={1}>
-          <Grid item xs={11}>
-            <TextField
-              label="Name"
-              placeholder="Repository name"
-              fullWidth
-              value={name}
-              onChange={(event) => setRepoName(event.target.value)}
-            />
-          </Grid>
-          <Grid item xs={1}>
-            <Checkbox
-              checked={isPrivate}
-              icon={<LockOpen/>}
-              checkedIcon={<Lock/>}
-              onChange={(event) => setRepoPrivate(event.target.checked)}
-            />
-          </Grid>
-        </Grid>
-      </Dialog>
-      <Dialog
-        open={messageOpen}
-        title="Commit Changes"
-        onClose={() => setMessageOpen(false)}
-        onAccept={handleCommit}
-      >
-        <TextField
-          fullWidth
-          label="Message"
-          placeholder="Enter a commit message"
-          value={message}
-          onChange={(event) => setCommitMessage(event.target.value)}
-        />
-      </Dialog>
+      <CreateRepoDialog open={open} onClose={() => setOpen(false)} onAccept={handleCreate} />
+      <CommitDialog open={messageOpen} onClose={() => setMessageOpen(false)} onAccept={handleCommit} />
       <Paper className={classes.paper}>
         <Grid container direction="column" spacing={1} columns={1}>
           <Grid item>
@@ -139,7 +105,7 @@ const AdminPanel = () => {
           </Grid>
           <Grid item>
             <FileSelector
-              files={files}
+              files={files?.filter(file => file.name !== "README.md")}
               onSelect={handleChangeFile}
               onAddFile={handleAddFile}
             />
