@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { TinyliciousClient } from "@fluidframework/tinylicious-client";
-import { SharedString } from "fluid-framework";
+import { SharedString } from "@fluidframework/sequence";
 
 export const useSharedString = () => {
   const [sharedString, setSharedString] = useState();
