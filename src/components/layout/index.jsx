@@ -2,6 +2,7 @@ import { AppBar, Container, Toolbar, Typography } from "@mui/material";
 import UserMenu from "./userMenu";
 import useStyles from "./styles";
 import { loggedIn } from "../../hooks/login";
+import OptionsMenu from "./optionsMenu";
 
 const Layout = ({ children }) => {
   const classes = useStyles();
@@ -13,11 +14,12 @@ const Layout = ({ children }) => {
           <Typography variant="h6" noWrap>
             Live Coding Editor
           </Typography>
-          {loggedIn() && (
-            <section className={classes.rightToolbar}>
+          <section className={classes.rightToolbar}>
+            <OptionsMenu/>
+            {loggedIn() && (
               <UserMenu />
-            </section>
-          )}
+            )}
+          </section>
         </Toolbar>
       </AppBar>
       <div className={classes.main}>
