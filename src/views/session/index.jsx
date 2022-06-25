@@ -11,6 +11,7 @@ import MarkdownDialog from "../../components/dialog/markdown";
 import { Edit, Visibility, VisibilityOff } from "@mui/icons-material";
 import useUser from "../../hooks/user/useUser";
 import useRepo from "../../hooks/repos/useRepo";
+import Chat from "../../components/chat";
 
 const Session = () => {
   const { sharedString, sharedMap } = useFluidContext();
@@ -93,8 +94,11 @@ const Session = () => {
               </Grid>
             </Grid>
             <Grid item container spacing={1} xs={12} sx={{ height: "95.5%" }}>
-              <Grid item xs={12} lg={!!showMarkdown ? 6 : 12}>
+              <Grid item xs={12} lg={6}>
                 <Editor sharedStringHelper={new SharedStringHelper(sharedString)} />
+              </Grid>
+              <Grid item xs={12} lg={6}>
+                <Chat/>
               </Grid>
               {
                 !!markdown && showMarkdown &&
