@@ -45,7 +45,8 @@ const FluidProvider = ({ children }) => {
             window.location.hash = id;
         } else {       
             ({ container } = await client.getContainer(containerId, containerSchema));
-            if (!container.connected) {
+            // ConnectionState.Connected === 2
+            if (container.connectionState !== 2) {
                 await new Promise((resolve) => {
                   container.once("connected", () => {
                     resolve();
