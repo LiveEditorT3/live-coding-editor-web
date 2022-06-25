@@ -27,7 +27,9 @@ export class HttpClient {
   static Post = async (path, data, config, baseUrl = Configuration.BASE_URL) =>
     await _fetch(
       path,
-      mapConfig("POST", JSON.stringify(data), config),
+      mapConfig("POST", JSON.stringify(data), {
+        headers: { "Access-Control-Allow-Origin": "*" },
+      }),
       baseUrl
     );
   static Put = async (path, data, config, baseUrl = Configuration.BASE_URL) =>
