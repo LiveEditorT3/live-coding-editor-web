@@ -1,6 +1,7 @@
 import TinyliciousClient from "@fluidframework/tinylicious-client";
 import { SharedMap } from "@fluidframework/map";
 import { SharedString } from "@fluidframework/sequence"
+import { SharedStringHelper } from "@fluid-experimental/react-inputs";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const FluidContext = createContext({});
@@ -10,16 +11,19 @@ export const useFluidContext = () => {
     const { getFluidData } = useContext(FluidContext)
     const [sharedString, setSharedString] = useState()
     const [sharedMap, setSharedMap] = useState()
+    const [sharedStringHelper, setSharedStringHelper] = useState()
 
     useEffect(() => {
         getFluidData().then((data) => {
             setSharedString(data.sharedString)
+            setSharedStringHelper(new SharedStringHelper(data.sharedString))
             setSharedMap(data.sharedMap)
         });
       }, [getFluidData]);
 
     return {
         sharedString,
+        sharedStringHelper,
         sharedMap
     }
 }

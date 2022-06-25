@@ -2,7 +2,6 @@ import { Card, CardContent, Chip, Grid } from "@mui/material";
 import Editor from "../../components/inputs/editor";
 import { loggedIn } from "../../hooks/login";
 import AdminPanel from "../adminPanel";
-import { SharedStringHelper } from "@fluid-experimental/react-inputs";
 import { useRepoContext } from "../../contexts/repoContext";
 import { useFluidContext } from "../../contexts/fluidContext";
 import { useEffect, useState } from "react";
@@ -15,7 +14,7 @@ import Chat from "../../components/chat";
 import FirebaseProvider from "../../contexts/firebaseContext";
 
 const Session = () => {
-  const { sharedString, sharedMap } = useFluidContext();
+  const { sharedString, sharedStringHelper, sharedMap } = useFluidContext();
   const { name, clearFile } = useRepoContext();
   const [path, setPath] = useState();
   const [markdown, setMarkdown] = useState();
@@ -96,7 +95,7 @@ const Session = () => {
             </Grid>
             <Grid item container spacing={1} xs={12} sx={{ height: "95.5%" }}>
               <Grid item xs={12} lg={6} xl={8}>
-                <Editor sharedStringHelper={new SharedStringHelper(sharedString)} />
+                {sharedStringHelper && <Editor sharedStringHelper={sharedStringHelper} />}
               </Grid>
               <Grid item container xs={12} lg={6} xl={4}>
                 {
