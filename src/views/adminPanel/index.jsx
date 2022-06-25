@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
+import Dropdown from "../../components/inputs/dropdown";
 import useRepos from "../../hooks/repos/useRepos";
 import useUser from "../../hooks/user/useUser";
 import useStyles from "./styles";
+import Dialog from "../../components/dialog";
 import {
   Button,
+  Checkbox,
   Grid,
   Paper,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { Save } from "@mui/icons-material";
+import { Lock, LockOpen, Save } from "@mui/icons-material";
 import { useRepoContext } from "../../contexts/repoContext";
 import useRepo from "../../hooks/repos/useRepo";
-import FileSelector from "../../components/inputs/selectors/fileSelector";
-import { useFluidContext } from "../../contexts/fluidContext";
-import { selectEditorMode } from "../../models/languageModes";
-import RepoSelector from "../../components/inputs/selectors/repoSelector";
-import CreateRepoDialog from "../../components/dialog/createRepo";
-import CommitDialog from "../../components/dialog/commit";
+import FileSelector from "../../components/inputs/fileSelector";
 
 const AdminPanel = () => {
   const user = useUser();
@@ -27,12 +27,13 @@ const AdminPanel = () => {
     path,
     message,
     setRepoName,
+    setRepoPrivate,
     setFile,
+    setCommitMessage,
+    setEditorMode,
     setContent,
     setFileSha,
   } = useRepoContext();
-
-  const { sharedMap } = useFluidContext();
   const classes = useStyles();
   const [sent, setSent] = useState(false);
   const { repos, createRepo, commitFile } = useRepos(sent);
@@ -42,11 +43,8 @@ const AdminPanel = () => {
   const { files, getFile } = useRepo(repo, user.login);
 
   useEffect(() => {
-    if (!repo && !!repos && !!repos.length) {
-      setRepo(repos[0].name);
-      setRepoName(repos[0].name)
-    }
-  }, [repos, open, messageOpen, repo, setRepoName]);
+    if (!repo && !!repos && !!repos.length) setRepo(repos[0].name);
+  }, [repos, open, messageOpen, repo]);
 
   const handleCreate = (event) => {
     createRepo(name, isPrivate);
@@ -67,15 +65,12 @@ const AdminPanel = () => {
   const handleChangeRepo = (event) => {
     const selected = event.target.value;
     if (!!selected) setRepo(selected);
-    setRepoName(selected);
-    sharedMap.set("markdown", "");
   };
 
   const handleChangeFile = (file) => {
     getFile(file.name).then((res) => {
       setFile(res.path);
-      sharedMap.set("mode", selectEditorMode(file.name));
-      sharedMap.set("file", file.name);
+      setEditorMode(file.name);
       setContent(res.content, true);
       setFileSha(res.sha);
     });
@@ -83,29 +78,74 @@ const AdminPanel = () => {
 
   const handleAddFile = (name) => {
     setFile(name);
-    sharedMap.set("mode", selectEditorMode(name))
-    sharedMap.set("file", name);
+    setEditorMode(name);
     setContent("", true);
     setFileSha("");
   };
 
   return (
     <>
-      <CreateRepoDialog open={open} onClose={() => setOpen(false)} onAccept={handleCreate} />
-      <CommitDialog open={messageOpen} onClose={() => setMessageOpen(false)} onAccept={handleCommit} />
+      <Dialog
+        open={open}
+        title="Create Repo"
+        onClose={() => setOpen(false)}
+        onAccept={handleCreate}
+      >
+        <Grid container spacing={1}>
+          <Grid item xs={9}>
+            <TextField
+              fullWidth
+              value={name}
+              onChange={(event) => setRepoName(event.target.value)}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <Checkbox
+              checked={isPrivate}
+              onChange={(event) => setRepoPrivate(event.target.checked)}
+            />
+            <Typography variant="caption">Private</Typography>
+          </Grid>
+        </Grid>
+      </Dialog>
+      <Dialog
+        open={messageOpen}
+        title="Commit Message"
+        onClose={() => setMessageOpen(false)}
+        onAccept={handleCommit}
+      >
+        <TextField
+          fullWidth
+          value={message}
+          onChange={(event) => setCommitMessage(event.target.value)}
+        />
+      </Dialog>
       <Paper className={classes.paper}>
         <Grid container direction="column" spacing={1} columns={1}>
           <Grid item>
-            <RepoSelector
-              repo={repo}
-              repos={repos}
-              onAdd={() => setOpen(true)}
+            <Dropdown
+              size="small"
+              fullWidth
+              options={repos}
+              value={repo || ""}
+              getOptionLabel={(option) => (
+                <Grid container spacing={1} alignItems="center">
+                  <Grid item>{option.private ? <Lock /> : <LockOpen />}</Grid>
+                  <Grid item>
+                    <Typography variant="body1">
+                      <strong>{option?.name}</strong>
+                    </Typography>
+                  </Grid>
+                </Grid>
+              )}
+              getOptionValue={(option) => option?.name}
               onChange={handleChangeRepo}
+              onAdd={() => setOpen(true)}
             />
           </Grid>
           <Grid item>
             <FileSelector
-              files={files?.filter(file => file.name !== "README.md")}
+              files={files}
               onSelect={handleChangeFile}
               onAddFile={handleAddFile}
             />

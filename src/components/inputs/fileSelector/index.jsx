@@ -1,7 +1,6 @@
-import { Cancel, PostAdd } from "@mui/icons-material";
+import { PostAdd } from "@mui/icons-material";
 import {
   IconButton,
-  InputAdornment,
   List,
   ListItem,
   ListItemButton,
@@ -28,7 +27,6 @@ const FileSelector = ({ files, onSelect, onAddFile }) => {
         <ListItem dense disableGutters>
           <TextField
             fullWidth
-            label="New File"
             size="small"
             variant="outlined"
             onChange={(e) => setName(e.target.value)}
@@ -37,15 +35,6 @@ const FileSelector = ({ files, onSelect, onAddFile }) => {
                 setOpen(false);
                 onAddFile(name);
               }
-            }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setOpen(false)} edge="end">
-                    <Cancel />
-                  </IconButton>
-                </InputAdornment>
-              ),
             }}
           />
         </ListItem>

@@ -3,8 +3,6 @@ const Configuration = {
   GH_CLIENT_ID: process.env.REACT_APP_GITHUB_CLIENT_ID,
   GH_REDIRECT_URL: `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_CALLBACK_PORT}`,
   PATH: "/",
-  FLUID_SERVER_HOST: process.env.REACT_APP_FLUID_SERVER_HOST,
-  FLUID_SERVER_PORT: process.env.REACT_APP_FLUID_SERVER_PORT,
 };
 
 export default Configuration;

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { selectEditorMode } from "../models/languageModes";
 
 const RepoContext = createContext({});
 
@@ -17,6 +18,7 @@ export const useRepoContext = () => {
     setSha,
     setPath,
     setMessage,
+    setMode,
   } = useContext(RepoContext);
 
   const setRepoName = (name) => setName(name);
@@ -30,11 +32,14 @@ export const useRepoContext = () => {
 
   const setFile = (name) => setPath(name);
 
+  const setEditorMode = (mode) => setMode(selectEditorMode(mode));
+
   const setFileSha = (sha) => setSha(sha);
 
   const clearFile = () => {
     setPath("");
     setMessage("");
+    setMode("");
     setSha("");
     setFileContent({ content: "", refresh: true });
   };
@@ -53,6 +58,7 @@ export const useRepoContext = () => {
     setFileSha,
     setCommitMessage,
     setFile,
+    setEditorMode,
     clearFile,
   };
 };
@@ -67,6 +73,8 @@ const RepoProvider = ({ children }) => {
   const [path, setPath] = useState("");
   const [message, setMessage] = useState("");
 
+  const [mode, setMode] = useState("python");
+
   const [sha, setSha] = useState("");
 
   return (
@@ -78,12 +86,14 @@ const RepoProvider = ({ children }) => {
         sha,
         path,
         message,
+        mode,
         setName,
         setPrivate,
         setFileContent,
         setSha,
         setPath,
         setMessage,
+        setMode,
       }}
     >
       {children}

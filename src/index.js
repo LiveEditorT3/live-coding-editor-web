@@ -13,22 +13,17 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import RepoProvider from "./contexts/repoContext";
-import FluidProvider from "./contexts/fluidContext";
-import useTheme from "./hooks/theme/useLightTheme";
 
 const App = () => {
-  const { lightTheme } = useTheme();
   return (
-    <ThemeProvider theme={getTheme(lightTheme)}>
+    <ThemeProvider theme={getTheme()}>
       <CssBaseline enableColorScheme />
       <StyledEngineProvider injectFirst>
         <LoginProvider>
           <Layout>
-            <FluidProvider>
-              <RepoProvider>
-                <Router />
-              </RepoProvider>
-            </FluidProvider>
+            <RepoProvider>
+              <Router />
+            </RepoProvider>
           </Layout>
         </LoginProvider>
       </StyledEngineProvider>

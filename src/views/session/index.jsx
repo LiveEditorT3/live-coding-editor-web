@@ -1,115 +1,34 @@
-import { Chip, Divider, Grid } from "@mui/material";
+import { Chip, Grid } from "@mui/material";
 import Editor from "../../components/inputs/editor";
+import { useSharedString } from "../../hooks/editor/useSharedString";
 import { loggedIn } from "../../hooks/login";
 import AdminPanel from "../adminPanel";
 import { SharedStringHelper } from "@fluid-experimental/react-inputs";
 import { useRepoContext } from "../../contexts/repoContext";
-import { useFluidContext } from "../../contexts/fluidContext";
-import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import MarkdownDialog from "../../components/dialog/markdown";
-import { Edit, Visibility, VisibilityOff } from "@mui/icons-material";
-import useUser from "../../hooks/user/useUser";
-import useRepo from "../../hooks/repos/useRepo";
 
 const Session = () => {
-  const { sharedString, sharedMap } = useFluidContext();
-  const { name, clearFile } = useRepoContext();
-  const [path, setPath] = useState();
-  const [markdown, setMarkdown] = useState();
-  const [editMarkdownOpen, setEditMarkdownOpen] = useState(false);
-  const [showMarkdown, setShowMarkdown] = useState(false);
-  const [markdownFile, setMarkdownFile] = useState();
-  const user = useUser();
-  const { getFile } = useRepo(name, user.login);
-
-  useEffect(() => {
-    if (sharedMap !== undefined) {
-      
-      const syncView = () => {
-        setPath(sharedMap.get("file"))
-        setMarkdown(sharedMap.get("markdown"))
-      }
-      
-      syncView();
-      sharedMap.on("valueChanged", syncView);
-      // turn off listener when component is unmounted
-      return () => { sharedMap.off("valueChanged", syncView) }
-    }
-  
-  }, [sharedMap])
-
-  useEffect(() => {
-    if (!!user && !!name)
-        getFile("README.md")
-            .then(file => {
-                setMarkdownFile(file)
-                sharedMap.set("markdown", file.content)
-            })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name])
-
-  const handleClear = (event) => {
-    sharedMap.set("file", "");
-    clearFile();
-  }
-
+  const sharedString = useSharedString();
+  const { path, clearFile } = useRepoContext();
   return (
-    <>
-      {
-        loggedIn() &&
-        <MarkdownDialog 
-          open={editMarkdownOpen} 
-          file={markdownFile} 
-          user={user.login}
-          repo={name}
-          onClose={() => setEditMarkdownOpen(false)} 
-        />
-      }
-      <Grid container spacing={1} sx={{ height: "100%" }}>
-        {loggedIn() && (
-          <Grid item xs={12} sm={4} lg={3} xl={2}>
-            <AdminPanel />
-          </Grid>
-        )}
-        {(sharedString || !!path) && (
-          <Grid item container spacing={1} xs={12} sm={loggedIn() ? 8 : 12} lg={loggedIn() ? 9 : 12} xl={loggedIn() ? 10 : 12} sx={{ height: "100%" }}>
-            <Grid item container justifyContent={!!path ? "space-between": "flex-end"} xs={12} sx={{ height: "4.5%" }}>
-              {
-                !!path &&
-                <Grid item>
-                  <Chip sx={{ borderRadius: 1.5 }} label={path} onDelete={loggedIn() ? handleClear : undefined} />
-                </Grid>
-              }
-              <Grid item>
-                <Chip 
-                  sx={{ borderRadius: 1.5 }} 
-                  icon={loggedIn() ? <Edit/> : undefined} 
-                  onClick={loggedIn() ? () => setEditMarkdownOpen(true) : undefined} 
-                  deleteIcon={showMarkdown ? <VisibilityOff/> : <Visibility/>} 
-                  label={"README.md"} 
-                  onDelete={() => setShowMarkdown(!showMarkdown)} 
-                />
-              </Grid>
+    <Grid container spacing={1}>
+      {loggedIn() && (
+        <Grid item xs={3}>
+          <AdminPanel />
+        </Grid>
+      )}
+      {(sharedString || !!path) && (
+        <Grid item container spacing={1} xs={9}>
+          {loggedIn() && !!path && (
+            <Grid item xs={12}>
+              <Chip label={path} onDelete={() => clearFile()} />
             </Grid>
-            <Grid item container spacing={1} xs={12} sx={{ height: "95.5%" }}>
-              <Grid item xs={12} lg={!!showMarkdown ? 6 : 12}>
-                <Editor sharedStringHelper={new SharedStringHelper(sharedString)} />
-              </Grid>
-              {
-                !!markdown && showMarkdown &&
-                <>
-                  <Divider orientation="vertical" sx={{marginRight:"-1px"}}/>
-                  <Grid item sm={12} lg={6}>
-                    <ReactMarkdown>{markdown}</ReactMarkdown>
-                  </Grid>
-                </>
-              }
-            </Grid>
+          )}
+          <Grid item xs={12}>
+            <Editor sharedStringHelper={new SharedStringHelper(sharedString)} />
           </Grid>
-        )}
-      </Grid>
-    </>
+        </Grid>
+      )}
+    </Grid>
   );
 };
 
