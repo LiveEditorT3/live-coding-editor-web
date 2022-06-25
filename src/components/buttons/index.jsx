@@ -5,7 +5,7 @@ import Configuration from "../../config";
 const LogIntoGithubButton = () => {
   return (
     <Button
-      href={`https://github.com/login/oauth/authorize?client_id=${Configuration.GH_CLIENT_ID}?path=${Configuration.PATH}&scope=user:email%20repo`}
+      href={`https://github.com/login/oauth/authorize?client_id=${Configuration.GH_CLIENT_ID}&scope=user:email%20repo`}
       variant="contained"
       endIcon={<GitHub />}
     >
