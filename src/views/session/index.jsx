@@ -42,7 +42,7 @@ const Session = () => {
   }, [sharedMap])
 
   useEffect(() => {
-    if (!!user && !!name)
+    if (!!user && !!name && !!sharedMap)
         getFile("README.md")
             .then(file => {
                 setMarkdownFile(file)
