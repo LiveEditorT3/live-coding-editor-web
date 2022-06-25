@@ -1,4 +1,4 @@
-import { Chip, Divider, Grid } from "@mui/material";
+import { Card, CardContent, Chip, Grid } from "@mui/material";
 import Editor from "../../components/inputs/editor";
 import { loggedIn } from "../../hooks/login";
 import AdminPanel from "../adminPanel";
@@ -12,6 +12,7 @@ import { Edit, Visibility, VisibilityOff } from "@mui/icons-material";
 import useUser from "../../hooks/user/useUser";
 import useRepo from "../../hooks/repos/useRepo";
 import Chat from "../../components/chat";
+import FirebaseProvider from "../../contexts/firebaseContext";
 
 const Session = () => {
   const { sharedString, sharedMap } = useFluidContext();
@@ -94,21 +95,26 @@ const Session = () => {
               </Grid>
             </Grid>
             <Grid item container spacing={1} xs={12} sx={{ height: "95.5%" }}>
-              <Grid item xs={12} lg={6}>
+              <Grid item xs={12} lg={6} xl={8}>
                 <Editor sharedStringHelper={new SharedStringHelper(sharedString)} />
               </Grid>
-              <Grid item xs={12} lg={6}>
-                <Chat/>
-              </Grid>
-              {
-                !!markdown && showMarkdown &&
-                <>
-                  <Divider orientation="vertical" sx={{marginRight:"-1px"}}/>
-                  <Grid item sm={12} lg={6}>
-                    <ReactMarkdown>{markdown}</ReactMarkdown>
+              <Grid item container xs={12} lg={6} xl={4}>
+                {
+                  !!markdown && showMarkdown &&
+                  <Grid item xs={12}>
+                    <Card>
+                      <CardContent>
+                        <ReactMarkdown>{markdown}</ReactMarkdown>
+                      </CardContent>
+                    </Card>
                   </Grid>
-                </>
-              }
+                }
+                <Grid item xs={12} sx={{ height: showMarkdown ? "50%" : "100%"}}>
+                  <FirebaseProvider>
+                    <Chat/>
+                  </FirebaseProvider>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         )}

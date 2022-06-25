@@ -1,5 +1,6 @@
 import TinyliciousClient from "@fluidframework/tinylicious-client";
-import { SharedMap, SharedString } from "fluid-framework";
+import { SharedMap } from "@fluidframework/map";
+import { SharedString } from "@fluidframework/sequence"
 import { createContext, useContext, useEffect, useState } from "react";
 
 const FluidContext = createContext({});

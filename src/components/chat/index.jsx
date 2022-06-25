@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, Chip, Grid, Paper, TextField } from "@mui/material";
+import { Send } from "@mui/icons-material";
+import { Card, CardContent, CardHeader, Grid, IconButton, Paper, TextField } from "@mui/material";
 import useUser from "../../hooks/user/useUser";
 import Message from "./message";
 
@@ -35,28 +36,34 @@ const dummyMessages = [
     },
 ]
 const Chat = () => {
-    const { name } = useUser();
     return (
         <Card>
             <CardHeader title="Chat"/>
             <CardContent>
                 <Grid container spacing={1} direction="column">
                     <Grid item xs={12}>
-                        <Paper variant="outlined" elevation={0} sx={{ maxHeight: '70vh', overflow: "auto" }}>
+                        <Paper variant="outlined" elevation={0} sx={{ maxHeight: '70vh', overflow: "auto", padding: "5px" }}>
                             {
                                 dummyMessages.map(message => 
-                                    <Grid item xs={12} justifyContent={message.user === name ? "flex-start" : "flex-end"}>
+                                    <Grid key={message.timestamp} item xs={12}>
                                         <Message user={message.user} text={message.message} timestamp={message.timestamp}/>
                                     </Grid>)
                             }
                         </Paper>
                     </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            size="small"
-                            fullWidth
-                            placeholder="Send a message"
-                        />
+                    <Grid item container xs={12} spacing={1} sx={{ display: "flex", flexWrap: "nowrap" }}>
+                        <Grid item sx={{ flex: 1 }}>
+                            <TextField
+                                size="small"
+                                fullWidth
+                                placeholder="Send a message"
+                            />
+                        </Grid>
+                        <Grid item>
+                            <IconButton>
+                                <Send/>
+                            </IconButton>
+                        </Grid>
                     </Grid>
                 </Grid>
             </CardContent>
