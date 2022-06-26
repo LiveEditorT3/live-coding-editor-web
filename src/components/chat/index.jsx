@@ -1,6 +1,5 @@
 import { Send } from "@mui/icons-material";
 import { Card, CardContent, CardHeader, Grid, IconButton, Paper, TextField } from "@mui/material";
-import useUser from "../../hooks/user/useUser";
 import Message from "./message";
 
 const dummyMessages = [
