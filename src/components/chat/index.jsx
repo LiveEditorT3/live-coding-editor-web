@@ -33,6 +33,11 @@ const dummyMessages = [
         message: "Hola que tal",
         timestamp: 128
     },
+    {
+        user: "Lucas",
+        message: "Sarasa",
+        timestamp: 128
+    },
 ]
 const Chat = () => {
     return (
