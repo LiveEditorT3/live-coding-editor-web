@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useState } from "react";
 import { initializeApp } from "firebase/app";
 import FirebaseConfig from "../firebaseConfig";
 import { useContext } from "react";
@@ -6,17 +6,25 @@ import { useContext } from "react";
 const FirebaseContext = createContext({});
 
 export const useFirebaseContext = () => {
-    const { app } = useContext(FirebaseContext);
+    const { app, messages, setMessages } = useContext(FirebaseContext);
+
+    const addMessage = (message) => {
+        setMessages([...messages, message])
+    }
+    
     return {
-        app
+        app,
+        messages,
+        addMessage
     };
 };
 
 const FirebaseProvider = ({ children }) => {
     const app = initializeApp(FirebaseConfig);
+    const [messages, setMessages] = useState([]);
 
     return (
-        <FirebaseContext.Provider value={{ app }}>
+        <FirebaseContext.Provider value={{ app, messages, setMessages }}>
             {children}
         </FirebaseContext.Provider>
     );

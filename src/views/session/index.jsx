@@ -109,9 +109,7 @@ const Session = () => {
                   </Grid>
                 }
                 <Grid item xs={12} sx={{ height: showMarkdown ? "50%" : "100%"}}>
-                  <FirebaseProvider>
-                    <Chat/>
-                  </FirebaseProvider>
+                  <Chat/>
                 </Grid>
               </Grid>
             </Grid>

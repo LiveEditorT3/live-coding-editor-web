@@ -1,6 +1,12 @@
 import { Send } from "@mui/icons-material";
 import { Card, CardContent, CardHeader, Grid, IconButton, Paper, TextField } from "@mui/material";
+import { useEffect } from "react";
+import { useFirebaseContext } from "../../contexts/firebaseContext";
+import { get, getDatabase, onChildAdded, onValue, orderByChild, push, query, ref, set } from "firebase/database";
 import Message from "./message";
+import { useState } from "react";
+import useUser from "../../hooks/user/useUser";
+import { useRef } from "react";
 
 const dummyMessages = [
     {
@@ -39,7 +45,29 @@ const dummyMessages = [
         timestamp: 128
     },
 ]
+
 const Chat = () => {
+    const { app, messages, addMessage } = useFirebaseContext();
+    const { name } = useUser();
+    const [messageToSend, setMessageToSend] = useState("");
+    const dateReference = useRef(Date.now());
+
+    useEffect(() => {
+        const db = getDatabase(app);
+        const messagesRef = ref(db, `chats${window.location.pathname}`);
+        onChildAdded(messagesRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data.timestamp > dateReference.current){
+                addMessage(data);
+        }});
+    }, [app]);
+
+    const sendMessage = (event) => {
+        const db = getDatabase(app);
+        const message = { user: name, message:messageToSend, timestamp: Date.now() }
+        push(ref(db, `chats${window.location.pathname}`), message);
+        setMessageToSend("")
+    }
     return (
         <Card>
             <CardHeader title="Chat"/>
@@ -48,7 +76,7 @@ const Chat = () => {
                     <Grid item xs={12}>
                         <Paper variant="outlined" elevation={0} sx={{ maxHeight: '70vh', overflow: "auto", padding: "5px" }}>
                             {
-                                dummyMessages.map(message => 
+                                !!messages && !!messages.length && messages.map(message => 
                                     <Grid key={message.timestamp} item xs={12}>
                                         <Message user={message.user} text={message.message} timestamp={message.timestamp}/>
                                     </Grid>)
@@ -61,10 +89,12 @@ const Chat = () => {
                                 size="small"
                                 fullWidth
                                 placeholder="Send a message"
+                                value={messageToSend}
+                                onChange={(e) => setMessageToSend(e.target.value)}
                             />
                         </Grid>
                         <Grid item>
-                            <IconButton>
+                            <IconButton onClick={sendMessage}>
                                 <Send/>
                             </IconButton>
                         </Grid>

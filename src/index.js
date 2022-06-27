@@ -15,6 +15,7 @@ import {
 import RepoProvider from "./contexts/repoContext";
 import FluidProvider from "./contexts/fluidContext";
 import useTheme from "./hooks/theme/useLightTheme";
+import FirebaseProvider from "./contexts/firebaseContext";
 
 const App = () => {
   const { lightTheme } = useTheme();
@@ -26,7 +27,9 @@ const App = () => {
           <Layout>
             <FluidProvider>
               <RepoProvider>
-                <Router />
+                <FirebaseProvider>
+                  <Router />
+                </FirebaseProvider>
               </RepoProvider>
             </FluidProvider>
           </Layout>
