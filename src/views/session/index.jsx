@@ -11,7 +11,7 @@ import { Edit, Visibility, VisibilityOff } from "@mui/icons-material";
 import useUser from "../../hooks/user/useUser";
 import useRepo from "../../hooks/repos/useRepo";
 import Chat from "../../components/chat";
-import FirebaseProvider from "../../contexts/firebaseContext";
+import NameDialog from "../../components/dialog/name";
 
 const Session = () => {
   const { sharedString, sharedStringHelper, sharedMap } = useFluidContext();
@@ -21,6 +21,7 @@ const Session = () => {
   const [editMarkdownOpen, setEditMarkdownOpen] = useState(false);
   const [showMarkdown, setShowMarkdown] = useState(false);
   const [markdownFile, setMarkdownFile] = useState();
+  const [nameOpen, setNameOpen] = useState(true);
   const user = useUser();
   const { getFile } = useRepo(name, user.login);
 
@@ -58,14 +59,18 @@ const Session = () => {
   return (
     <>
       {
-        loggedIn() &&
+        loggedIn() ?
         <MarkdownDialog 
           open={editMarkdownOpen} 
           file={markdownFile} 
           user={user.login}
           repo={name}
           onClose={() => setEditMarkdownOpen(false)} 
-        />
+        /> :
+        <NameDialog
+          open={nameOpen}
+          onClose={() => setNameOpen(false)}
+          />
       }
       <Grid container spacing={1} sx={{ height: "100%" }}>
         {loggedIn() && (

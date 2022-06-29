@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import useRepos from "../../hooks/repos/useRepos";
 import useUser from "../../hooks/user/useUser";
-import useStyles from "./styles";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Button,
   Grid,
-  Paper,
+  Typography,
 } from "@mui/material";
-import { Save } from "@mui/icons-material";
+import { ExpandMore, Save } from "@mui/icons-material";
 import { useRepoContext } from "../../contexts/repoContext";
 import useRepo from "../../hooks/repos/useRepo";
 import FileSelector from "../../components/inputs/selectors/fileSelector";
@@ -16,6 +18,9 @@ import { selectEditorMode } from "../../models/languageModes";
 import RepoSelector from "../../components/inputs/selectors/repoSelector";
 import CreateRepoDialog from "../../components/dialog/createRepo";
 import CommitDialog from "../../components/dialog/commit";
+import { getDatabase, ref, remove } from "firebase/database";
+import { useFirebaseContext } from "../../contexts/firebaseContext";
+import PeopleSelector from "../../components/inputs/selectors/peopleSelector";
 
 const AdminPanel = () => {
   const user = useUser();
@@ -32,8 +37,8 @@ const AdminPanel = () => {
     setFileSha,
   } = useRepoContext();
 
-  const { sharedMap } = useFluidContext();
-  const classes = useStyles();
+  const { sharedMap, audience } = useFluidContext();
+  const { app } = useFirebaseContext();
   const [sent, setSent] = useState(false);
   const { repos, createRepo, commitFile } = useRepos(sent);
   const [repo, setRepo] = useState();
@@ -47,6 +52,15 @@ const AdminPanel = () => {
       setRepoName(repos[0].name)
     }
   }, [repos, open, messageOpen, repo, setRepoName]);
+
+  useEffect(() => {
+    if (!!audience) {
+      audience.on("memberRemoved", (member) => {
+        const db = getDatabase(app);
+        remove(ref(db, `sessions${window.location.pathname}/${member.userId}`));
+      })
+    }
+  }, [audience, app])
 
   const handleCreate = (event) => {
     createRepo(name, isPrivate);
@@ -93,35 +107,49 @@ const AdminPanel = () => {
     <>
       <CreateRepoDialog open={open} onClose={() => setOpen(false)} onAccept={handleCreate} />
       <CommitDialog open={messageOpen} onClose={() => setMessageOpen(false)} onAccept={handleCommit} />
-      <Paper className={classes.paper}>
-        <Grid container direction="column" spacing={1} columns={1}>
-          <Grid item>
-            <RepoSelector
-              repo={repo}
-              repos={repos}
-              onAdd={() => setOpen(true)}
-              onChange={handleChangeRepo}
-            />
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMore/>}>
+          <Typography variant="h5">Options</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid container direction="column" spacing={1} columns={1}>
+            <Grid item>
+              <RepoSelector
+                repo={repo}
+                repos={repos}
+                onAdd={() => setOpen(true)}
+                onChange={handleChangeRepo}
+              />
+            </Grid>
+            <Grid item>
+              <FileSelector
+                files={files?.filter(file => file.name !== "README.md")}
+                onSelect={handleChangeFile}
+                onAddFile={handleAddFile}
+              />
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                fullWidth
+                endIcon={<Save />}
+                onClick={() => setMessageOpen(true)}
+              >
+                Save
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item>
-            <FileSelector
-              files={files?.filter(file => file.name !== "README.md")}
-              onSelect={handleChangeFile}
-              onAddFile={handleAddFile}
-            />
-          </Grid>
-          <Grid item>
-            <Button
-              variant="outlined"
-              fullWidth
-              endIcon={<Save />}
-              onClick={() => setMessageOpen(true)}
-            >
-              Save
-            </Button>
-          </Grid>
-        </Grid>
-      </Paper>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMore/>}>
+          <Typography variant="h5">People</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <PeopleSelector/>
+        </AccordionDetails>
+      </Accordion>
+
     </>
   );
 };

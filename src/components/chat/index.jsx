@@ -2,49 +2,11 @@ import { Send } from "@mui/icons-material";
 import { Card, CardContent, CardHeader, Grid, IconButton, Paper, TextField } from "@mui/material";
 import { useEffect } from "react";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
-import { get, getDatabase, onChildAdded, onValue, orderByChild, push, query, ref, set } from "firebase/database";
+import { getDatabase, onChildAdded, push, ref } from "firebase/database";
 import Message from "./message";
 import { useState } from "react";
 import useUser from "../../hooks/user/useUser";
 import { useRef } from "react";
-
-const dummyMessages = [
-    {
-        user: "Juan",
-        message: "Hola que tal",
-        timestamp: 123
-    },
-    {
-        user: "Federico Alvarez",
-        message: "Bienvenidos",
-        timestamp: 124
-    },
-    {
-        user: "Jorge",
-        message: "Hola que tal",
-        timestamp: 125
-    },
-    {
-        user: "Juan",
-        message: "This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen peas along with the mussels, if you like.",
-        timestamp: 126
-    },
-    {
-        user: "Horacio",
-        message: "Hola que tal",
-        timestamp: 127
-    },
-    {
-        user: "Lucas",
-        message: "Hola que tal",
-        timestamp: 128
-    },
-    {
-        user: "Lucas",
-        message: "Sarasa",
-        timestamp: 128
-    },
-]
 
 const Chat = () => {
     const { app, messages, addMessage } = useFirebaseContext();

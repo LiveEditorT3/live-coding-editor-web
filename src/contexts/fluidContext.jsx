@@ -8,23 +8,26 @@ const FluidContext = createContext({});
 const MODE_KEY = "mode";
 
 export const useFluidContext = () => {
-    const { getFluidData } = useContext(FluidContext)
-    const [sharedString, setSharedString] = useState()
-    const [sharedMap, setSharedMap] = useState()
-    const [sharedStringHelper, setSharedStringHelper] = useState()
+    const { getFluidData } = useContext(FluidContext);
+    const [sharedString, setSharedString] = useState();
+    const [sharedMap, setSharedMap] = useState();
+    const [sharedStringHelper, setSharedStringHelper] = useState();
+    const [audience, setAudience] = useState();
 
     useEffect(() => {
         getFluidData().then((data) => {
-            setSharedString(data.sharedString)
-            setSharedStringHelper(new SharedStringHelper(data.sharedString))
-            setSharedMap(data.sharedMap)
+            setSharedString(data.sharedString);
+            setSharedStringHelper(new SharedStringHelper(data.sharedString));
+            setSharedMap(data.sharedMap);
+            setAudience(data.audience);
         });
       }, [getFluidData]);
 
     return {
         sharedString,
         sharedStringHelper,
-        sharedMap
+        sharedMap,
+        audience
     }
 }
 
@@ -37,14 +40,15 @@ const FluidProvider = ({ children }) => {
 
     const getFluidData = async () => {
         let container;
+        let services;
         const containerId = window.location.hash.substring(1);
         if (!containerId) {
-            ({ container } = await client.createContainer(containerSchema));
+            ({ container, services } = await client.createContainer(containerSchema));
             container.initialObjects.sharedMap.set(MODE_KEY, "python");
             const id = await container.attach();
             window.location.hash = id;
         } else {       
-            ({ container } = await client.getContainer(containerId, containerSchema));
+            ({ container, services } = await client.getContainer(containerId, containerSchema));
             // ConnectionState.Connected === 2
             if (container.connectionState !== 2) {
                 await new Promise((resolve) => {
@@ -54,7 +58,7 @@ const FluidProvider = ({ children }) => {
                 });
               }
         }
-        return container.initialObjects;
+        return { ...container.initialObjects, audience: services.audience };
     }
 
     return (
