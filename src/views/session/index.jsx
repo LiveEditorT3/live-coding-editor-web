@@ -12,6 +12,8 @@ import useUser from "../../hooks/user/useUser";
 import useRepo from "../../hooks/repos/useRepo";
 import Chat from "../../components/chat";
 import NameDialog from "../../components/dialog/name";
+import { useFirebaseContext } from "../../contexts/firebaseContext";
+import { getDatabase, ref, remove } from "firebase/database";
 
 const Session = () => {
   const { sharedString, sharedStringHelper, sharedMap } = useFluidContext();
@@ -24,6 +26,7 @@ const Session = () => {
   const [nameOpen, setNameOpen] = useState(true);
   const user = useUser();
   const { getFile } = useRepo(name, user.login);
+  const { app } = useFirebaseContext();
 
   useEffect(() => {
     if (sharedMap !== undefined) {
@@ -40,6 +43,15 @@ const Session = () => {
     }
   
   }, [sharedMap])
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", () => {
+      if (!loggedIn() && !!user.id) {
+        const db = getDatabase(app);
+        remove(ref(db, `sessions${window.location.pathname}/${user.id}`));
+      }
+    })
+  }, [app, user.id])
 
   useEffect(() => {
     if (!!user && !!name && !!sharedMap)
@@ -59,14 +71,17 @@ const Session = () => {
   return (
     <>
       {
-        loggedIn() ?
+        loggedIn() &&
         <MarkdownDialog 
           open={editMarkdownOpen} 
           file={markdownFile} 
           user={user.login}
           repo={name}
           onClose={() => setEditMarkdownOpen(false)} 
-        /> :
+        />
+      }
+      {
+        !loggedIn() && !user.name &&
         <NameDialog
           open={nameOpen}
           onClose={() => setNameOpen(false)}

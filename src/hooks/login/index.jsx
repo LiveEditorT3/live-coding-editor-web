@@ -1,6 +1,8 @@
+import { getDatabase, ref, set } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 } from "uuid";
+import { useFirebaseContext } from "../../contexts/firebaseContext";
 import userService from "../../services/userService";
 import { setUser } from "../../stores/user.state";
 import {
@@ -36,6 +38,7 @@ export const saveTokenInStorage = (token, key = TOKEN_KEY) =>
 export const LoginProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(!!getTokenInStorage());
   const { login } = useSelector((store) => store.user.user.login);
+  const { app } = useFirebaseContext();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -54,7 +57,7 @@ export const LoginProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const { user: localUser } = getUserFromStorage();
+    const localUser = JSON.parse(localStorage.getItem("user"));
 
     const getUser = () => {
       userService.GetUser().then((user) => {
@@ -65,12 +68,14 @@ export const LoginProvider = ({ children }) => {
       });
     };
 
-    if (loggedIn) {
-      if (!!localUser && localUser.login !== login)
-        dispatch(setUser(localUser));
-      else if (!login) getUser();
+    if (!!localUser && localUser.login !== login) {
+      const db = getDatabase(app);
+      set(ref(db, `sessions${window.location.pathname}/${localUser.id}`), { id: localUser.id, name: localUser.name, login: localUser.login, write: loggedIn });
+      dispatch(setUser(localUser));
     }
-  }, [dispatch, login, loggedIn]);
+    else if (loggedIn && !login) 
+      getUser();
+  }, [dispatch, login, loggedIn, app]);
 
   return <>{children}</>;
 };

@@ -9,8 +9,9 @@ import useUser from "../../hooks/user/useUser";
 import { useRef } from "react";
 
 const Chat = () => {
-    const { app, messages, addMessage } = useFirebaseContext();
+    const { app } = useFirebaseContext();
     const { name } = useUser();
+    const [messages, setMessages] = useState([]);
     const [messageToSend, setMessageToSend] = useState("");
     const dateReference = useRef(Date.now());
 
@@ -20,8 +21,10 @@ const Chat = () => {
         onChildAdded(messagesRef, (snapshot) => {
             const data = snapshot.val();
             if (data.timestamp > dateReference.current){
-                addMessage(data);
+                setMessages(prev => [...prev, data]);
         }});
+
+        return () => messagesRef.off();
     }, [app]);
 
     const sendMessage = (event) => {

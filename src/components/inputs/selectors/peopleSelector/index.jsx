@@ -13,16 +13,19 @@ const PeopleSelector = () => {
         const db = getDatabase(app);
         const membersRef = ref(db, `sessions${window.location.pathname}`);
         onChildAdded(membersRef, (member) => {
-            setPeople([...people, member.val()])
+            setPeople(prev => [...prev, member.val()])
         });
         onChildRemoved(membersRef, (member) => {
-            setPeople(people.filter(p => p.id !== member.key));
+            setPeople(prev => prev.filter(p => p.id !== member.key));
         });
         onChildChanged(membersRef, (member) => {
-            const changed = people.find(p => p.id === member.key);
-            const data = member.val()
-            changed.write = data.write;
+            setPeople(prev => prev.map(person => ({
+                ...person,
+                write: person.id === member.key ? member.val().write : person.write
+            })));
         });
+
+        return () => membersRef.off();
     }, [app])
 
     const handleToggleWrite = (id, checked) => {

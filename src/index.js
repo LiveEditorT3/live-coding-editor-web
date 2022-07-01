@@ -23,17 +23,17 @@ const App = () => {
     <ThemeProvider theme={getTheme(lightTheme)}>
       <CssBaseline enableColorScheme />
       <StyledEngineProvider injectFirst>
-        <LoginProvider>
-          <Layout>
-            <FluidProvider>
-              <RepoProvider>
-                <FirebaseProvider>
+        <Layout>
+          <FluidProvider>
+            <RepoProvider>
+              <FirebaseProvider>
+                <LoginProvider>
                   <Router />
-                </FirebaseProvider>
-              </RepoProvider>
-            </FluidProvider>
-          </Layout>
-        </LoginProvider>
+                </LoginProvider>
+              </FirebaseProvider>
+            </RepoProvider>
+          </FluidProvider>
+        </Layout>
       </StyledEngineProvider>
     </ThemeProvider>
   );
