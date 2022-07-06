@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
 import useRepos from "../../hooks/repos/useRepos";
 import useUser from "../../hooks/user/useUser";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Button,
-  Grid,
-  Typography,
-} from "@mui/material";
-import { ExpandMore, Save } from "@mui/icons-material";
+import { Button, Grid } from "@mui/material";
+import { Save } from "@mui/icons-material";
 import { useRepoContext } from "../../contexts/repoContext";
 import useRepo from "../../hooks/repos/useRepo";
 import FileSelector from "../../components/inputs/selectors/fileSelector";
@@ -21,6 +14,8 @@ import CommitDialog from "../../components/dialog/commit";
 import { getDatabase, ref, remove } from "firebase/database";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
 import PeopleSelector from "../../components/inputs/selectors/peopleSelector";
+import Tab from "../../components/buttons/tab";
+import DisplayCard from "../../components/displayCard";
 
 const AdminPanel = () => {
   const user = useUser();
@@ -44,6 +39,8 @@ const AdminPanel = () => {
   const [repo, setRepo] = useState();
   const [open, setOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const [peopleOpen, setPeopleOpen] = useState(false);
   const { files, getFile } = useRepo(repo, user.login);
 
   useEffect(() => {
@@ -107,49 +104,58 @@ const AdminPanel = () => {
     <>
       <CreateRepoDialog open={open} onClose={() => setOpen(false)} onAccept={handleCreate} />
       <CommitDialog open={messageOpen} onClose={() => setMessageOpen(false)} onAccept={handleCommit} />
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMore/>}>
-          <Typography variant="h5">Options</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Grid container direction="column" spacing={1} columns={1}>
-            <Grid item>
-              <RepoSelector
-                repo={repo}
-                repos={repos}
-                onAdd={() => setOpen(true)}
-                onChange={handleChangeRepo}
-              />
-            </Grid>
-            <Grid item>
-              <FileSelector
-                files={files?.filter(file => file.name !== "README.md")}
-                onSelect={handleChangeFile}
-                onAddFile={handleAddFile}
-              />
-            </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                fullWidth
-                endIcon={<Save />}
-                onClick={() => setMessageOpen(true)}
-              >
-                Save
-              </Button>
-            </Grid>
+      <Grid container spacing={2} direction="row" sx={{ height: "100%" }}>
+        <Grid item container spacing={1} direction="column" xs={2}>
+          <Grid item>
+            <Tab label="Options" open={optionsOpen} onOpen={() => setOptionsOpen(prev => !prev)} />
           </Grid>
-        </AccordionDetails>
-      </Accordion>
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMore/>}>
-          <Typography variant="h5">People</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <PeopleSelector/>
-        </AccordionDetails>
-      </Accordion>
-
+          <Grid item>
+            <Tab label="People" open={peopleOpen} onOpen={() => setPeopleOpen(prev => !prev)} />
+          </Grid>
+        </Grid>
+        <Grid item container spacing={1} direction="column" xs={10} sx={{display: peopleOpen || optionsOpen ? "flex" : "none"}}>
+          <Grid item sx={{ height: peopleOpen ? "50%" : "100%", display: optionsOpen ? "flex" : "none" }}>
+            <DisplayCard title="Options" height={"100%"}>
+              <Grid container direction="column" spacing={1} columns={1}>
+                <Grid item>
+                  <RepoSelector
+                    repo={repo}
+                    repos={repos}
+                    onAdd={() => setOpen(true)}
+                    onChange={handleChangeRepo}
+                  />
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    endIcon={<Save />}
+                    onClick={() => setMessageOpen(true)}
+                  >
+                    Save
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <FileSelector
+                    files={files?.filter(file => file.name !== "README.md")}
+                    onSelect={handleChangeFile}
+                    onAddFile={handleAddFile}
+                  />
+                </Grid>
+              </Grid>
+            </DisplayCard>
+          </Grid>
+          <Grid item sx={{ height: optionsOpen ? "50%" : "100%", display: peopleOpen ? "flex" : "none" }}>
+            <DisplayCard title="People" height={"100%"}>
+              <Grid container direction="column" spacing={1} columns={1}>
+                <Grid item>
+                  <PeopleSelector/>
+                </Grid>
+              </Grid>
+            </DisplayCard>
+          </Grid>
+        </Grid>
+      </Grid>
     </>
   );
 };

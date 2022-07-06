@@ -62,8 +62,10 @@ export const LoginProvider = ({ children }) => {
     const getUser = () => {
       userService.GetUser().then((user) => {
         if (!!user) {
+          const db = getDatabase(app);
           saveUserInStorage({ user });
           dispatch(setUser(user));
+          set(ref(db, `sessions${window.location.pathname}/${user.id}`), { id: user.id, name: user.name, login: user.login, write: loggedIn, admin: loggedIn });
         }
       });
     };

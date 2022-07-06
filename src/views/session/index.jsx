@@ -1,4 +1,4 @@
-import { Card, CardContent, Chip, Grid } from "@mui/material";
+import { Chip, Grid } from "@mui/material";
 import Editor from "../../components/inputs/editor";
 import { loggedIn } from "../../hooks/login";
 import AdminPanel from "../adminPanel";
@@ -14,14 +14,16 @@ import Chat from "../../components/chat";
 import NameDialog from "../../components/dialog/name";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
 import { getDatabase, ref, remove } from "firebase/database";
+import DisplayCard from "../../components/displayCard";
 
 const Session = () => {
-  const { sharedString, sharedStringHelper, sharedMap } = useFluidContext();
+  const { sharedStringHelper, sharedMap } = useFluidContext();
   const { name, clearFile } = useRepoContext();
   const [path, setPath] = useState();
   const [markdown, setMarkdown] = useState();
   const [editMarkdownOpen, setEditMarkdownOpen] = useState(false);
   const [showMarkdown, setShowMarkdown] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [markdownFile, setMarkdownFile] = useState();
   const [nameOpen, setNameOpen] = useState(true);
   const user = useUser();
@@ -87,21 +89,21 @@ const Session = () => {
           onClose={() => setNameOpen(false)}
           />
       }
-      <Grid container spacing={1} sx={{ height: "100%" }}>
+      <Grid container spacing={1} sx={{ height: "100%", display: "flex", flexWrap: "nowrap" }}>
         {loggedIn() && (
-          <Grid item xs={12} sm={4} lg={3} xl={2}>
+          <Grid item>
             <AdminPanel />
           </Grid>
         )}
-        {(sharedString || !!path) && (
-          <Grid item container spacing={1} xs={12} sm={loggedIn() ? 8 : 12} lg={loggedIn() ? 9 : 12} xl={loggedIn() ? 10 : 12} sx={{ height: "100%" }}>
-            <Grid item container justifyContent={!!path ? "space-between": "flex-end"} xs={12} sx={{ height: "4.5%" }}>
-              {
-                !!path &&
-                <Grid item>
-                  <Chip sx={{ borderRadius: 1.5 }} label={path} onDelete={loggedIn() ? handleClear : undefined} />
-                </Grid>
-              }
+        <Grid item container spacing={1} sx={{ height: "100%", flex: 1 }}>
+          <Grid item container justifyContent={!!path ? "space-between": "flex-end"} xs={12} sx={{ height: "4.5%" }}>
+            {
+              !!path &&
+              <Grid item>
+                <Chip sx={{ borderRadius: 1.5 }} label={path} onDelete={loggedIn() ? handleClear : undefined} />
+              </Grid>
+            }
+            <Grid item container spacing={1} xs={5} justifyContent="flex-end">
               <Grid item>
                 <Chip 
                   sx={{ borderRadius: 1.5 }} 
@@ -112,29 +114,34 @@ const Session = () => {
                   onDelete={() => setShowMarkdown(!showMarkdown)} 
                 />
               </Grid>
-            </Grid>
-            <Grid item container spacing={1} xs={12} sx={{ height: "95.5%" }}>
-              <Grid item xs={12} lg={6} xl={8}>
-                {sharedStringHelper && <Editor sharedStringHelper={sharedStringHelper} />}
-              </Grid>
-              <Grid item container xs={12} lg={6} xl={4}>
-                {
-                  !!markdown && showMarkdown &&
-                  <Grid item xs={12}>
-                    <Card>
-                      <CardContent>
-                        <ReactMarkdown>{markdown}</ReactMarkdown>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                }
-                <Grid item xs={12} sx={{ height: showMarkdown ? "50%" : "100%"}}>
-                  <Chat/>
-                </Grid>
+              <Grid item>
+                <Chip 
+                  sx={{ borderRadius: 1.5 }} 
+                  deleteIcon={showChat ? <VisibilityOff/> : <Visibility/>} 
+                  label={"Chat"} 
+                  onDelete={() => setShowChat(!showChat)} 
+                />
               </Grid>
             </Grid>
           </Grid>
-        )}
+          <Grid item container spacing={1} xs={12} sx={{ height: "100%", display: "flex", flexWrap: "nowrap" }}>
+            {
+              <Grid item sx={{ flex: 1}}>
+                {sharedStringHelper && <Editor sharedStringHelper={sharedStringHelper} />}
+              </Grid>
+            }
+            <Grid item container xs={12} lg={6} xl={4} spacing={1} justifyContent="flex-end" sx={{ height: "100%" }}>
+              <Grid item xs={12} sx={{ height: showChat ? "50%" : "100%", display: !!markdown && showMarkdown ? "block" : "none"}}>
+                <DisplayCard height={"100%"}>
+                    <ReactMarkdown>{markdown}</ReactMarkdown>
+                </DisplayCard>
+              </Grid>
+              <Grid item xs={12} sx={{ height: showMarkdown ? "50%" : "100%", display: showChat ? "block" : "none"}}>
+                <Chat/>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
       </Grid>
     </>
   );

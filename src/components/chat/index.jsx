@@ -1,8 +1,8 @@
 import { Send } from "@mui/icons-material";
-import { Card, CardContent, CardHeader, Grid, IconButton, Paper, TextField } from "@mui/material";
+import { Card, CardContent, CardHeader, Grid, IconButton, InputAdornment, OutlinedInput, Paper } from "@mui/material";
 import { useEffect } from "react";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
-import { getDatabase, onChildAdded, push, ref } from "firebase/database";
+import { getDatabase, off, onChildAdded, push, ref } from "firebase/database";
 import Message from "./message";
 import { useState } from "react";
 import useUser from "../../hooks/user/useUser";
@@ -24,7 +24,7 @@ const Chat = () => {
                 setMessages(prev => [...prev, data]);
         }});
 
-        return () => messagesRef.off();
+        return () => off(messagesRef);
     }, [app]);
 
     const sendMessage = (event) => {
@@ -34,12 +34,12 @@ const Chat = () => {
         setMessageToSend("")
     }
     return (
-        <Card>
+        <Card sx={{ height: "100%" }}>
             <CardHeader title="Chat"/>
-            <CardContent>
-                <Grid container spacing={1} direction="column">
-                    <Grid item xs={12}>
-                        <Paper variant="outlined" elevation={0} sx={{ maxHeight: '70vh', overflow: "auto", padding: "5px" }}>
+            <CardContent sx={{ height: "95%"}}>
+                <Grid container spacing={1} direction="column" sx={{ height: "100%", display: "flex", flexWrap: "nowrap", flexDirection: "column" }}>
+                    <Grid item xs={12} sx={{ maxHeight: "90%"}}>
+                        <Paper variant="outlined" elevation={0} sx={{ height: "100%", overflow: "auto", padding: "5px" }}>
                             {
                                 !!messages && !!messages.length && messages.map(message => 
                                     <Grid key={message.timestamp} item xs={12}>
@@ -48,20 +48,23 @@ const Chat = () => {
                             }
                         </Paper>
                     </Grid>
-                    <Grid item container xs={12} spacing={1} sx={{ display: "flex", flexWrap: "nowrap" }}>
-                        <Grid item sx={{ flex: 1 }}>
-                            <TextField
+                    <Grid item container xs={12} spacing={1} alignItems="flex-end">
+                        <Grid item xs={12}>
+                            <OutlinedInput
                                 size="small"
                                 fullWidth
                                 placeholder="Send a message"
                                 value={messageToSend}
                                 onChange={(e) => setMessageToSend(e.target.value)}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton onClick={sendMessage}>
+                                            <Send/>
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                sx={{ borderRadius: "20px"}}
                             />
-                        </Grid>
-                        <Grid item>
-                            <IconButton onClick={sendMessage}>
-                                <Send/>
-                            </IconButton>
                         </Grid>
                     </Grid>
                 </Grid>

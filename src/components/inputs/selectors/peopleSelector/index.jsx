@@ -1,6 +1,6 @@
-import { EditOffSharp, EditSharp } from "@mui/icons-material";
+import { EditOffSharp, EditSharp, Security } from "@mui/icons-material";
 import { Avatar, Checkbox, List, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
-import { getDatabase, onChildAdded, onChildChanged, onChildRemoved, ref, update } from "firebase/database";
+import { getDatabase, off, onChildAdded, onChildChanged, onChildRemoved, ref, update } from "firebase/database";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useFirebaseContext } from "../../../../contexts/firebaseContext";
@@ -25,7 +25,7 @@ const PeopleSelector = () => {
             })));
         });
 
-        return () => membersRef.off();
+        return () => off(membersRef);
     }, [app])
 
     const handleToggleWrite = (id, checked) => {
@@ -41,6 +41,8 @@ const PeopleSelector = () => {
                     <ListItem 
                         key={person.id}
                         secondaryAction={
+                            !!person.admin ? 
+                            <Security/> :
                             <Checkbox
                                 edge="end"
                                 checked={person.write}
