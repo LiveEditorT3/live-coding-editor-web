@@ -7,7 +7,6 @@ import userService from "../../services/userService";
 import { setUser } from "../../stores/user.state";
 import {
   clearUser,
-  getUserFromStorage,
   saveUserInStorage,
 } from "../user/useUser";
 

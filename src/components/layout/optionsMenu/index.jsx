@@ -37,9 +37,12 @@ const OptionsMenu = () => {
             </IconButton>
           }
         />
-        <IconButton onClick={handleShare}>
-          <Share sx={{color: "white"}}/>
-        </IconButton>
+        {
+          !!window.location.hash &&
+          <IconButton onClick={handleShare}>
+            <Share sx={{color: "white"}}/>
+          </IconButton>
+        }
         <Checkbox
             onClick={toggleTheme}
             checked={lightTheme}

@@ -114,8 +114,8 @@ const AdminPanel = () => {
           </Grid>
         </Grid>
         <Grid item container spacing={1} direction="column" xs={10} sx={{display: peopleOpen || optionsOpen ? "flex" : "none"}}>
-          <Grid item sx={{ height: peopleOpen ? "50%" : "100%", display: optionsOpen ? "flex" : "none" }}>
-            <DisplayCard title="Options" height={"100%"}>
+          <Grid item sx={{ height: peopleOpen ? "50%" : "100%", display: optionsOpen ? "flex" : "none", width: "100%"  }}>
+            <DisplayCard title="Options" height={"100%"} width={"100%"}>
               <Grid container direction="column" spacing={1} columns={1}>
                 <Grid item>
                   <RepoSelector
@@ -146,7 +146,7 @@ const AdminPanel = () => {
             </DisplayCard>
           </Grid>
           <Grid item sx={{ height: optionsOpen ? "50%" : "100%", display: peopleOpen ? "flex" : "none" }}>
-            <DisplayCard title="People" height={"100%"}>
+            <DisplayCard title="People" height={"100%"} width={"100%"}>
               <Grid container direction="column" spacing={1} columns={1}>
                 <Grid item>
                   <PeopleSelector/>

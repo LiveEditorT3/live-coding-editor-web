@@ -11,10 +11,14 @@ import { useFirebaseContext } from "../../../contexts/firebaseContext";
 const NameDialog = ({ open, onClose }) => {
     const { app } = useFirebaseContext();
     const [name, setName] = useState("");
+    const [error, setError] = useState(false);
     const { audience } = useFluidContext();
     const dispatch = useDispatch();
 
     const handleAccept = (event) => {
+        setError(false);
+        if (!name.trim()) 
+            return setError(true);
         const fluidUser = audience.getMyself();
         const user = { name, id: fluidUser.userId, login: "" };
         const db = getDatabase(app);
@@ -28,13 +32,14 @@ const NameDialog = ({ open, onClose }) => {
         <Dialog
             open={open}
             title="Welcome!"
-            onClose={onClose}
             onAccept={handleAccept}
         >
             <TextField
                 fullWidth
+                error={error}
                 label="Name"
                 placeholder="Enter your name"
+                helperText={error ? "Please enter your name to continue" : null}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
             />

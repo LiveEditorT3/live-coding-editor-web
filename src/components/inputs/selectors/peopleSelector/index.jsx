@@ -4,6 +4,7 @@ import { getDatabase, off, onChildAdded, onChildChanged, onChildRemoved, ref, up
 import { useEffect } from "react";
 import { useState } from "react";
 import { useFirebaseContext } from "../../../../contexts/firebaseContext";
+import { utils } from "../../../../utils/utils";
 
 const PeopleSelector = () => {
     const { app } = useFirebaseContext();
@@ -53,7 +54,7 @@ const PeopleSelector = () => {
                         }
                     >
                         <ListItemAvatar>
-                            <Avatar>{person.name[0]}</Avatar>
+                            <Avatar>{utils.formatAvatar(person.name)}</Avatar>
                         </ListItemAvatar>
                         <ListItemText primary={person.name}/>
                     </ListItem>

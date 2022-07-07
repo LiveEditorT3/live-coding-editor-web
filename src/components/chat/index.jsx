@@ -7,6 +7,7 @@ import Message from "./message";
 import { useState } from "react";
 import useUser from "../../hooks/user/useUser";
 import { useRef } from "react";
+import { useLayoutEffect } from "react";
 
 const Chat = () => {
     const { app } = useFirebaseContext();
@@ -14,6 +15,7 @@ const Chat = () => {
     const [messages, setMessages] = useState([]);
     const [messageToSend, setMessageToSend] = useState("");
     const dateReference = useRef(Date.now());
+    const chatRef = useRef();
 
     useEffect(() => {
         const db = getDatabase(app);
@@ -33,13 +35,19 @@ const Chat = () => {
         push(ref(db, `chats${window.location.pathname}`), message);
         setMessageToSend("")
     }
+
+    useLayoutEffect(() => {
+        if (chatRef.current)
+            chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }, [messages, chatRef]);
+
     return (
         <Card sx={{ height: "100%" }}>
             <CardHeader title="Chat"/>
             <CardContent sx={{ height: "95%"}}>
                 <Grid container spacing={1} direction="column" sx={{ height: "100%", display: "flex", flexWrap: "nowrap", flexDirection: "column" }}>
-                    <Grid item xs={12} sx={{ maxHeight: "90%"}}>
-                        <Paper variant="outlined" elevation={0} sx={{ height: "100%", overflow: "auto", padding: "5px" }}>
+                    <Grid item xs={12} sx={{ maxHeight: "85%"}}>
+                        <Paper ref={chatRef} variant="outlined" elevation={0} sx={{ height: "100%", overflow: "auto", padding: "5px" }}>
                             {
                                 !!messages && !!messages.length && messages.map(message => 
                                     <Grid key={message.timestamp} item xs={12}>
@@ -49,23 +57,25 @@ const Chat = () => {
                         </Paper>
                     </Grid>
                     <Grid item container xs={12} spacing={1} alignItems="flex-end">
-                        <Grid item xs={12}>
-                            <OutlinedInput
-                                size="small"
-                                fullWidth
-                                placeholder="Send a message"
-                                value={messageToSend}
-                                onChange={(e) => setMessageToSend(e.target.value)}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton onClick={sendMessage}>
-                                            <Send/>
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                                sx={{ borderRadius: "20px"}}
-                            />
-                        </Grid>
+                        <OutlinedInput
+                            size="small"
+                            fullWidth
+                            placeholder="Send a message"
+                            value={messageToSend}
+                            onChange={(e) => setMessageToSend(e.target.value)}
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton onClick={sendMessage}>
+                                        <Send/>
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                            sx={{ borderRadius: "20px"}}
+                            onKeyPress={(e) => {
+                                if (e.key === "Enter")
+                                    sendMessage();
+                            }}
+                        />
                     </Grid>
                 </Grid>
             </CardContent>

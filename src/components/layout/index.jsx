@@ -1,11 +1,12 @@
 import { AppBar, Container, Toolbar, Typography } from "@mui/material";
 import UserMenu from "./userMenu";
 import useStyles from "./styles";
-import { loggedIn } from "../../hooks/login";
 import OptionsMenu from "./optionsMenu";
+import useUser from "../../hooks/user/useUser";
 
 const Layout = ({ children }) => {
   const classes = useStyles();
+  const { name, login } = useUser();
 
   return (
     <div className={classes.root}>
@@ -16,9 +17,10 @@ const Layout = ({ children }) => {
           </Typography>
           <section className={classes.rightToolbar}>
             <OptionsMenu/>
-            {loggedIn() && (
+            {
+              (!!name || !!login) &&
               <UserMenu />
-            )}
+            }
           </section>
         </Toolbar>
       </AppBar>
