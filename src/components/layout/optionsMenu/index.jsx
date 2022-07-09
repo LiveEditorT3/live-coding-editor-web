@@ -1,7 +1,7 @@
 import { Brightness4, Brightness7, Close, Share } from "@mui/icons-material";
 import { Checkbox, IconButton, Snackbar } from "@mui/material";
 import { useState } from "react";
-import useTheme from "../../../hooks/theme/useLightTheme";
+import useTheme from "../../../hooks/theme/useTheme";
 
 const OptionsMenu = () => {
   const { lightTheme, toggleTheme } = useTheme();

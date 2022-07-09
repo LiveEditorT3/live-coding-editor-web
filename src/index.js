@@ -6,7 +6,6 @@ import { store } from "./stores/store";
 import Layout from "./components/layout";
 import { LoginProvider } from "./hooks/login";
 import Router from "./router/routes";
-import { getTheme } from "./theme";
 import {
   CssBaseline,
   StyledEngineProvider,
@@ -14,7 +13,7 @@ import {
 } from "@mui/material";
 import RepoProvider from "./contexts/repoContext";
 import FluidProvider from "./contexts/fluidContext";
-import useTheme from "./hooks/theme/useLightTheme";
+import { useTheme, getTheme } from "./hooks/theme/useTheme";
 import FirebaseProvider from "./contexts/firebaseContext";
 
 const App = () => {

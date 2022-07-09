@@ -10,7 +10,7 @@ import "codemirror/mode/clike/clike";
 import "codemirror/mode/go/go";
 import "codemirror/keymap/sublime";
 import { useFluidContext } from "../../../contexts/fluidContext";
-import useTheme from "../../../hooks/theme/useLightTheme";
+import useTheme from "../../../hooks/theme/useTheme";
 import { useFirebaseContext } from "../../../contexts/firebaseContext";
 import { getDatabase, onValue, ref } from "firebase/database";
 import useUser from "../../../hooks/user/useUser";

@@ -2,6 +2,15 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setTheme } from "../../stores/theme.state";
 
+import { createTheme } from "@mui/material";
+
+const getTheme = (light) =>
+  createTheme({
+    palette: {
+      mode: light ? "light" : "dark",
+    },
+});
+
 const useTheme = () => {
   const state = useSelector((store) => store.theme);
   const dispatch = useDispatch();
@@ -23,4 +32,5 @@ const useTheme = () => {
     toggleTheme,
   };
 };
-export default useTheme;
+
+export { useTheme, getTheme };
