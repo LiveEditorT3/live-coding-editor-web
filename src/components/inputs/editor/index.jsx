@@ -11,12 +11,18 @@ import "codemirror/mode/go/go";
 import "codemirror/keymap/sublime";
 import { useFluidContext } from "../../../contexts/fluidContext";
 import useTheme from "../../../hooks/theme/useLightTheme";
+import { useFirebaseContext } from "../../../contexts/firebaseContext";
+import { getDatabase, onValue, ref } from "firebase/database";
+import useUser from "../../../hooks/user/useUser";
+import { loggedIn } from "../../../hooks/login";
 
 const Editor = (props) => {
   const sharedStringHelper = props.sharedStringHelper;
   const { mode, fileContent, setContent } = useRepoContext();
+  const { app } = useFirebaseContext();
   const { sharedMap } = useFluidContext();
   const { lightTheme } = useTheme();
+  const { id } = useUser();
   
   const editorRef = useRef(null);
 
@@ -156,6 +162,16 @@ const Editor = (props) => {
     };
   }, [sharedStringHelper, setContent]);
 
+  useEffect(() => {
+    if (!!id && !loggedIn()) {
+      const db = getDatabase(app);
+      const membersRef = ref(db, `sessions${window.location.pathname}/${id}/write`)
+      onValue(membersRef, (snapshot) => {
+        const data = snapshot.val();
+        editorRef.current.setOption("readOnly", data ? false : "nocursor");
+      })
+    }
+  }, [app, id])
   return (
     <div>
       <textarea id="code" />

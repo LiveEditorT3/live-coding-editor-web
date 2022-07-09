@@ -15,6 +15,7 @@ import {
 import RepoProvider from "./contexts/repoContext";
 import FluidProvider from "./contexts/fluidContext";
 import useTheme from "./hooks/theme/useLightTheme";
+import FirebaseProvider from "./contexts/firebaseContext";
 
 const App = () => {
   const { lightTheme } = useTheme();
@@ -22,15 +23,17 @@ const App = () => {
     <ThemeProvider theme={getTheme(lightTheme)}>
       <CssBaseline enableColorScheme />
       <StyledEngineProvider injectFirst>
-        <LoginProvider>
-          <Layout>
-            <FluidProvider>
-              <RepoProvider>
-                <Router />
-              </RepoProvider>
-            </FluidProvider>
-          </Layout>
-        </LoginProvider>
+        <Layout>
+          <FluidProvider>
+            <RepoProvider>
+              <FirebaseProvider>
+                <LoginProvider>
+                  <Router />
+                </LoginProvider>
+              </FirebaseProvider>
+            </RepoProvider>
+          </FluidProvider>
+        </Layout>
       </StyledEngineProvider>
     </ThemeProvider>
   );

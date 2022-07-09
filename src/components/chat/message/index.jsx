@@ -7,7 +7,7 @@ const Message = ({ user, text, timestamp }) => {
         <Grid container direction="column" sx={{ padding: "4px" }}>
             <Grid item xs={12}>
                 <Typography variant="body2">
-                    <strong>{user}</strong> <Typography variant="caption">{timestamp}</Typography>
+                    <strong>{user}</strong> <Typography variant="caption">{new Date(timestamp).toLocaleString('es-AR')}</Typography>
                 </Typography>
             </Grid>
             <Grid item xs={12}>

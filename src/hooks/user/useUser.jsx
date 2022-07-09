@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 
 export const clearUser = () => localStorage.removeItem("user");
 export const getUserFromStorage = () =>
-  JSON.parse(localStorage.getItem("user")) || {};
+  JSON.parse(localStorage.getItem("user"));
 export const saveUserInStorage = (user) =>
   localStorage.setItem("user", JSON.stringify(user));
 

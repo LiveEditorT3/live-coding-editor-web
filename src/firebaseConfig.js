@@ -1,14 +1,14 @@
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const FirebaseConfig = {
-    apiKey: "AIzaSyBE7bUoFdwuThT7Mv_dnCq_Pie9ym7UCFs",
-    authDomain: "live-coding-editor-5762f.firebaseapp.com",
-    projectId: "live-coding-editor-5762f",
-    storageBucket: "live-coding-editor-5762f.appspot.com",
-    messagingSenderId: "423933700967",
-    appId: "1:423933700967:web:b6cac8aff10d99097e5dc2",
-    measurementId: "G-0BLXSQE1R6",
-    databaseURL: "https://live-coding-editor-5762f-default-rtdb.firebaseio.com"
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}.appspot.com`,
+    messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_APP_ID,
+    measurementId: process.env.REACT_APP_MEASUREMENT_ID,
+    databaseURL: `https://${process.env.REACT_APP_FIREBASE_PROJECT_ID}-default-rtdb.firebaseio.com`
   };
   
   export default FirebaseConfig

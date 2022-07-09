@@ -7,6 +7,9 @@ const FirebaseContext = createContext({});
 
 export const useFirebaseContext = () => {
     const { app } = useContext(FirebaseContext);
+
+    
+
     return {
         app
     };

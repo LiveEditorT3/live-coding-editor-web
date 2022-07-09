@@ -1,11 +1,12 @@
+import { getDatabase, ref, set } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 } from "uuid";
+import { useFirebaseContext } from "../../contexts/firebaseContext";
 import userService from "../../services/userService";
 import { setUser } from "../../stores/user.state";
 import {
   clearUser,
-  getUserFromStorage,
   saveUserInStorage,
 } from "../user/useUser";
 
@@ -36,6 +37,7 @@ export const saveTokenInStorage = (token, key = TOKEN_KEY) =>
 export const LoginProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(!!getTokenInStorage());
   const { login } = useSelector((store) => store.user.user.login);
+  const { app } = useFirebaseContext();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -54,23 +56,27 @@ export const LoginProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const { user: localUser } = getUserFromStorage();
+    const localUser = JSON.parse(localStorage.getItem("user"));
 
     const getUser = () => {
       userService.GetUser().then((user) => {
         if (!!user) {
+          const db = getDatabase(app);
           saveUserInStorage({ user });
           dispatch(setUser(user));
+          set(ref(db, `sessions${window.location.pathname}/${user.id}`), { id: user.id, name: user.name, login: user.login, write: loggedIn, admin: loggedIn });
         }
       });
     };
 
-    if (loggedIn) {
-      if (!!localUser && localUser.login !== login)
-        dispatch(setUser(localUser));
-      else if (!login) getUser();
+    if (loggedIn && !login) 
+      getUser();
+    else if (!!localUser && localUser.login !== login) {
+      const db = getDatabase(app);
+      set(ref(db, `sessions${window.location.pathname}/${localUser.id}`), { id: localUser.id, name: localUser.name, login: localUser.login, write: loggedIn });
+      dispatch(setUser(localUser));
     }
-  }, [dispatch, login, loggedIn]);
+  }, [dispatch, login, loggedIn, app]);
 
   return <>{children}</>;
 };

@@ -23,8 +23,7 @@ const MarkdownDialog = ({ open, file, user, repo, onClose }) => {
     }
 
     useEffect(() => {
-        if (!!file?.content)
-            setMarkdown(file.content)
+        setMarkdown(file?.content || "");
     }, [file])
     
     return(
