@@ -12,14 +12,12 @@ const Dialog = ({ title, open, onClose, onAccept, children, ...rest }) => {
       <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>{children}</DialogContent>
       <DialogActions>
-        {
-          onClose &&
-          <Button onClick={onClose}>Close</Button>
-        }
-        {
-          onAccept &&
-          <Button onClick={onAccept} variant="contained">Accept</Button>
-        }
+        {onClose && <Button onClick={onClose}>Close</Button>}
+        {onAccept && (
+          <Button onClick={onAccept} variant="contained">
+            Accept
+          </Button>
+        )}
       </DialogActions>
     </MuiDialog>
   );

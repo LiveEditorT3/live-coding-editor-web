@@ -46,7 +46,7 @@ const AdminPanel = () => {
   useEffect(() => {
     if (!repo && !!repos && !!repos.length) {
       setRepo(repos[0].name);
-      setRepoName(repos[0].name)
+      setRepoName(repos[0].name);
     }
   }, [repos, open, messageOpen, repo, setRepoName]);
 
@@ -55,9 +55,9 @@ const AdminPanel = () => {
       audience.on("memberRemoved", (member) => {
         const db = getDatabase(app);
         remove(ref(db, `sessions${window.location.pathname}/${member.userId}`));
-      })
+      });
     }
-  }, [audience, app])
+  }, [audience, app]);
 
   const handleCreate = (event) => {
     createRepo(name, isPrivate);
@@ -94,7 +94,7 @@ const AdminPanel = () => {
 
   const handleAddFile = (name) => {
     setFile(name);
-    sharedMap.set("mode", selectEditorMode(name))
+    sharedMap.set("mode", selectEditorMode(name));
     sharedMap.set("file", name);
     setContent("", true);
     setFileSha("");
@@ -102,21 +102,64 @@ const AdminPanel = () => {
 
   return (
     <>
-      <CreateRepoDialog open={open} onClose={() => setOpen(false)} onAccept={handleCreate} />
-      <CommitDialog open={messageOpen} onClose={() => setMessageOpen(false)} onAccept={handleCommit} />
-      <Grid container spacing={2} direction="row" sx={{ height: "100%", minWidth: peopleOpen || optionsOpen ? "25vw" : "4vw" }}>
+      <CreateRepoDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        onAccept={handleCreate}
+      />
+      <CommitDialog
+        open={messageOpen}
+        onClose={() => setMessageOpen(false)}
+        onAccept={handleCommit}
+      />
+      <Grid
+        container
+        spacing={2}
+        direction="row"
+        sx={{
+          height: "100%",
+          minWidth: peopleOpen || optionsOpen ? "25vw" : "4vw",
+        }}
+      >
         <Grid item container spacing={1} direction="column" xs={2}>
           <Grid item>
-            <Tab label="Options" open={optionsOpen} onOpen={() => setOptionsOpen(prev => !prev)} />
+            <Tab
+              label="Options"
+              open={optionsOpen}
+              onOpen={() => setOptionsOpen((prev) => !prev)}
+            />
           </Grid>
           <Grid item>
-            <Tab label="People" open={peopleOpen} onOpen={() => setPeopleOpen(prev => !prev)} />
+            <Tab
+              label="People"
+              open={peopleOpen}
+              onOpen={() => setPeopleOpen((prev) => !prev)}
+            />
           </Grid>
         </Grid>
-        <Grid item container spacing={1} direction="column" xs={10} sx={{display: peopleOpen || optionsOpen ? "flex" : "none" }}>
-          <Grid item sx={{ height: peopleOpen ? "44vh" : "88vh", display: optionsOpen ? "flex" : "none", width: "100%"  }}>
-            <DisplayCard title="Options" height={"100%"} width={"100%"} overflow={"auto"}>
-              <Grid container direction="column" spacing={1} columns={1} >
+        <Grid
+          item
+          container
+          spacing={1}
+          direction="column"
+          xs={10}
+          sx={{ display: peopleOpen || optionsOpen ? "flex" : "none" }}
+        >
+          <Grid
+            item
+            sx={{
+              height: peopleOpen ? "44vh" : "88vh",
+              display: optionsOpen ? "flex" : "none",
+              width: "100%",
+            }}
+          >
+            <DisplayCard
+              title="Options"
+              height={"100%"}
+              width={"100%"}
+              overflow={"auto"}
+            >
+              <Grid container direction="column" spacing={1} columns={1}>
                 <Grid item>
                   <RepoSelector
                     repo={repo}
@@ -137,7 +180,7 @@ const AdminPanel = () => {
                 </Grid>
                 <Grid item>
                   <FileSelector
-                    files={files?.filter(file => file.name !== "README.md")}
+                    files={files?.filter((file) => file.name !== "README.md")}
                     onSelect={handleChangeFile}
                     onAddFile={handleAddFile}
                   />
@@ -145,11 +188,22 @@ const AdminPanel = () => {
               </Grid>
             </DisplayCard>
           </Grid>
-          <Grid item sx={{ height: optionsOpen ? "44vh" : "88vh", display: peopleOpen ? "flex" : "none" }}>
-            <DisplayCard title="People" height={"100%"} width={"100%"} overflow={"auto"}>
+          <Grid
+            item
+            sx={{
+              height: optionsOpen ? "44vh" : "88vh",
+              display: peopleOpen ? "flex" : "none",
+            }}
+          >
+            <DisplayCard
+              title="People"
+              height={"100%"}
+              width={"100%"}
+              overflow={"auto"}
+            >
               <Grid container direction="column" spacing={1} columns={1}>
                 <Grid item>
-                  <PeopleSelector/>
+                  <PeopleSelector />
                 </Grid>
               </Grid>
             </DisplayCard>

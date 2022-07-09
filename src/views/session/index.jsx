@@ -32,19 +32,19 @@ const Session = () => {
 
   useEffect(() => {
     if (sharedMap !== undefined) {
-      
       const syncView = () => {
-        setPath(sharedMap.get("file"))
-        setMarkdown(sharedMap.get("markdown"))
-      }
-      
+        setPath(sharedMap.get("file"));
+        setMarkdown(sharedMap.get("markdown"));
+      };
+
       syncView();
       sharedMap.on("valueChanged", syncView);
       // turn off listener when component is unmounted
-      return () => { sharedMap.off("valueChanged", syncView) }
+      return () => {
+        sharedMap.off("valueChanged", syncView);
+      };
     }
-  
-  }, [sharedMap])
+  }, [sharedMap]);
 
   useEffect(() => {
     window.addEventListener("beforeunload", () => {
@@ -52,105 +52,149 @@ const Session = () => {
         const db = getDatabase(app);
         remove(ref(db, `sessions${window.location.pathname}/${user.id}`));
       }
-    })
-  }, [app, user.id])
+    });
+  }, [app, user.id]);
 
   useEffect(() => {
     if (!!user && !!name && !!sharedMap)
-        getFile("README.md")
-            .then(file => {
-                setMarkdownFile(file)
-                sharedMap.set("markdown", file.content)
-            })
-            .catch(() => {
-                setMarkdownFile({ path: "README.md" })
-                sharedMap.set("markdown", "")
-            })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name])
+      getFile("README.md")
+        .then((file) => {
+          setMarkdownFile(file);
+          sharedMap.set("markdown", file.content);
+        })
+        .catch(() => {
+          setMarkdownFile({ path: "README.md" });
+          sharedMap.set("markdown", "");
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name]);
 
   const handleClear = (event) => {
     sharedMap.set("file", "");
     clearFile();
-  }
+  };
 
   return (
     <>
-      {
-        loggedIn() &&
-        <MarkdownDialog 
-          open={editMarkdownOpen} 
-          file={markdownFile} 
+      {loggedIn() && (
+        <MarkdownDialog
+          open={editMarkdownOpen}
+          file={markdownFile}
           user={user.login}
           repo={name}
-          onClose={() => setEditMarkdownOpen(false)} 
+          onClose={() => setEditMarkdownOpen(false)}
         />
-      }
-      {
-        !loggedIn() && !user.name &&
-        <NameDialog
-          open={nameOpen}
-          onClose={() => setNameOpen(false)}
-          />
-      }
-      <Grid container spacing={1} sx={{ height: "100%",  display: "flex", flexWrap: "nowrap" }}>
+      )}
+      {!loggedIn() && !user.name && (
+        <NameDialog open={nameOpen} onClose={() => setNameOpen(false)} />
+      )}
+      <Grid
+        container
+        spacing={1}
+        sx={{ height: "100%", display: "flex", flexWrap: "nowrap" }}
+      >
         {loggedIn() && (
           <Grid item>
             <AdminPanel />
           </Grid>
         )}
         <Grid item container spacing={1} sx={{ height: "100%", flex: 1 }}>
-          <Grid item container justifyContent={!!path ? "space-between": "flex-end"} xs={12}>
-            {
-              !!path &&
+          <Grid
+            item
+            container
+            justifyContent={!!path ? "space-between" : "flex-end"}
+            xs={12}
+          >
+            {!!path && (
               <Grid item>
-                <Chip sx={{ borderRadius: 1.5 }} label={path} onDelete={loggedIn() ? handleClear : undefined} />
+                <Chip
+                  sx={{ borderRadius: 1.5 }}
+                  label={path}
+                  onDelete={loggedIn() ? handleClear : undefined}
+                />
               </Grid>
-            }
+            )}
             <Grid item container spacing={1} xs={5} justifyContent="flex-end">
               <Grid item>
-                <Chip 
-                  sx={{ borderRadius: 1.5 }} 
-                  icon={loggedIn() ? <Edit/> : undefined} 
-                  onClick={loggedIn() ? () => setEditMarkdownOpen(true) : undefined} 
-                  deleteIcon={showMarkdown ? <VisibilityOff/> : <Visibility/>} 
-                  label={"README.md"} 
-                  onDelete={() => setShowMarkdown(!showMarkdown)} 
+                <Chip
+                  sx={{ borderRadius: 1.5 }}
+                  icon={loggedIn() ? <Edit /> : undefined}
+                  onClick={
+                    loggedIn() ? () => setEditMarkdownOpen(true) : undefined
+                  }
+                  deleteIcon={showMarkdown ? <VisibilityOff /> : <Visibility />}
+                  label={"README.md"}
+                  onDelete={() => setShowMarkdown(!showMarkdown)}
                 />
               </Grid>
               <Grid item>
-                <Chip 
-                  sx={{ borderRadius: 1.5 }} 
-                  deleteIcon={showChat ? <VisibilityOff/> : <Visibility/>} 
-                  label={"Chat"} 
-                  onDelete={() => setShowChat(!showChat)} 
+                <Chip
+                  sx={{ borderRadius: 1.5 }}
+                  deleteIcon={showChat ? <VisibilityOff /> : <Visibility />}
+                  label={"Chat"}
+                  onDelete={() => setShowChat(!showChat)}
                 />
               </Grid>
             </Grid>
           </Grid>
-          <Grid item container spacing={1} xs={12} sx={{ height: "100%", display: "flex", flexWrap: "nowrap" }}>
+          <Grid
+            item
+            container
+            spacing={1}
+            xs={12}
+            sx={{ height: "100%", display: "flex", flexWrap: "nowrap" }}
+          >
             {
-              <Grid item sx={{ flex: 1, overflow: "auto", height: "85.2vh", marginTop: "7px" }}>
-                {sharedStringHelper && <Editor sharedStringHelper={sharedStringHelper} />}
+              <Grid
+                item
+                sx={{
+                  flex: 1,
+                  overflow: "auto",
+                  height: "85.2vh",
+                  marginTop: "7px",
+                }}
+              >
+                {sharedStringHelper && (
+                  <Editor sharedStringHelper={sharedStringHelper} />
+                )}
               </Grid>
             }
-            <Grid 
-              item 
-              container 
-              xs={showMarkdown || showChat ? 12 : "auto"} 
-              lg={showMarkdown || showChat ? 5 : "auto"} 
-              xl={showMarkdown || showChat ? 4 : "auto"} 
-              spacing={1} 
-              justifyContent="flex-end" 
+            <Grid
+              item
+              container
+              xs={showMarkdown || showChat ? 12 : "auto"}
+              lg={showMarkdown || showChat ? 5 : "auto"}
+              xl={showMarkdown || showChat ? 4 : "auto"}
+              spacing={1}
+              justifyContent="flex-end"
               sx={{ height: "100%" }}
             >
-              <Grid item xs={12} sx={{ height: showChat ? "41.5vh" : "85.2vh", display: !!markdown && showMarkdown ? "block" : "none"}}>
-                <DisplayCard height={"100%"} overflow={"auto"} wordBreak={"break-word"} maxHeight={showChat ? "41.5vh" : "85.2vh"}>
-                    <ReactMarkdown>{markdown}</ReactMarkdown>
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  height: showChat ? "41.5vh" : "85.2vh",
+                  display: !!markdown && showMarkdown ? "block" : "none",
+                }}
+              >
+                <DisplayCard
+                  height={"100%"}
+                  overflow={"auto"}
+                  wordBreak={"break-word"}
+                  maxHeight={showChat ? "41.5vh" : "85.2vh"}
+                >
+                  <ReactMarkdown>{markdown}</ReactMarkdown>
                 </DisplayCard>
               </Grid>
-              <Grid item xs={12} sx={{ height: !!markdown && showMarkdown ? "41.5vh" : "85.2vh", display: showChat ? "block" : "none"}}>
-                <Chat compact={!!markdown && showMarkdown}/>
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  height: !!markdown && showMarkdown ? "41.5vh" : "85.2vh",
+                  display: showChat ? "block" : "none",
+                }}
+              >
+                <Chat compact={!!markdown && showMarkdown} />
               </Grid>
             </Grid>
           </Grid>

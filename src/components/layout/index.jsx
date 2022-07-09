@@ -16,11 +16,8 @@ const Layout = ({ children }) => {
             Live Coding Editor
           </Typography>
           <section className={classes.rightToolbar}>
-            <OptionsMenu/>
-            {
-              (!!name || !!login) &&
-              <UserMenu />
-            }
+            <OptionsMenu />
+            {(!!name || !!login) && <UserMenu />}
           </section>
         </Toolbar>
       </AppBar>
