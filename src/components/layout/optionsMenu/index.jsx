@@ -1,10 +1,10 @@
 import { Brightness4, Brightness7, Close, Share } from "@mui/icons-material";
 import { Checkbox, IconButton, Snackbar } from "@mui/material";
+import { useTheme } from "@mui/styles";
 import { useState } from "react";
-import useTheme from "../../../hooks/theme/useTheme";
 
-const OptionsMenu = () => {
-  const { lightTheme, toggleTheme } = useTheme();
+const OptionsMenu = ({ toggleThemeMode }) => {
+  const theme = useTheme();
   const [open, setOpen] = useState(false);
 
   const handleShare = (event) => {
@@ -43,8 +43,8 @@ const OptionsMenu = () => {
         </IconButton>
       )}
       <Checkbox
-        onClick={toggleTheme}
-        checked={lightTheme}
+        onClick={toggleThemeMode}
+        checked={theme.palette.mode === "light"}
         checkedIcon={<Brightness7 />}
         icon={<Brightness4 />}
         sx={{

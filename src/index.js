@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { createTheme } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./stores/store";
@@ -13,16 +14,27 @@ import {
 } from "@mui/material";
 import RepoProvider from "./contexts/repoContext";
 import FluidProvider from "./contexts/fluidContext";
-import { useTheme, getTheme } from "./hooks/theme/useTheme";
+import { useToggleableSemiPersistentState } from "./hooks/useSemiPersistentState";
 import FirebaseProvider from "./contexts/firebaseContext";
 
 const App = () => {
-  const { lightTheme } = useTheme();
+  const [themeMode, toggleThemeMode] = useToggleableSemiPersistentState(
+    "theme",
+    "light",
+    ["light", "dark"]
+  );
+
   return (
-    <ThemeProvider theme={getTheme(lightTheme)}>
+    <ThemeProvider
+      theme={createTheme({
+        palette: {
+          mode: themeMode,
+        },
+      })}
+    >
       <CssBaseline enableColorScheme />
       <StyledEngineProvider injectFirst>
-        <Layout>
+        <Layout toggleThemeMode={toggleThemeMode}>
           <FluidProvider>
             <RepoProvider>
               <FirebaseProvider>

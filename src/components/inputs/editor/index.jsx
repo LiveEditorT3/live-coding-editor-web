@@ -10,18 +10,17 @@ import "codemirror/mode/clike/clike";
 import "codemirror/mode/go/go";
 import "codemirror/keymap/sublime";
 import { useFluidContext } from "../../../contexts/fluidContext";
-import useTheme from "../../../hooks/theme/useTheme";
 import { useFirebaseContext } from "../../../contexts/firebaseContext";
 import { getDatabase, onValue, ref } from "firebase/database";
 import useUser from "../../../hooks/user/useUser";
 import { loggedIn } from "../../../hooks/login";
+import { useTheme } from "@mui/styles";
 
-const Editor = (props) => {
-  const sharedStringHelper = props.sharedStringHelper;
+const Editor = ({ sharedStringHelper }) => {
+  const theme = useTheme();
   const { mode, fileContent, setContent } = useRepoContext();
   const { app } = useFirebaseContext();
   const { sharedMap } = useFluidContext();
-  const { lightTheme } = useTheme();
   const { id } = useUser();
 
   const editorRef = useRef(null);
@@ -102,8 +101,11 @@ const Editor = (props) => {
   }, [mode]);
 
   useEffect(() => {
-    editorRef.current.setOption("theme", lightTheme ? "eclipse" : "colorforth");
-  }, [lightTheme]);
+    editorRef.current.setOption(
+      "theme",
+      theme.palette.mode === "light" ? "eclipse" : "colorforth"
+    );
+  }, [theme]);
 
   useEffect(() => {
     if (sharedMap !== undefined) {

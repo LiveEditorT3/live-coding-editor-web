@@ -4,7 +4,7 @@ import useStyles from "./styles";
 import OptionsMenu from "./optionsMenu";
 import useUser from "../../hooks/user/useUser";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, toggleThemeMode }) => {
   const classes = useStyles();
   const { name, login } = useUser();
 
@@ -16,7 +16,7 @@ const Layout = ({ children }) => {
             Live Coding Editor
           </Typography>
           <section className={classes.rightToolbar}>
-            <OptionsMenu />
+            <OptionsMenu toggleThemeMode={toggleThemeMode} />
             {(!!name || !!login) && <UserMenu />}
           </section>
         </Toolbar>
