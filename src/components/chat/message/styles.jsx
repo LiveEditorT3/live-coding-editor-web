@@ -5,9 +5,9 @@ export default makeStyles((theme) => ({
     padding: "10px",
     borderRadius: "25px",
     maxWidth: "85%",
-    margin: "10px"
+    margin: "10px",
   },
   text: {
-    wordWrap: "break-word"
-  }
+    wordWrap: "break-word",
+  },
 }));

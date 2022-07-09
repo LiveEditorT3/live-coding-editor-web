@@ -10,20 +10,19 @@ import "codemirror/mode/clike/clike";
 import "codemirror/mode/go/go";
 import "codemirror/keymap/sublime";
 import { useFluidContext } from "../../../contexts/fluidContext";
-import useTheme from "../../../hooks/theme/useLightTheme";
 import { useFirebaseContext } from "../../../contexts/firebaseContext";
 import { getDatabase, onValue, ref } from "firebase/database";
 import useUser from "../../../hooks/user/useUser";
 import { loggedIn } from "../../../hooks/login";
+import { useTheme } from "@mui/styles";
 
-const Editor = (props) => {
-  const sharedStringHelper = props.sharedStringHelper;
+const Editor = ({ sharedStringHelper }) => {
+  const theme = useTheme();
   const { mode, fileContent, setContent } = useRepoContext();
   const { app } = useFirebaseContext();
   const { sharedMap } = useFluidContext();
-  const { lightTheme } = useTheme();
   const { id } = useUser();
-  
+
   const editorRef = useRef(null);
 
   const getStringText = (lines) => lines.join("\n");
@@ -92,7 +91,7 @@ const Editor = (props) => {
     );
     editorComponent.on("change", handleChange);
     editorComponent.setValue(sharedStringHelper.getText());
-    editorComponent.setSize("100%", "100%")
+    editorComponent.setSize("100%", "100%");
     editorRef.current = editorComponent;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -102,22 +101,26 @@ const Editor = (props) => {
   }, [mode]);
 
   useEffect(() => {
-    editorRef.current.setOption("theme", lightTheme ? "eclipse" : "colorforth");
-  }, [lightTheme]);
+    editorRef.current.setOption(
+      "theme",
+      theme.palette.mode === "light" ? "eclipse" : "colorforth"
+    );
+  }, [theme]);
 
   useEffect(() => {
     if (sharedMap !== undefined) {
-      
-      const syncView = () => editorRef.current.setOption("mode", sharedMap.get("mode") || "python");
-      
+      const syncView = () =>
+        editorRef.current.setOption("mode", sharedMap.get("mode") || "python");
+
       syncView();
       sharedMap.on("valueChanged", syncView);
       // turn off listener when component is unmounted
-      return () => { sharedMap.off("valueChanged", syncView) }
+      return () => {
+        sharedMap.off("valueChanged", syncView);
+      };
     }
-  
-  }, [sharedMap])
-  
+  }, [sharedMap]);
+
   const handleChange = (instance, changeObj) => {
     if (changeObj.origin === "setValue") return;
 
@@ -135,7 +138,7 @@ const Editor = (props) => {
         sharedStringHelper.replaceText(fileContent.content, 0, text.length);
       else sharedStringHelper.removeText(0, text.length);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileContent]);
 
   useEffect(() => {
@@ -165,13 +168,16 @@ const Editor = (props) => {
   useEffect(() => {
     if (!!id && !loggedIn()) {
       const db = getDatabase(app);
-      const membersRef = ref(db, `sessions${window.location.pathname}/${id}/write`)
+      const membersRef = ref(
+        db,
+        `sessions${window.location.pathname}/${id}/write`
+      );
       onValue(membersRef, (snapshot) => {
         const data = snapshot.val();
         editorRef.current.setOption("readOnly", data ? false : "nocursor");
-      })
+      });
     }
-  }, [app, id])
+  }, [app, id]);
   return (
     <div>
       <textarea id="code" />

@@ -5,10 +5,7 @@ import { v4 } from "uuid";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
 import userService from "../../services/userService";
 import { setUser } from "../../stores/user.state";
-import {
-  clearUser,
-  saveUserInStorage,
-} from "../user/useUser";
+import { clearUser, saveUserInStorage } from "../user/useUser";
 
 export const TOKEN_KEY = "x-token";
 
@@ -64,16 +61,26 @@ export const LoginProvider = ({ children }) => {
           const db = getDatabase(app);
           saveUserInStorage({ user });
           dispatch(setUser(user));
-          set(ref(db, `sessions${window.location.pathname}/${user.id}`), { id: user.id, name: user.name, login: user.login, write: loggedIn, admin: loggedIn });
+          set(ref(db, `sessions${window.location.pathname}/${user.id}`), {
+            id: user.id,
+            name: user.name,
+            login: user.login,
+            write: loggedIn,
+            admin: loggedIn,
+          });
         }
       });
     };
 
-    if (loggedIn && !login) 
-      getUser();
+    if (loggedIn && !login) getUser();
     else if (!!localUser && localUser.login !== login) {
       const db = getDatabase(app);
-      set(ref(db, `sessions${window.location.pathname}/${localUser.id}`), { id: localUser.id, name: localUser.name, login: localUser.login, write: loggedIn });
+      set(ref(db, `sessions${window.location.pathname}/${localUser.id}`), {
+        id: localUser.id,
+        name: localUser.name,
+        login: localUser.login,
+        write: loggedIn,
+      });
       dispatch(setUser(localUser));
     }
   }, [dispatch, login, loggedIn, app]);

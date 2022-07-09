@@ -26,10 +26,11 @@ const UserMenu = () => {
   return (
     <>
       <IconButton ref={anchorEl} onClick={handleOpen}>
-        {
-          !!avatar_url ? 
-          <Avatar variant="square" src={avatar_url} alt={""} /> : <Avatar variant="square">{utils.formatAvatar(name)}</Avatar>
-        }
+        {!!avatar_url ? (
+          <Avatar variant="square" src={avatar_url} alt={""} />
+        ) : (
+          <Avatar variant="square">{utils.formatAvatar(name)}</Avatar>
+        )}
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -47,10 +48,11 @@ const UserMenu = () => {
       >
         <ListItem divider>
           <ListItemAvatar>
-            {
-              !!avatar_url ? 
-              <Avatar variant="square" src={avatar_url} alt={""} /> : <Avatar variant="square">{utils.formatAvatar(name)}</Avatar>
-            }
+            {!!avatar_url ? (
+              <Avatar variant="square" src={avatar_url} alt={""} />
+            ) : (
+              <Avatar variant="square">{utils.formatAvatar(name)}</Avatar>
+            )}
           </ListItemAvatar>
           <ListItemText primary={name} secondary={login || "Guest"} />
         </ListItem>
