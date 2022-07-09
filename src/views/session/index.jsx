@@ -62,6 +62,10 @@ const Session = () => {
                 setMarkdownFile(file)
                 sharedMap.set("markdown", file.content)
             })
+            .catch(() => {
+                setMarkdownFile({ path: "README.md" })
+                sharedMap.set("markdown", "")
+            })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name])
 
@@ -89,14 +93,14 @@ const Session = () => {
           onClose={() => setNameOpen(false)}
           />
       }
-      <Grid container spacing={1} sx={{ height: "100%", display: "flex", flexWrap: "nowrap" }}>
+      <Grid container spacing={1} sx={{ height: "100%",  display: "flex", flexWrap: "nowrap" }}>
         {loggedIn() && (
           <Grid item>
             <AdminPanel />
           </Grid>
         )}
         <Grid item container spacing={1} sx={{ height: "100%", flex: 1 }}>
-          <Grid item container justifyContent={!!path ? "space-between": "flex-end"} xs={12} sx={{ height: "4.5%" }}>
+          <Grid item container justifyContent={!!path ? "space-between": "flex-end"} xs={12}>
             {
               !!path &&
               <Grid item>
@@ -126,18 +130,27 @@ const Session = () => {
           </Grid>
           <Grid item container spacing={1} xs={12} sx={{ height: "100%", display: "flex", flexWrap: "nowrap" }}>
             {
-              <Grid item sx={{ flex: 1}}>
+              <Grid item sx={{ flex: 1, overflow: "auto", height: "85.2vh", marginTop: "7px" }}>
                 {sharedStringHelper && <Editor sharedStringHelper={sharedStringHelper} />}
               </Grid>
             }
-            <Grid item container xs={12} lg={6} xl={4} spacing={1} justifyContent="flex-end" sx={{ height: "100%" }}>
-              <Grid item xs={12} sx={{ height: showChat ? "50%" : "100%", display: !!markdown && showMarkdown ? "block" : "none"}}>
-                <DisplayCard height={"100%"}>
+            <Grid 
+              item 
+              container 
+              xs={showMarkdown || showChat ? 12 : "auto"} 
+              lg={showMarkdown || showChat ? 5 : "auto"} 
+              xl={showMarkdown || showChat ? 4 : "auto"} 
+              spacing={1} 
+              justifyContent="flex-end" 
+              sx={{ height: "100%" }}
+            >
+              <Grid item xs={12} sx={{ height: showChat ? "41.5vh" : "85.2vh", display: !!markdown && showMarkdown ? "block" : "none"}}>
+                <DisplayCard height={"100%"} overflow={"auto"} wordBreak={"break-word"} maxHeight={showChat ? "41.5vh" : "85.2vh"}>
                     <ReactMarkdown>{markdown}</ReactMarkdown>
                 </DisplayCard>
               </Grid>
-              <Grid item xs={12} sx={{ height: showMarkdown ? "50%" : "100%", display: showChat ? "block" : "none"}}>
-                <Chat/>
+              <Grid item xs={12} sx={{ height: !!markdown && showMarkdown ? "41.5vh" : "85.2vh", display: showChat ? "block" : "none"}}>
+                <Chat compact={!!markdown && showMarkdown}/>
               </Grid>
             </Grid>
           </Grid>

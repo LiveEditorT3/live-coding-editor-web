@@ -104,7 +104,7 @@ const AdminPanel = () => {
     <>
       <CreateRepoDialog open={open} onClose={() => setOpen(false)} onAccept={handleCreate} />
       <CommitDialog open={messageOpen} onClose={() => setMessageOpen(false)} onAccept={handleCommit} />
-      <Grid container spacing={2} direction="row" sx={{ height: "100%" }}>
+      <Grid container spacing={2} direction="row" sx={{ height: "100%", minWidth: peopleOpen || optionsOpen ? "25vw" : "4vw" }}>
         <Grid item container spacing={1} direction="column" xs={2}>
           <Grid item>
             <Tab label="Options" open={optionsOpen} onOpen={() => setOptionsOpen(prev => !prev)} />
@@ -113,10 +113,10 @@ const AdminPanel = () => {
             <Tab label="People" open={peopleOpen} onOpen={() => setPeopleOpen(prev => !prev)} />
           </Grid>
         </Grid>
-        <Grid item container spacing={1} direction="column" xs={10} sx={{display: peopleOpen || optionsOpen ? "flex" : "none"}}>
-          <Grid item sx={{ height: peopleOpen ? "50%" : "100%", display: optionsOpen ? "flex" : "none", width: "100%"  }}>
-            <DisplayCard title="Options" height={"100%"} width={"100%"}>
-              <Grid container direction="column" spacing={1} columns={1}>
+        <Grid item container spacing={1} direction="column" xs={10} sx={{display: peopleOpen || optionsOpen ? "flex" : "none" }}>
+          <Grid item sx={{ height: peopleOpen ? "44vh" : "88vh", display: optionsOpen ? "flex" : "none", width: "100%"  }}>
+            <DisplayCard title="Options" height={"100%"} width={"100%"} overflow={"auto"}>
+              <Grid container direction="column" spacing={1} columns={1} >
                 <Grid item>
                   <RepoSelector
                     repo={repo}
@@ -145,8 +145,8 @@ const AdminPanel = () => {
               </Grid>
             </DisplayCard>
           </Grid>
-          <Grid item sx={{ height: optionsOpen ? "50%" : "100%", display: peopleOpen ? "flex" : "none" }}>
-            <DisplayCard title="People" height={"100%"} width={"100%"}>
+          <Grid item sx={{ height: optionsOpen ? "44vh" : "88vh", display: peopleOpen ? "flex" : "none" }}>
+            <DisplayCard title="People" height={"100%"} width={"100%"} overflow={"auto"}>
               <Grid container direction="column" spacing={1} columns={1}>
                 <Grid item>
                   <PeopleSelector/>

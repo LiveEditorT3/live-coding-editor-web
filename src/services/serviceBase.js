@@ -16,7 +16,14 @@ const mapConfig = (method, body, config) => ({
 
 const _fetch = async (path, config, baseUrl) =>
   await fetch(`${baseUrl}${path}`, config).then(async (res) => {
-    if (res.status === 401) clearToken();
+    if (res.status === 400 || !res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Request failed");
+    }
+    if (res.status === 401) {
+      clearToken();
+      throw new Error("Not authenticated");
+    }
     if (res.status === 204 || res.status === 201) return res;
     return res.json();
   });

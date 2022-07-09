@@ -9,7 +9,7 @@ import useUser from "../../hooks/user/useUser";
 import { useRef } from "react";
 import { useLayoutEffect } from "react";
 
-const Chat = () => {
+const Chat = ({ compact }) => {
     const { app } = useFirebaseContext();
     const { name } = useUser();
     const [messages, setMessages] = useState([]);
@@ -46,7 +46,7 @@ const Chat = () => {
             <CardHeader title="Chat"/>
             <CardContent sx={{ height: "95%"}}>
                 <Grid container spacing={1} direction="column" sx={{ height: "100%", display: "flex", flexWrap: "nowrap", flexDirection: "column" }}>
-                    <Grid item xs={12} sx={{ maxHeight: "85%"}}>
+                    <Grid item xs={12} sx={{ maxHeight: compact ? "85%" : "100%"}}>
                         <Paper ref={chatRef} variant="outlined" elevation={0} sx={{ height: "100%", overflow: "auto", padding: "5px" }}>
                             {
                                 !!messages && !!messages.length && messages.map(message => 
@@ -56,7 +56,7 @@ const Chat = () => {
                             }
                         </Paper>
                     </Grid>
-                    <Grid item container xs={12} spacing={1} alignItems="flex-end">
+                    <Grid item container xs={12} spacing={1} alignItems="center" sx={{ marginBottom: compact ? "3%" : "-2.05%", maxHeight: compact ? "8vh" : "8vh" }}>
                         <OutlinedInput
                             size="small"
                             fullWidth
@@ -70,7 +70,7 @@ const Chat = () => {
                                     </IconButton>
                                 </InputAdornment>
                             }
-                            sx={{ borderRadius: "20px"}}
+                            sx={{ borderRadius: "20px", paddingRight: "1px", marginLeft:"8px"}}
                             onKeyPress={(e) => {
                                 if (e.key === "Enter")
                                     sendMessage();

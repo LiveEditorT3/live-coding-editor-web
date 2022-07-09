@@ -14,7 +14,7 @@ const RepoSelector = ({ repos, repo, onAdd, onChange }) => {
             <Grid container spacing={1} alignItems="center">
                 <Grid item>{option.private ? <Lock /> : <LockOpen />}</Grid>
                 <Grid item>
-                <Typography variant="body1">
+                <Typography variant="body1" noWrap>
                     <strong>{option?.name}</strong>
                 </Typography>
                 </Grid>

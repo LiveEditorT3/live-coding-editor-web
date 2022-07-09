@@ -69,13 +69,13 @@ export const LoginProvider = ({ children }) => {
       });
     };
 
-    if (!!localUser && localUser.login !== login) {
+    if (loggedIn && !login) 
+      getUser();
+    else if (!!localUser && localUser.login !== login) {
       const db = getDatabase(app);
       set(ref(db, `sessions${window.location.pathname}/${localUser.id}`), { id: localUser.id, name: localUser.name, login: localUser.login, write: loggedIn });
       dispatch(setUser(localUser));
     }
-    else if (loggedIn && !login) 
-      getUser();
   }, [dispatch, login, loggedIn, app]);
 
   return <>{children}</>;
