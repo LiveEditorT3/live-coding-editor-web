@@ -1,30 +1,35 @@
-import { Brightness4, Brightness7, Close, Share } from "@mui/icons-material";
-import { Checkbox, IconButton, Snackbar } from "@mui/material";
+import { Brightness4, Brightness7, Close, ContentCopy, Link, Share } from "@mui/icons-material";
+import { Avatar, Checkbox, IconButton, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Menu, MenuItem, Snackbar } from "@mui/material";
 import { useTheme } from "@mui/styles";
 import { useState } from "react";
 
 const OptionsMenu = ({ toggleThemeMode }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const menuOpen = Boolean(anchorEl);
 
-  const handleShare = (event) => {
+  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
+
+  const handleShare = (full) => {
     setOpen(true);
-    navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(full ? window.location.href : window.location.href.substring(window.location.origin.length + 1))
   };
 
   const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
+    if (reason === 'clickaway') {
       return;
     }
     setOpen(false);
   };
 
-  return (
+  return(
     <>
-      <Snackbar
-        open={open}
-        autoHideDuration={5000}
-        message="Copied link to clipboard"
+      <Snackbar 
+        open={open} 
+        autoHideDuration={5000} 
+        message="Copied to clipboard"
         onClose={handleClose}
         action={
           <IconButton
@@ -37,11 +42,47 @@ const OptionsMenu = ({ toggleThemeMode }) => {
           </IconButton>
         }
       />
-      {!!window.location.hash && (
-        <IconButton onClick={handleShare}>
-          <Share sx={{ color: "white" }} />
-        </IconButton>
-      )}
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        keepMounted
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        open={menuOpen}
+        onClose={handleMenuClose}
+      >
+        <ListItem divider>
+          <ListItemAvatar>
+            <Avatar>
+              <Share/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Share Options" />
+        </ListItem>
+        <MenuItem onClick={() => handleShare(true)}>
+          <ListItemIcon>
+            <Link/>
+          </ListItemIcon>
+          <ListItemText>Link</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => handleShare(false)}>
+          <ListItemIcon>
+            <ContentCopy/>
+          </ListItemIcon>
+          <ListItemText>Session Id</ListItemText>
+        </MenuItem>
+      </Menu>
+      {
+        !!window.location.hash &&
+          <IconButton onClick={handleMenuOpen}>
+            <Share sx={{color: "white"}}/>
+          </IconButton>
+      }
       <Checkbox
         onClick={toggleThemeMode}
         checked={theme.palette.mode === "light"}
