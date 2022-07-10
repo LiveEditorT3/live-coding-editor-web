@@ -1,19 +1,6 @@
 import Configuration from "../config";
 
-const mapConfig = (method, body, config) => ({
-  ...config,
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    Authorization: localStorage.getItem(Configuration.TOKEN_KEY),
-    ...config?.headers,
-  },
-  method,
-  body,
-  credentials: "include",
-});
-
-const _fetch = async (path, config, baseUrl) => {
+const _fetch = async (path, config, baseUrl = Configuration.BASE_URL) => {
   const res = await fetch(`${baseUrl}${path}`, config);
 
   if (res.status === 400 || !res.ok) {
@@ -35,26 +22,55 @@ const _fetch = async (path, config, baseUrl) => {
 };
 
 export class HttpClient {
-  static Get = async (path, config, baseUrl = Configuration.BASE_URL) =>
-    await _fetch(path, mapConfig("GET", null, config), baseUrl);
-  static Post = async (path, data, config, baseUrl = Configuration.BASE_URL) =>
-    await _fetch(
-      path,
-      mapConfig("POST", JSON.stringify(data), {
-        headers: { "Access-Control-Allow-Origin": "*" },
-      }),
-      baseUrl
-    );
-  static Put = async (path, data, config, baseUrl = Configuration.BASE_URL) =>
-    await _fetch(path, mapConfig("PUT", JSON.stringify(data), config), baseUrl);
-  static Delete = async (
-    path,
-    data,
-    config,
-    baseUrl = Configuration.BASE_URL
-  ) =>
-    await _fetch(
-      path,
-      mapConfig("DELETE", data ? JSON.stringify(data) : null, config, baseUrl)
-    );
+  static Get = async (path, config) =>
+    await _fetch(path, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem(Configuration.TOKEN_KEY),
+      },
+      ...config,
+    });
+
+  static Post = async (path, data, config) =>
+    await _fetch(path, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem(Configuration.TOKEN_KEY),
+      },
+      body: JSON.stringify(data),
+      ...config,
+    });
+
+  static Put = async (path, data, config) =>
+    await _fetch(path, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem(Configuration.TOKEN_KEY),
+      },
+      body: JSON.stringify(data),
+      ...config,
+    });
+
+  static Delete = async (path, data, config) =>
+    await _fetch(path, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem(Configuration.TOKEN_KEY),
+      },
+      body: data ? JSON.stringify(data) : null,
+      ...config,
+    });
 }
