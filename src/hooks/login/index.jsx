@@ -6,15 +6,15 @@ import { useFirebaseContext } from "../../contexts/firebaseContext";
 import userService from "../../services/userService";
 import { setUser } from "../../stores/user.state";
 import { clearUser, saveUserInStorage } from "../user/useUser";
-
-export const TOKEN_KEY = "x-token";
+import Configuration from "../../config";
 
 export const signOut = () => {
   clearToken();
   clearUser();
 };
+
 export const clearToken = () => {
-  localStorage && localStorage.removeItem(TOKEN_KEY);
+  localStorage && localStorage.removeItem(Configuration.TOKEN_KEY);
   window.location.replace(window.location.origin);
 };
 
@@ -26,9 +26,9 @@ const getCode = () => {
 export const loggedIn = () => !!getTokenInStorage();
 
 export const getTokenInStorage = () =>
-  localStorage && localStorage.getItem(TOKEN_KEY);
+  localStorage && localStorage.getItem(Configuration.TOKEN_KEY);
 
-export const saveTokenInStorage = (token, key = TOKEN_KEY) =>
+export const saveTokenInStorage = (token, key = Configuration.TOKEN_KEY) =>
   localStorage && localStorage.setItem(key, token);
 
 export const LoginProvider = ({ children }) => {
