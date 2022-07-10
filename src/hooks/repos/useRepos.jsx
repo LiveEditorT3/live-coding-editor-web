@@ -6,7 +6,8 @@ const useRepos = (sent) => {
 
   useEffect(() => {
     const getRepos = async () => {
-      reposService.Get().then((res) => setRepos(res));
+      const res = await reposService.Get();
+      setRepos(res);
     };
     getRepos();
   }, [sent]);

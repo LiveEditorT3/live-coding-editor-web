@@ -10,16 +10,15 @@ const MarkdownDialog = ({ open, file, user, repo, onClose }) => {
   const { sharedMap } = useFluidContext();
   const { commitFile } = useRepos();
 
-  const handleAccept = (event) => {
-    commitFile(user, repo, {
+  const handleAccept = async (event) => {
+    await commitFile(user, repo, {
       content: markdown,
       path: file.path,
       message: "Updated README.md",
       sha: file.sha,
-    }).then(() => {
-      sharedMap.set("markdown", markdown);
-      onClose();
     });
+    sharedMap.set("markdown", markdown);
+    onClose();
   };
 
   useEffect(() => {

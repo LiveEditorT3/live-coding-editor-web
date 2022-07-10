@@ -66,13 +66,14 @@ const AdminPanel = () => {
     setOpen(false);
   };
 
-  const handleCommit = (event) => {
-    commitFile(user.login, repo, {
+  const handleCommit = async (event) => {
+    await commitFile(user.login, repo, {
       content: fileContent.content,
       path,
       message,
       sha,
-    }).then(() => setMessageOpen(false));
+    });
+    setMessageOpen(false);
   };
 
   const handleChangeRepo = (event) => {
@@ -82,14 +83,13 @@ const AdminPanel = () => {
     sharedMap.set("markdown", "");
   };
 
-  const handleChangeFile = (file) => {
-    getFile(file.name).then((res) => {
-      setFile(res.path);
-      sharedMap.set("mode", selectEditorMode(file.name));
-      sharedMap.set("file", file.name);
-      setContent(res.content, true);
-      setFileSha(res.sha);
-    });
+  const handleChangeFile = async (file) => {
+    const res = await getFile(file.name);
+    setFile(res.path);
+    sharedMap.set("mode", selectEditorMode(file.name));
+    sharedMap.set("file", file.name);
+    setContent(res.content, true);
+    setFileSha(res.sha);
   };
 
   const handleAddFile = (name) => {

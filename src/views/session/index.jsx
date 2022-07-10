@@ -56,16 +56,19 @@ const Session = () => {
   }, [app, user.id]);
 
   useEffect(() => {
-    if (!!user && !!name && !!sharedMap)
-      getFile("README.md")
-        .then((file) => {
+    const getReadme = async () => {
+      if (!!user && !!name && !!sharedMap) {
+        try {
+          const file = await getFile("README.md");
           setMarkdownFile(file);
           sharedMap.set("markdown", file.content);
-        })
-        .catch(() => {
+        } catch (e) {
           setMarkdownFile({ path: "README.md" });
           sharedMap.set("markdown", "");
-        });
+        }
+      }
+    };
+    getReadme();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name]);
 

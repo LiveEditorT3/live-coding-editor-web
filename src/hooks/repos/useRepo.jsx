@@ -6,7 +6,8 @@ const useRepo = (name, user) => {
 
   useEffect(() => {
     const getFiles = async () => {
-      reposService.GetFiles(user, name).then((res) => setFiles(res));
+      const res = await reposService.GetFiles(user, name);
+      setFiles(res);
     };
     if (!!user && !!name) getFiles();
   }, [name, user]);
