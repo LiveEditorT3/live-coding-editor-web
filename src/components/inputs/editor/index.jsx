@@ -1,5 +1,5 @@
 import { useRepoContext } from "../../../contexts/repoContext";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useContext } from "react";
 import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/mode/python/python";
@@ -12,16 +12,16 @@ import "codemirror/keymap/sublime";
 import { useFluidContext } from "../../../contexts/fluidContext";
 import { useFirebaseContext } from "../../../contexts/firebaseContext";
 import { getDatabase, onValue, ref } from "firebase/database";
-import useUser from "../../../hooks/user/useUser";
 import { loggedIn } from "../../../hooks/login";
 import { useTheme } from "@mui/styles";
+import { LoginContext } from "../../../hooks/login/index";
 
 const Editor = ({ sharedStringHelper }) => {
   const theme = useTheme();
   const { mode, fileContent, setContent } = useRepoContext();
   const { app } = useFirebaseContext();
   const { sharedMap } = useFluidContext();
-  const { id } = useUser();
+  const { user } = useContext(LoginContext);
 
   const editorRef = useRef(null);
 
@@ -166,18 +166,18 @@ const Editor = ({ sharedStringHelper }) => {
   }, [sharedStringHelper, setContent]);
 
   useEffect(() => {
-    if (!!id && !loggedIn()) {
+    if (!!user.id && !loggedIn()) {
       const db = getDatabase(app);
       const membersRef = ref(
         db,
-        `sessions${window.location.pathname}/${id}/write`
+        `sessions${window.location.pathname}/${user.id}/write`
       );
       onValue(membersRef, (snapshot) => {
         const data = snapshot.val();
         editorRef.current.setOption("readOnly", data ? false : "nocursor");
       });
     }
-  }, [app, id]);
+  }, [app, user.id]);
   return (
     <div>
       <textarea id="code" />

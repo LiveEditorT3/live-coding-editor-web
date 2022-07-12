@@ -1,18 +1,12 @@
 import { getDatabase, ref, set } from "firebase/database";
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState, createContext, useCallback } from "react";
 import { v4 } from "uuid";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
 import userService from "../../services/userService";
-import { setUser } from "../../stores/user.state";
-import { clearUser, saveUserInStorage } from "../user/useUser";
 import Configuration from "../../config";
-
-export const signOut = () => {
-  localStorage.removeItem(Configuration.TOKEN_KEY);
-  clearUser();
-  window.location.replace(window.location.origin);
-};
+import userReducer from "../../stores/user/reducer";
+import { actions } from "../../stores/user/actions";
+import { useSemiPersistentReducer } from "../useSemiPersistentReducer";
 
 const getCode = () => {
   const params = new URLSearchParams(window.location.search);
@@ -21,13 +15,34 @@ const getCode = () => {
 
 export const loggedIn = () => !!localStorage.getItem(Configuration.TOKEN_KEY);
 
+export const LoginContext = createContext();
+
 export const LoginProvider = ({ children }) => {
+  const [user, dispatchUser] = useSemiPersistentReducer("user", userReducer, {
+    id: "",
+    name: "",
+    login: "",
+  });
   const [loggedIn, setLoggedIn] = useState(
     !!localStorage.getItem(Configuration.TOKEN_KEY)
   );
-  const { login } = useSelector((store) => store.user.user.login);
   const { app } = useFirebaseContext();
-  const dispatch = useDispatch();
+
+  const setUser = useCallback(
+    (user) => {
+      dispatchUser({
+        type: actions.SET_USER,
+        payload: user,
+      });
+    },
+    [dispatchUser]
+  );
+
+  function clearUser() {
+    dispatchUser({
+      type: actions.CLEAR_USER,
+    });
+  }
 
   useEffect(() => {
     const getAccessToken = async () => {
@@ -50,21 +65,20 @@ export const LoginProvider = ({ children }) => {
       const user = await userService.GetUser();
       if (!!user) {
         const db = getDatabase(app);
-        saveUserInStorage({ user });
-        dispatch(setUser(user));
+        setUser(user);
         set(ref(db, `sessions${window.location.pathname}/${user.id}`), {
           id: user.id,
           name: user.name,
-          login: user.login,
+          login: user?.login,
           write: loggedIn,
           admin: loggedIn,
         });
       }
     };
 
-    if (loggedIn && !login) {
+    if (loggedIn && !user?.login) {
       getUser();
-    } else if (!!localUser && localUser.login !== login) {
+    } else if (!!localUser && localUser.login !== user?.login) {
       const db = getDatabase(app);
       set(ref(db, `sessions${window.location.pathname}/${localUser.id}`), {
         id: localUser.id,
@@ -72,9 +86,13 @@ export const LoginProvider = ({ children }) => {
         login: localUser.login,
         write: loggedIn,
       });
-      dispatch(setUser(localUser));
+      setUser(localUser);
     }
-  }, [dispatch, login, loggedIn, app]);
+  }, [setUser, user, loggedIn, app]);
 
-  return <>{children}</>;
+  return (
+    <LoginContext.Provider value={{ user, setUser, clearUser }}>
+      {children}
+    </LoginContext.Provider>
+  );
 };

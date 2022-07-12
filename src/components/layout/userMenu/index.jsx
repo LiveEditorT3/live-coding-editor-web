@@ -9,27 +9,33 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { useState } from "react";
-import { signOut } from "../../../hooks/login";
-import useUser from "../../../hooks/user/useUser";
+import { useState, useContext } from "react";
 import { utils } from "../../../utils/utils";
+import Configuration from "../../../config";
+import { LoginContext } from "../../../hooks/login/index";
 
 const UserMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const { login, name, avatar_url } = useUser();
+  const { user, clearUser } = useContext(LoginContext);
 
   const handleOpen = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
-  const handleSignOut = () => signOut();
+  const handleSignOut = () => {
+    localStorage.removeItem(Configuration.TOKEN_KEY);
+    clearUser();
+    window.location.replace(window.location.origin);
+  };
 
   return (
     <>
       <IconButton ref={anchorEl} onClick={handleOpen}>
-        {!!avatar_url ? (
-          <Avatar variant="square" src={avatar_url} alt={""} />
+        {!!user.avatar_url ? (
+          <Avatar variant="square" src={user.avatar_url} alt={"User avatar"} />
         ) : (
-          <Avatar variant="square">{utils.formatAvatar(name)}</Avatar>
+          <Avatar variant="square" alt={"User avatar"}>
+            {utils.formatAvatar(user.name)}
+          </Avatar>
         )}
       </IconButton>
       <Menu
@@ -48,13 +54,22 @@ const UserMenu = () => {
       >
         <ListItem divider>
           <ListItemAvatar>
-            {!!avatar_url ? (
-              <Avatar variant="square" src={avatar_url} alt={""} />
+            {!!user.avatar_url ? (
+              <Avatar
+                variant="square"
+                src={user.avatar_url}
+                alt={"User avatar"}
+              />
             ) : (
-              <Avatar variant="square">{utils.formatAvatar(name)}</Avatar>
+              <Avatar variant="square" alt={"User avatar"}>
+                {utils.formatAvatar(user.name)}
+              </Avatar>
             )}
           </ListItemAvatar>
-          <ListItemText primary={name} secondary={login || "Guest"} />
+          <ListItemText
+            primary={user.name}
+            secondary={user?.login || "Guest"}
+          />
         </ListItem>
         <MenuItem onClick={handleSignOut}>
           <ListItemIcon>

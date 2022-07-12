@@ -4,17 +4,17 @@ import { loggedIn } from "../../hooks/login";
 import AdminPanel from "../adminPanel";
 import { useRepoContext } from "../../contexts/repoContext";
 import { useFluidContext } from "../../contexts/fluidContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import ReactMarkdown from "react-markdown";
 import MarkdownDialog from "../../components/dialog/markdown";
 import { Edit, Visibility, VisibilityOff } from "@mui/icons-material";
-import useUser from "../../hooks/user/useUser";
 import useRepo from "../../hooks/repos/useRepo";
 import Chat from "../../components/chat";
 import NameDialog from "../../components/dialog/name";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
 import { getDatabase, ref, remove } from "firebase/database";
 import DisplayCard from "../../components/displayCard";
+import { LoginContext } from "../../hooks/login/index";
 
 const Session = () => {
   const { sharedStringHelper, sharedMap } = useFluidContext();
@@ -26,8 +26,8 @@ const Session = () => {
   const [showChat, setShowChat] = useState(false);
   const [markdownFile, setMarkdownFile] = useState();
   const [nameOpen, setNameOpen] = useState(true);
-  const user = useUser();
-  const { getFile } = useRepo(name, user.login);
+  const { user } = useContext(LoginContext);
+  const { getFile } = useRepo(name, user?.login);
   const { app } = useFirebaseContext();
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const Session = () => {
         remove(ref(db, `sessions${window.location.pathname}/${user.id}`));
       }
     });
-  }, [app, user.id]);
+  }, [app, user]);
 
   useEffect(() => {
     const getReadme = async () => {
@@ -83,7 +83,7 @@ const Session = () => {
         <MarkdownDialog
           open={editMarkdownOpen}
           file={markdownFile}
-          user={user.login}
+          user={user?.login}
           repo={name}
           onClose={() => setEditMarkdownOpen(false)}
         />

@@ -9,18 +9,21 @@ import {
   OutlinedInput,
   Paper,
 } from "@mui/material";
-import { useEffect } from "react";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
 import { getDatabase, off, onChildAdded, push, ref } from "firebase/database";
 import Message from "./message";
-import { useState } from "react";
-import useUser from "../../hooks/user/useUser";
-import { useRef } from "react";
-import { useLayoutEffect } from "react";
+import { LoginContext } from "../../hooks/login/index";
 
 const Chat = ({ compact }) => {
   const { app } = useFirebaseContext();
-  const { name } = useUser();
+  const { user } = useContext(LoginContext);
   const [messages, setMessages] = useState([]);
   const [messageToSend, setMessageToSend] = useState("");
   const dateReference = useRef(Date.now());
@@ -42,7 +45,7 @@ const Chat = ({ compact }) => {
   const sendMessage = (event) => {
     const db = getDatabase(app);
     const message = {
-      user: name,
+      user: user.name,
       message: messageToSend,
       timestamp: Date.now(),
     };

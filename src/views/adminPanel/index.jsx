@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import useRepos from "../../hooks/repos/useRepos";
-import useUser from "../../hooks/user/useUser";
 import { Button, Grid } from "@mui/material";
 import { Save } from "@mui/icons-material";
 import { useRepoContext } from "../../contexts/repoContext";
@@ -16,9 +15,10 @@ import { useFirebaseContext } from "../../contexts/firebaseContext";
 import PeopleSelector from "../../components/inputs/selectors/peopleSelector";
 import Tab from "../../components/buttons/tab";
 import DisplayCard from "../../components/displayCard";
+import { LoginContext } from "../../hooks/login/index";
 
 const AdminPanel = () => {
-  const user = useUser();
+  const { user } = useContext(LoginContext);
   const {
     name,
     isPrivate,
@@ -41,7 +41,7 @@ const AdminPanel = () => {
   const [messageOpen, setMessageOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [peopleOpen, setPeopleOpen] = useState(false);
-  const { files, getFile } = useRepo(repo, user.login);
+  const { files, getFile } = useRepo(repo, user?.login);
 
   useEffect(() => {
     if (!repo && !!repos && !!repos.length) {
@@ -67,7 +67,7 @@ const AdminPanel = () => {
   };
 
   const handleCommit = async (event) => {
-    await commitFile(user.login, repo, {
+    await commitFile(user?.login, repo, {
       content: fileContent.content,
       path,
       message,

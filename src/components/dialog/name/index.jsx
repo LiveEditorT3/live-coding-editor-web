@@ -1,19 +1,17 @@
 import { TextField } from "@mui/material";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useState, useContext } from "react";
 import Dialog from "..";
 import { useFluidContext } from "../../../contexts/fluidContext";
-import { setUser } from "../../../stores/user.state";
-import { saveUserInStorage } from "../../../hooks/user/useUser";
 import { getDatabase, ref, set } from "firebase/database";
 import { useFirebaseContext } from "../../../contexts/firebaseContext";
+import { LoginContext } from "../../../hooks/login/index";
 
 const NameDialog = ({ open, onClose }) => {
+  const { setUser } = useContext(LoginContext);
   const { app } = useFirebaseContext();
   const [name, setName] = useState("");
   const [error, setError] = useState(false);
   const { audience } = useFluidContext();
-  const dispatch = useDispatch();
 
   const handleAccept = (event) => {
     setError(false);
@@ -25,8 +23,7 @@ const NameDialog = ({ open, onClose }) => {
       ...user,
       write: false,
     });
-    dispatch(setUser(user));
-    saveUserInStorage(user);
+    setUser(user);
     onClose();
   };
 
