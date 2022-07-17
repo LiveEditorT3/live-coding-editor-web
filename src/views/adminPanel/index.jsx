@@ -2,7 +2,6 @@ import { useEffect, useState, useContext } from "react";
 import { Button, Grid } from "@mui/material";
 import { Save } from "@mui/icons-material";
 import { RepoContext } from "../../contexts/repoContext";
-import useRepo from "../../hooks/repos/useRepo";
 import FileSelector from "../../components/inputs/selectors/fileSelector";
 import { useFluidContext } from "../../contexts/fluidContext";
 import { selectEditorMode } from "../../models/languageModes";
@@ -41,7 +40,15 @@ const AdminPanel = () => {
   const [messageOpen, setMessageOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [peopleOpen, setPeopleOpen] = useState(false);
-  const { files, getFile } = useRepo(repo, user?.login);
+  const [files, setFiles] = useState([]);
+
+  useEffect(() => {
+    const getFiles = async () => {
+      const res = await ReposService.getFiles(user.login, repo);
+      setFiles(res);
+    };
+    if (!!user.login && !!repo) getFiles();
+  }, [repo, user.login]);
 
   useEffect(() => {
     const getRepos = async () => {
@@ -80,7 +87,7 @@ const AdminPanel = () => {
 
   const handleCommit = async (event) => {
     try {
-      await ReposService.commit(user, repo, {
+      await ReposService.commit(user.login, repo, {
         content: fileContent.content,
         path: filepath,
         message: commitMessage,
@@ -100,12 +107,16 @@ const AdminPanel = () => {
   };
 
   const handleChangeFile = async (file) => {
-    const res = await getFile(file.name);
-    setFilepath(res.path);
-    sharedMap.set("mode", selectEditorMode(file.name));
-    sharedMap.set("file", file.name);
-    setFileContent({ content: res.content, refresh: true });
-    setFileSHA(res.sha);
+    try {
+      const res = await ReposService.getFile(user.login, repo, file.name);
+      setFilepath(res.path);
+      sharedMap.set("mode", selectEditorMode(file.name));
+      sharedMap.set("file", file.name);
+      setFileContent({ content: res.content, refresh: true });
+      setFileSHA(res.sha);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleAddFile = (name) => {

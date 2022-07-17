@@ -7,7 +7,6 @@ import { useEffect, useState, useContext } from "react";
 import ReactMarkdown from "react-markdown";
 import MarkdownDialog from "../../components/dialog/markdown";
 import { Edit, Visibility, VisibilityOff } from "@mui/icons-material";
-import useRepo from "../../hooks/repos/useRepo";
 import Chat from "../../components/chat";
 import NameDialog from "../../components/dialog/name";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
@@ -15,6 +14,7 @@ import { getDatabase, ref, remove } from "firebase/database";
 import DisplayCard from "../../components/displayCard";
 import { LoginContext } from "../../contexts/loginContext";
 import { RepoContext } from "../../contexts/repoContext";
+import ReposService from "../../services/ReposService";
 
 const Session = () => {
   const { sharedStringHelper, sharedMap } = useFluidContext();
@@ -27,7 +27,6 @@ const Session = () => {
   const [markdownFile, setMarkdownFile] = useState();
   const [nameOpen, setNameOpen] = useState(true);
   const { user } = useContext(LoginContext);
-  const { getFile } = useRepo(repoName, user?.login);
   const { app } = useFirebaseContext();
 
   useEffect(() => {
@@ -59,7 +58,11 @@ const Session = () => {
     const getReadme = async () => {
       if (!!user && !!repoName && !!sharedMap) {
         try {
-          const file = await getFile("README.md");
+          const file = await ReposService.getFile(
+            user.login,
+            repoName,
+            "README.md"
+          );
           setMarkdownFile(file);
           sharedMap.set("markdown", file.content);
         } catch (e) {
@@ -69,8 +72,7 @@ const Session = () => {
       }
     };
     getReadme();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [repoName]);
+  }, [user, repoName, sharedMap]);
 
   const handleClear = (event) => {
     sharedMap.set("file", "");

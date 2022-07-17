@@ -121,7 +121,7 @@ const Editor = ({ sharedStringHelper }) => {
     if (changeObj.origin === "setValue") return;
 
     const newText = instance.getValue();
-    setFileContent(newText);
+    setFileContent({ content: newText, refresh: false });
 
     updateSharedString(instance, changeObj);
   };
@@ -152,7 +152,7 @@ const Editor = ({ sharedStringHelper }) => {
       editorRef.current.setValue(newText);
       editorRef.current.setCursor(cursorPosition);
 
-      setFileContent(newText);
+      setFileContent({ content: newText, refresh: false });
     };
 
     sharedStringHelper.on("textChanged", handleTextChanged);
