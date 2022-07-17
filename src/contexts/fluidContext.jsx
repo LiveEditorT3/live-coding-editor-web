@@ -15,12 +15,14 @@ export const useFluidContext = () => {
   const [audience, setAudience] = useState();
 
   useEffect(() => {
-    getFluidData().then((data) => {
+    const getData = async () => {
+      const data = await getFluidData();
       setSharedString(data.sharedString);
       setSharedStringHelper(new SharedStringHelper(data.sharedString));
       setSharedMap(data.sharedMap);
       setAudience(data.audience);
-    });
+    };
+    getData();
   }, [getFluidData]);
 
   return {

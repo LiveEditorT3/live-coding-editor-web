@@ -1,5 +1,4 @@
-import { useRepoContext } from "../../../contexts/repoContext";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useContext } from "react";
 import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/mode/python/python";
@@ -12,16 +11,17 @@ import "codemirror/keymap/sublime";
 import { useFluidContext } from "../../../contexts/fluidContext";
 import { useFirebaseContext } from "../../../contexts/firebaseContext";
 import { getDatabase, onValue, ref } from "firebase/database";
-import useUser from "../../../hooks/user/useUser";
-import { loggedIn } from "../../../hooks/login";
+import { loggedIn } from "../../../contexts/loginContext";
 import { useTheme } from "@mui/styles";
+import { LoginContext } from "../../../contexts/loginContext";
+import { RepoContext } from "../../../contexts/repoContext";
 
 const Editor = ({ sharedStringHelper }) => {
   const theme = useTheme();
-  const { mode, fileContent, setContent } = useRepoContext();
+  const { fileContent, setFileContent } = useContext(RepoContext);
   const { app } = useFirebaseContext();
   const { sharedMap } = useFluidContext();
-  const { id } = useUser();
+  const { user } = useContext(LoginContext);
 
   const editorRef = useRef(null);
 
@@ -97,10 +97,6 @@ const Editor = ({ sharedStringHelper }) => {
   }, []);
 
   useEffect(() => {
-    editorRef.current.setOption("mode", mode);
-  }, [mode]);
-
-  useEffect(() => {
     editorRef.current.setOption(
       "theme",
       theme.palette.mode === "light" ? "eclipse" : "colorforth"
@@ -125,7 +121,7 @@ const Editor = ({ sharedStringHelper }) => {
     if (changeObj.origin === "setValue") return;
 
     const newText = instance.getValue();
-    setContent(newText);
+    setFileContent({ content: newText, refresh: false });
 
     updateSharedString(instance, changeObj);
   };
@@ -134,9 +130,13 @@ const Editor = ({ sharedStringHelper }) => {
     if (fileContent.refresh) {
       const text = sharedStringHelper.getText();
       editorRef.current.setValue(fileContent.content);
-      if (!!fileContent.content)
+      if (!!fileContent.content) {
         sharedStringHelper.replaceText(fileContent.content, 0, text.length);
-      else sharedStringHelper.removeText(0, text.length);
+      } else if (text.length === 0) {
+        return;
+      } else {
+        sharedStringHelper.removeText(0, text.length);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileContent]);
@@ -156,28 +156,28 @@ const Editor = ({ sharedStringHelper }) => {
       editorRef.current.setValue(newText);
       editorRef.current.setCursor(cursorPosition);
 
-      setContent(newText);
+      setFileContent({ content: newText, refresh: false });
     };
 
     sharedStringHelper.on("textChanged", handleTextChanged);
     return () => {
       sharedStringHelper.off("textChanged", handleTextChanged);
     };
-  }, [sharedStringHelper, setContent]);
+  }, [sharedStringHelper, setFileContent]);
 
   useEffect(() => {
-    if (!!id && !loggedIn()) {
+    if (!!user.id && !loggedIn()) {
       const db = getDatabase(app);
       const membersRef = ref(
         db,
-        `sessions${window.location.pathname}/${id}/write`
+        `sessions${window.location.pathname}/${user.id}/write`
       );
       onValue(membersRef, (snapshot) => {
         const data = snapshot.val();
         editorRef.current.setOption("readOnly", data ? false : "nocursor");
       });
     }
-  }, [app, id]);
+  }, [app, user.id]);
   return (
     <div>
       <textarea id="code" />

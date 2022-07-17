@@ -1,89 +1,104 @@
-import { createContext, useContext, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
+import { LoginContext } from "./loginContext";
+import ReposService from "../services/ReposService";
+import reposReducer from "../stores/repos/reducer";
+import { actions } from "../stores/repos/actions";
 
-const RepoContext = createContext({});
-
-export const useRepoContext = () => {
-  const {
-    name,
-    isPrivate,
-    fileContent,
-    sha,
-    path,
-    message,
-    mode,
-    setName,
-    setPrivate,
-    setFileContent,
-    setSha,
-    setPath,
-    setMessage,
-  } = useContext(RepoContext);
-
-  const setRepoName = (name) => setName(name);
-
-  const setRepoPrivate = (value) => setPrivate(value);
-
-  const setContent = (content, refresh = false) =>
-    setFileContent({ content, refresh });
-
-  const setCommitMessage = (message) => setMessage(message);
-
-  const setFile = (name) => setPath(name);
-
-  const setFileSha = (sha) => setSha(sha);
-
-  const clearFile = () => {
-    setPath("");
-    setMessage("");
-    setSha("");
-    setFileContent({ content: "", refresh: true });
-  };
-
-  return {
-    name,
-    isPrivate,
-    fileContent,
-    sha,
-    path,
-    message,
-    mode,
-    setRepoName,
-    setRepoPrivate,
-    setContent,
-    setFileSha,
-    setCommitMessage,
-    setFile,
-    clearFile,
-  };
-};
+export const RepoContext = createContext({});
 
 const RepoProvider = ({ children }) => {
-  const [name, setName] = useState("");
-  const [isPrivate, setPrivate] = useState(true);
-  const [fileContent, setFileContent] = useState({
-    content: "",
-    refresh: false,
+  const { user } = useContext(LoginContext);
+  const [repos, dispatchRepos] = useReducer(reposReducer, {
+    repoName: undefined,
+    repoIsPrivate: undefined,
+    reposList: [],
+    filesList: [],
+    filepath: undefined,
+    fileContent: { content: "", refresh: true },
+    fileSHA: undefined,
+    commitMessage: "",
   });
-  const [path, setPath] = useState("");
-  const [message, setMessage] = useState("");
 
-  const [sha, setSha] = useState("");
+  function clearFile() {
+    dispatchRepos({ type: actions.CLEAR_FILE });
+  }
+
+  function selectCurrentRepo(repoName) {
+    dispatchRepos({ type: actions.SET_CURRENT_REPO, payload: repoName });
+  }
+
+  function selectCurrentFile(filepath, fileContent, fileSHA) {
+    dispatchRepos({
+      type: actions.SET_CURRENT_FILE,
+      payload: {
+        filepath,
+        fileContent,
+        fileSHA,
+      },
+    });
+  }
+
+  function setCommitMessage(commitMessage) {
+    dispatchRepos({ type: actions.SET_COMMIT_MESSAGE, payload: commitMessage });
+  }
+
+  function setFileContent(fileContent) {
+    dispatchRepos({ type: actions.SET_FILE_CONTENT, payload: fileContent });
+  }
+
+  const refreshReposList = useCallback(async () => {
+    try {
+      const res = await ReposService.get();
+      dispatchRepos({ type: actions.SET_REPOS_LIST, payload: res });
+    } catch (err) {
+      console.error(err);
+    }
+  }, [dispatchRepos]);
+
+  const refreshFilesList = useCallback(async () => {
+    try {
+      const res = await ReposService.getFiles(user.login, repos.repoName);
+      dispatchRepos({ type: actions.SET_FILES_LIST, payload: res });
+    } catch (err) {
+      console.error(err);
+    }
+  }, [dispatchRepos, user.login, repos.repoName]);
+
+  useEffect(() => {
+    // Get the list of repos if the current repo or the user changes
+    if (user && user.login) {
+      refreshReposList();
+    }
+    // Get the list of files in the repo if the current repo or the user changes
+    if (user && user.login && repos.repoName) {
+      refreshFilesList();
+    }
+  }, [user, repos.repoName, refreshReposList, refreshFilesList]);
+
+  // Clear everything is the user signs out
+  useEffect(() => {
+    if (!user && !user.login) {
+      dispatchRepos({ type: actions.CLEAR_REPOS });
+    }
+  }, [user]);
 
   return (
     <RepoContext.Provider
       value={{
-        name,
-        isPrivate,
-        fileContent,
-        sha,
-        path,
-        message,
-        setName,
-        setPrivate,
+        ...repos,
+        selectCurrentRepo,
+        selectCurrentFile,
+        setCommitMessage,
         setFileContent,
-        setSha,
-        setPath,
-        setMessage,
+        clearFile,
+        refreshReposList,
+        refreshFilesList,
       }}
     >
       {children}

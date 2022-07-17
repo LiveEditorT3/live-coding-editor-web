@@ -2,11 +2,12 @@ import { AppBar, Container, Toolbar, Typography } from "@mui/material";
 import UserMenu from "./userMenu";
 import useStyles from "./styles";
 import OptionsMenu from "./optionsMenu";
-import useUser from "../../hooks/user/useUser";
+import { LoginContext } from "../../contexts/loginContext";
+import { useContext } from "react";
 
 const Layout = ({ children, toggleThemeMode }) => {
   const classes = useStyles();
-  const { name, login } = useUser();
+  const { user } = useContext(LoginContext);
 
   return (
     <div className={classes.root}>
@@ -17,7 +18,7 @@ const Layout = ({ children, toggleThemeMode }) => {
           </Typography>
           <section className={classes.rightToolbar}>
             <OptionsMenu toggleThemeMode={toggleThemeMode} />
-            {(!!name || !!login) && <UserMenu />}
+            {(!!user?.name || !!user?.login) && <UserMenu />}
           </section>
         </Toolbar>
       </AppBar>

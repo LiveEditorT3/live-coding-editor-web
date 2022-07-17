@@ -1,24 +1,24 @@
 import { Chip, Grid } from "@mui/material";
 import Editor from "../../components/inputs/editor";
-import { loggedIn } from "../../hooks/login";
+import { loggedIn } from "../../contexts/loginContext";
 import AdminPanel from "../adminPanel";
-import { useRepoContext } from "../../contexts/repoContext";
 import { useFluidContext } from "../../contexts/fluidContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import ReactMarkdown from "react-markdown";
 import MarkdownDialog from "../../components/dialog/markdown";
 import { Edit, Visibility, VisibilityOff } from "@mui/icons-material";
-import useUser from "../../hooks/user/useUser";
-import useRepo from "../../hooks/repos/useRepo";
 import Chat from "../../components/chat";
 import NameDialog from "../../components/dialog/name";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
 import { getDatabase, ref, remove } from "firebase/database";
 import DisplayCard from "../../components/displayCard";
+import { LoginContext } from "../../contexts/loginContext";
+import { RepoContext } from "../../contexts/repoContext";
+import ReposService from "../../services/ReposService";
 
 const Session = () => {
   const { sharedStringHelper, sharedMap } = useFluidContext();
-  const { name, clearFile } = useRepoContext();
+  const { repoName, clearFile } = useContext(RepoContext);
   const [path, setPath] = useState();
   const [markdown, setMarkdown] = useState();
   const [editMarkdownOpen, setEditMarkdownOpen] = useState(false);
@@ -26,8 +26,7 @@ const Session = () => {
   const [showChat, setShowChat] = useState(false);
   const [markdownFile, setMarkdownFile] = useState();
   const [nameOpen, setNameOpen] = useState(true);
-  const user = useUser();
-  const { getFile } = useRepo(name, user.login);
+  const { user } = useContext(LoginContext);
   const { app } = useFirebaseContext();
 
   useEffect(() => {
@@ -53,21 +52,27 @@ const Session = () => {
         remove(ref(db, `sessions${window.location.pathname}/${user.id}`));
       }
     });
-  }, [app, user.id]);
+  }, [app, user]);
 
   useEffect(() => {
-    if (!!user && !!name && !!sharedMap)
-      getFile("README.md")
-        .then((file) => {
+    const getReadme = async () => {
+      if (!!user && !!repoName && !!sharedMap) {
+        try {
+          const file = await ReposService.getFile(
+            user.login,
+            repoName,
+            "README.md"
+          );
           setMarkdownFile(file);
           sharedMap.set("markdown", file.content);
-        })
-        .catch(() => {
+        } catch (e) {
           setMarkdownFile({ path: "README.md" });
           sharedMap.set("markdown", "");
-        });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name]);
+        }
+      }
+    };
+    getReadme();
+  }, [user, repoName, sharedMap]);
 
   const handleClear = (event) => {
     sharedMap.set("file", "");
@@ -80,8 +85,8 @@ const Session = () => {
         <MarkdownDialog
           open={editMarkdownOpen}
           file={markdownFile}
-          user={user.login}
-          repo={name}
+          user={user?.login}
+          repo={repoName}
           onClose={() => setEditMarkdownOpen(false)}
         />
       )}

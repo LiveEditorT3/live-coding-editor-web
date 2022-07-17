@@ -2,10 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { createTheme } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
-import { Provider } from "react-redux";
-import { store } from "./stores/store";
 import Layout from "./components/layout";
-import { LoginProvider } from "./hooks/login";
+import { LoginProvider } from "./contexts/loginContext";
 import Router from "./router/routes";
 import {
   CssBaseline,
@@ -34,27 +32,25 @@ const App = () => {
     >
       <CssBaseline enableColorScheme />
       <StyledEngineProvider injectFirst>
-        <Layout toggleThemeMode={toggleThemeMode}>
-          <FluidProvider>
-            <RepoProvider>
-              <FirebaseProvider>
-                <LoginProvider>
+        <FirebaseProvider>
+          <LoginProvider>
+            <Layout toggleThemeMode={toggleThemeMode}>
+              <FluidProvider>
+                <RepoProvider>
                   <Router />
-                </LoginProvider>
-              </FirebaseProvider>
-            </RepoProvider>
-          </FluidProvider>
-        </Layout>
+                </RepoProvider>
+              </FluidProvider>
+            </Layout>
+          </LoginProvider>
+        </FirebaseProvider>
       </StyledEngineProvider>
     </ThemeProvider>
   );
 };
 
 ReactDOM.render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </Provider>,
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>,
   document.getElementById("root")
 );
