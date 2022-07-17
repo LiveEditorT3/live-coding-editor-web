@@ -1,9 +1,10 @@
+import { useContext } from "react";
 import { TextField } from "@mui/material";
 import Dialog from "..";
-import { useRepoContext } from "../../../contexts/repoContext";
+import { RepoContext } from "../../../contexts/repoContext";
 
 const CommitDialog = ({ open, onClose, onAccept }) => {
-  const { message, setCommitMessage } = useRepoContext();
+  const { commitMessage, setCommitMessage } = useContext(RepoContext);
 
   return (
     <Dialog
@@ -16,7 +17,7 @@ const CommitDialog = ({ open, onClose, onAccept }) => {
         fullWidth
         label="Message"
         placeholder="Enter a commit message"
-        value={message}
+        value={commitMessage}
         onChange={(event) => setCommitMessage(event.target.value)}
       />
     </Dialog>

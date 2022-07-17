@@ -1,89 +1,41 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useState } from "react";
 
-const RepoContext = createContext({});
-
-export const useRepoContext = () => {
-  const {
-    name,
-    isPrivate,
-    fileContent,
-    sha,
-    path,
-    message,
-    mode,
-    setName,
-    setPrivate,
-    setFileContent,
-    setSha,
-    setPath,
-    setMessage,
-  } = useContext(RepoContext);
-
-  const setRepoName = (name) => setName(name);
-
-  const setRepoPrivate = (value) => setPrivate(value);
-
-  const setContent = (content, refresh = false) =>
-    setFileContent({ content, refresh });
-
-  const setCommitMessage = (message) => setMessage(message);
-
-  const setFile = (name) => setPath(name);
-
-  const setFileSha = (sha) => setSha(sha);
-
-  const clearFile = () => {
-    setPath("");
-    setMessage("");
-    setSha("");
-    setFileContent({ content: "", refresh: true });
-  };
-
-  return {
-    name,
-    isPrivate,
-    fileContent,
-    sha,
-    path,
-    message,
-    mode,
-    setRepoName,
-    setRepoPrivate,
-    setContent,
-    setFileSha,
-    setCommitMessage,
-    setFile,
-    clearFile,
-  };
-};
+export const RepoContext = createContext({});
 
 const RepoProvider = ({ children }) => {
-  const [name, setName] = useState("");
-  const [isPrivate, setPrivate] = useState(true);
+  const [repoName, setRepoName] = useState("");
+  const [repoIsPrivate, setRepoIsPrivate] = useState(true);
   const [fileContent, setFileContent] = useState({
     content: "",
     refresh: false,
   });
-  const [path, setPath] = useState("");
-  const [message, setMessage] = useState("");
+  const [filepath, setFilepath] = useState("");
+  const [commitMessage, setCommitMessage] = useState("");
+  const [fileSHA, setFileSHA] = useState("");
 
-  const [sha, setSha] = useState("");
+  const clearFile = () => {
+    setFilepath("");
+    setCommitMessage("");
+    setFileSHA("");
+    setFileContent({ content: "", refresh: true });
+  };
 
   return (
     <RepoContext.Provider
       value={{
-        name,
-        isPrivate,
+        repoName,
+        repoIsPrivate,
         fileContent,
-        sha,
-        path,
-        message,
-        setName,
-        setPrivate,
+        filepath,
+        commitMessage,
+        fileSHA,
+        setRepoName,
+        setRepoIsPrivate,
         setFileContent,
-        setSha,
-        setPath,
-        setMessage,
+        setFilepath,
+        setCommitMessage,
+        setFileSHA,
+        clearFile,
       }}
     >
       {children}

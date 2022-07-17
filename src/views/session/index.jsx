@@ -2,7 +2,6 @@ import { Chip, Grid } from "@mui/material";
 import Editor from "../../components/inputs/editor";
 import { loggedIn } from "../../contexts/loginContext";
 import AdminPanel from "../adminPanel";
-import { useRepoContext } from "../../contexts/repoContext";
 import { useFluidContext } from "../../contexts/fluidContext";
 import { useEffect, useState, useContext } from "react";
 import ReactMarkdown from "react-markdown";
@@ -15,10 +14,11 @@ import { useFirebaseContext } from "../../contexts/firebaseContext";
 import { getDatabase, ref, remove } from "firebase/database";
 import DisplayCard from "../../components/displayCard";
 import { LoginContext } from "../../contexts/loginContext";
+import { RepoContext } from "../../contexts/repoContext";
 
 const Session = () => {
   const { sharedStringHelper, sharedMap } = useFluidContext();
-  const { name, clearFile } = useRepoContext();
+  const { repoName, clearFile } = useContext(RepoContext);
   const [path, setPath] = useState();
   const [markdown, setMarkdown] = useState();
   const [editMarkdownOpen, setEditMarkdownOpen] = useState(false);
@@ -27,7 +27,7 @@ const Session = () => {
   const [markdownFile, setMarkdownFile] = useState();
   const [nameOpen, setNameOpen] = useState(true);
   const { user } = useContext(LoginContext);
-  const { getFile } = useRepo(name, user?.login);
+  const { getFile } = useRepo(repoName, user?.login);
   const { app } = useFirebaseContext();
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const Session = () => {
 
   useEffect(() => {
     const getReadme = async () => {
-      if (!!user && !!name && !!sharedMap) {
+      if (!!user && !!repoName && !!sharedMap) {
         try {
           const file = await getFile("README.md");
           setMarkdownFile(file);
@@ -70,7 +70,7 @@ const Session = () => {
     };
     getReadme();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name]);
+  }, [repoName]);
 
   const handleClear = (event) => {
     sharedMap.set("file", "");
@@ -84,7 +84,7 @@ const Session = () => {
           open={editMarkdownOpen}
           file={markdownFile}
           user={user?.login}
-          repo={name}
+          repo={repoName}
           onClose={() => setEditMarkdownOpen(false)}
         />
       )}

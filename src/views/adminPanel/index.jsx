@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import useRepos from "../../hooks/repos/useRepos";
 import { Button, Grid } from "@mui/material";
 import { Save } from "@mui/icons-material";
-import { useRepoContext } from "../../contexts/repoContext";
+import { RepoContext } from "../../contexts/repoContext";
 import useRepo from "../../hooks/repos/useRepo";
 import FileSelector from "../../components/inputs/selectors/fileSelector";
 import { useFluidContext } from "../../contexts/fluidContext";
@@ -20,17 +20,17 @@ import { LoginContext } from "../../contexts/loginContext";
 const AdminPanel = () => {
   const { user } = useContext(LoginContext);
   const {
-    name,
-    isPrivate,
+    repoName,
+    repoIsPrivate,
     fileContent,
-    sha,
-    path,
-    message,
+    fileSHA,
+    filepath,
+    commitMessage,
     setRepoName,
-    setFile,
-    setContent,
-    setFileSha,
-  } = useRepoContext();
+    setFilepath,
+    setFileContent,
+    setFileSHA,
+  } = useContext(RepoContext);
 
   const { sharedMap, audience } = useFluidContext();
   const { app } = useFirebaseContext();
@@ -60,18 +60,18 @@ const AdminPanel = () => {
   }, [audience, app]);
 
   const handleCreate = (event) => {
-    createRepo(name, isPrivate);
+    createRepo(repoName, repoIsPrivate);
     setSent(true);
-    setRepo(name);
+    setRepo(repoName);
     setOpen(false);
   };
 
   const handleCommit = async (event) => {
     await commitFile(user?.login, repo, {
       content: fileContent.content,
-      path,
-      message,
-      sha,
+      filepath,
+      commitMessage,
+      fileSHA,
     });
     setMessageOpen(false);
   };
@@ -85,19 +85,19 @@ const AdminPanel = () => {
 
   const handleChangeFile = async (file) => {
     const res = await getFile(file.name);
-    setFile(res.path);
+    setFilepath(res.path);
     sharedMap.set("mode", selectEditorMode(file.name));
     sharedMap.set("file", file.name);
-    setContent(res.content, true);
-    setFileSha(res.sha);
+    setFileContent({ content: res.content, refresh: true });
+    setFileSHA(res.sha);
   };
 
   const handleAddFile = (name) => {
-    setFile(name);
+    setFilepath(name);
     sharedMap.set("mode", selectEditorMode(name));
     sharedMap.set("file", name);
-    setContent("", true);
-    setFileSha("");
+    setFileContent({ content: "", refresh: true });
+    setFileSHA("");
   };
 
   return (

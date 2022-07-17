@@ -1,4 +1,3 @@
-import { useRepoContext } from "../../../contexts/repoContext";
 import { useEffect, useRef, useContext } from "react";
 import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
@@ -15,10 +14,11 @@ import { getDatabase, onValue, ref } from "firebase/database";
 import { loggedIn } from "../../../contexts/loginContext";
 import { useTheme } from "@mui/styles";
 import { LoginContext } from "../../../contexts/loginContext";
+import { RepoContext } from "../../../contexts/repoContext";
 
 const Editor = ({ sharedStringHelper }) => {
   const theme = useTheme();
-  const { mode, fileContent, setContent } = useRepoContext();
+  const { fileContent, setFileContent } = useContext(RepoContext);
   const { app } = useFirebaseContext();
   const { sharedMap } = useFluidContext();
   const { user } = useContext(LoginContext);
@@ -97,10 +97,6 @@ const Editor = ({ sharedStringHelper }) => {
   }, []);
 
   useEffect(() => {
-    editorRef.current.setOption("mode", mode);
-  }, [mode]);
-
-  useEffect(() => {
     editorRef.current.setOption(
       "theme",
       theme.palette.mode === "light" ? "eclipse" : "colorforth"
@@ -125,7 +121,7 @@ const Editor = ({ sharedStringHelper }) => {
     if (changeObj.origin === "setValue") return;
 
     const newText = instance.getValue();
-    setContent(newText);
+    setFileContent(newText);
 
     updateSharedString(instance, changeObj);
   };
@@ -156,14 +152,14 @@ const Editor = ({ sharedStringHelper }) => {
       editorRef.current.setValue(newText);
       editorRef.current.setCursor(cursorPosition);
 
-      setContent(newText);
+      setFileContent(newText);
     };
 
     sharedStringHelper.on("textChanged", handleTextChanged);
     return () => {
       sharedStringHelper.off("textChanged", handleTextChanged);
     };
-  }, [sharedStringHelper, setContent]);
+  }, [sharedStringHelper, setFileContent]);
 
   useEffect(() => {
     if (!!user.id && !loggedIn()) {

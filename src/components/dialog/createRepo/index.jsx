@@ -1,10 +1,12 @@
+import { useContext } from "react";
 import { Lock, LockOpen } from "@mui/icons-material";
 import { Checkbox, Grid, TextField } from "@mui/material";
-import { useRepoContext } from "../../../contexts/repoContext";
+import { RepoContext } from "../../../contexts/repoContext";
 import Dialog from "../index";
 
 const CreateRepoDialog = ({ open, onClose, onAccept }) => {
-  const { name, isPrivate, setRepoName, setRepoPrivate } = useRepoContext();
+  const { repoName, repoIsPrivate, setRepoName, setRepoIsPrivate } =
+    useContext(RepoContext);
   return (
     <Dialog
       open={open}
@@ -18,16 +20,16 @@ const CreateRepoDialog = ({ open, onClose, onAccept }) => {
             label="Name"
             placeholder="Repository name"
             fullWidth
-            value={name}
+            value={repoName}
             onChange={(event) => setRepoName(event.target.value)}
           />
         </Grid>
         <Grid item xs={1}>
           <Checkbox
-            checked={isPrivate}
+            checked={repoIsPrivate}
             icon={<LockOpen />}
             checkedIcon={<Lock />}
-            onChange={(event) => setRepoPrivate(event.target.checked)}
+            onChange={(event) => setRepoIsPrivate(event.target.checked)}
           />
         </Grid>
       </Grid>
