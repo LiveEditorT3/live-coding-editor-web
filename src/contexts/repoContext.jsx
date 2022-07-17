@@ -1,40 +1,93 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
+import { LoginContext } from "./loginContext";
+import ReposService from "../services/ReposService";
+import reposReducer from "../stores/repos/reducer";
+import { actions } from "../stores/repos/actions";
 
 export const RepoContext = createContext({});
 
 const RepoProvider = ({ children }) => {
-  const [repoName, setRepoName] = useState("");
-  const [repoIsPrivate, setRepoIsPrivate] = useState(true);
-  const [fileContent, setFileContent] = useState({
-    content: "",
-    refresh: false,
+  const { user } = useContext(LoginContext);
+  const [repos, dispatchRepos] = useReducer(reposReducer, {
+    repoName: undefined,
+    repoIsPrivate: undefined,
+    reposList: [],
+    filesList: [],
+    filepath: undefined,
+    fileContent: { content: "", refresh: true },
+    fileSHA: undefined,
+    commitMessage: "",
   });
-  const [filepath, setFilepath] = useState("");
-  const [commitMessage, setCommitMessage] = useState("");
-  const [fileSHA, setFileSHA] = useState("");
 
-  const clearFile = () => {
-    setFilepath("");
-    setCommitMessage("");
-    setFileSHA("");
-    setFileContent({ content: "", refresh: true });
-  };
+  function clearFile() {
+    dispatchRepos({ type: actions.CLEAR_FILE });
+  }
+
+  function selectCurrentRepo(repoName) {
+    dispatchRepos({ type: actions.SET_CURRENT_REPO, payload: repoName });
+  }
+
+  function selectCurrentFile(filepath, fileContent, fileSHA) {
+    dispatchRepos({
+      type: actions.SET_CURRENT_FILE,
+      payload: {
+        filepath,
+        fileContent,
+        fileSHA,
+      },
+    });
+  }
+
+  function setCommitMessage(commitMessage) {
+    dispatchRepos({ type: actions.SET_COMMIT_MESSAGE, payload: commitMessage });
+  }
+
+  function setFileContent(fileContent) {
+    dispatchRepos({ type: actions.SET_FILE_CONTENT, payload: fileContent });
+  }
+
+  useEffect(() => {
+    // Get the list of repos if the current repo or the user changes
+    const getReposList = async () => {
+      try {
+        const res = await ReposService.get();
+        dispatchRepos({ type: actions.SET_REPOS_LIST, payload: res });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    if (user && user.login) {
+      getReposList();
+    }
+    // Get the list of files in the repo if the current repo or the user changes
+    const getFiles = async () => {
+      try {
+        const res = await ReposService.getFiles(user.login, repos.repoName);
+        dispatchRepos({ type: actions.SET_FILES_LIST, payload: res });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    if (user && user.login && repos.repoName) {
+      getFiles();
+    }
+  }, [user, repos.repoName]);
+
+  // Clear everything is the user signs out
+  useEffect(() => {
+    if (!user && !user.login) {
+      dispatchRepos({ type: actions.CLEAR_REPOS });
+    }
+  }, [user]);
 
   return (
     <RepoContext.Provider
       value={{
-        repoName,
-        repoIsPrivate,
-        fileContent,
-        filepath,
-        commitMessage,
-        fileSHA,
-        setRepoName,
-        setRepoIsPrivate,
-        setFileContent,
-        setFilepath,
+        ...repos,
+        selectCurrentRepo,
+        selectCurrentFile,
         setCommitMessage,
-        setFileSHA,
+        setFileContent,
         clearFile,
       }}
     >

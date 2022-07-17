@@ -20,50 +20,30 @@ const AdminPanel = () => {
   const { user } = useContext(LoginContext);
   const {
     repoName,
-    repoIsPrivate,
     fileContent,
     fileSHA,
     filepath,
     commitMessage,
-    setRepoName,
-    setFilepath,
-    setFileContent,
-    setFileSHA,
+    filesList,
+    reposList,
+    selectCurrentRepo,
+    selectCurrentFile,
   } = useContext(RepoContext);
 
   const { sharedMap, audience } = useFluidContext();
   const { app } = useFirebaseContext();
-  const [sent, setSent] = useState(false);
-  const [repos, setRepos] = useState([]);
-  const [repo, setRepo] = useState();
   const [open, setOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [peopleOpen, setPeopleOpen] = useState(false);
-  const [files, setFiles] = useState([]);
 
+  // Set default repo to first one on the list
+  // This hook should run only when repoName is still not set and repoList is set.
   useEffect(() => {
-    const getFiles = async () => {
-      const res = await ReposService.getFiles(user.login, repo);
-      setFiles(res);
-    };
-    if (!!user.login && !!repo) getFiles();
-  }, [repo, user.login]);
-
-  useEffect(() => {
-    const getRepos = async () => {
-      const res = await ReposService.get();
-      setRepos(res);
-    };
-    getRepos();
-  }, [sent]);
-
-  useEffect(() => {
-    if (!repo && !!repos && !!repos.length) {
-      setRepo(repos[0].name);
-      setRepoName(repos[0].name);
+    if (!repoName && !!reposList && reposList.length > 0) {
+      selectCurrentRepo(reposList[0].name);
     }
-  }, [repos, open, messageOpen, repo, setRepoName]);
+  }, [repoName, reposList, selectCurrentRepo]);
 
   useEffect(() => {
     if (!!audience) {
@@ -74,20 +54,21 @@ const AdminPanel = () => {
     }
   }, [audience, app]);
 
-  const handleCreate = async (event) => {
-    try {
-      await ReposService.create(repoName, repoIsPrivate);
-    } catch (err) {
-      console.error(err);
+  const handleCreateRepo = async (name, isPrivate) => {
+    if (!!name) {
+      try {
+        await ReposService.create(name, isPrivate);
+      } catch (err) {
+        console.error(err);
+      }
+      selectCurrentRepo(name);
     }
-    setSent(true);
-    setRepo(repoName);
     setOpen(false);
   };
 
   const handleCommit = async (event) => {
     try {
-      await ReposService.commit(user.login, repo, {
+      await ReposService.commit(user.login, repoName, {
         content: fileContent.content,
         path: filepath,
         message: commitMessage,
@@ -100,31 +81,30 @@ const AdminPanel = () => {
   };
 
   const handleChangeRepo = (event) => {
-    const selected = event.target.value;
-    if (!!selected) setRepo(selected);
-    setRepoName(selected);
+    const selectedRepoName = event.target.value;
+    selectCurrentRepo(selectedRepoName);
     sharedMap.set("markdown", "");
   };
 
   const handleChangeFile = async (file) => {
     try {
-      const res = await ReposService.getFile(user.login, repo, file.name);
-      setFilepath(res.path);
+      const res = await ReposService.getFile(user.login, repoName, file.name);
+      selectCurrentFile(
+        res.path,
+        { content: res.content, refresh: true },
+        res.sha
+      );
       sharedMap.set("mode", selectEditorMode(file.name));
       sharedMap.set("file", file.name);
-      setFileContent({ content: res.content, refresh: true });
-      setFileSHA(res.sha);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleAddFile = (name) => {
-    setFilepath(name);
-    sharedMap.set("mode", selectEditorMode(name));
-    sharedMap.set("file", name);
-    setFileContent({ content: "", refresh: true });
-    setFileSHA("");
+  const handleAddFile = (newFilepath) => {
+    selectCurrentFile(newFilepath, { content: "", refresh: true }, "");
+    sharedMap.set("mode", selectEditorMode(newFilepath));
+    sharedMap.set("file", newFilepath);
   };
 
   return (
@@ -132,7 +112,7 @@ const AdminPanel = () => {
       <CreateRepoDialog
         open={open}
         onClose={() => setOpen(false)}
-        onAccept={handleCreate}
+        onAccept={handleCreateRepo}
       />
       <CommitDialog
         open={messageOpen}
@@ -189,8 +169,8 @@ const AdminPanel = () => {
               <Grid container direction="column" spacing={1} columns={1}>
                 <Grid item>
                   <RepoSelector
-                    repo={repo}
-                    repos={repos}
+                    repo={repoName}
+                    repos={reposList}
                     onAdd={() => setOpen(true)}
                     onChange={handleChangeRepo}
                   />
@@ -207,7 +187,9 @@ const AdminPanel = () => {
                 </Grid>
                 <Grid item>
                   <FileSelector
-                    files={files?.filter((file) => file.name !== "README.md")}
+                    files={filesList?.filter(
+                      (file) => file.name !== "README.md"
+                    )}
                     onSelect={handleChangeFile}
                     onAddFile={handleAddFile}
                   />
