@@ -30,18 +30,13 @@ export const LoginProvider = ({ children }) => {
 
   const setUser = useCallback(
     (user) => {
-      dispatchUser({
-        type: actions.SET_USER,
-        payload: user,
-      });
+      dispatchUser({ type: actions.SET_USER, payload: user });
     },
     [dispatchUser]
   );
 
   function clearUser() {
-    dispatchUser({
-      type: actions.CLEAR_USER,
-    });
+    dispatchUser({ type: actions.CLEAR_USER });
   }
 
   useEffect(() => {
