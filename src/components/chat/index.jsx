@@ -19,7 +19,7 @@ import {
 import { useFirebaseContext } from "../../contexts/firebaseContext";
 import { getDatabase, off, onChildAdded, push, ref } from "firebase/database";
 import Message from "./message";
-import { LoginContext } from "../../hooks/login/index";
+import { LoginContext } from "../../contexts/loginContext";
 
 const Chat = ({ compact }) => {
   const { app } = useFirebaseContext();

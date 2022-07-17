@@ -1,6 +1,6 @@
 import { Chip, Grid } from "@mui/material";
 import Editor from "../../components/inputs/editor";
-import { loggedIn } from "../../hooks/login";
+import { loggedIn } from "../../contexts/loginContext";
 import AdminPanel from "../adminPanel";
 import { useRepoContext } from "../../contexts/repoContext";
 import { useFluidContext } from "../../contexts/fluidContext";
@@ -14,7 +14,7 @@ import NameDialog from "../../components/dialog/name";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
 import { getDatabase, ref, remove } from "firebase/database";
 import DisplayCard from "../../components/displayCard";
-import { LoginContext } from "../../hooks/login/index";
+import { LoginContext } from "../../contexts/loginContext";
 
 const Session = () => {
   const { sharedStringHelper, sharedMap } = useFluidContext();

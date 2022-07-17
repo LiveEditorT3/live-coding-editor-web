@@ -12,9 +12,9 @@ import "codemirror/keymap/sublime";
 import { useFluidContext } from "../../../contexts/fluidContext";
 import { useFirebaseContext } from "../../../contexts/firebaseContext";
 import { getDatabase, onValue, ref } from "firebase/database";
-import { loggedIn } from "../../../hooks/login";
+import { loggedIn } from "../../../contexts/loginContext";
 import { useTheme } from "@mui/styles";
-import { LoginContext } from "../../../hooks/login/index";
+import { LoginContext } from "../../../contexts/loginContext";
 
 const Editor = ({ sharedStringHelper }) => {
   const theme = useTheme();

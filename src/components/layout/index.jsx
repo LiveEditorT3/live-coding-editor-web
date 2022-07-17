@@ -2,7 +2,7 @@ import { AppBar, Container, Toolbar, Typography } from "@mui/material";
 import UserMenu from "./userMenu";
 import useStyles from "./styles";
 import OptionsMenu from "./optionsMenu";
-import { LoginContext } from "../../hooks/login/index";
+import { LoginContext } from "../../contexts/loginContext";
 import { useContext } from "react";
 
 const Layout = ({ children, toggleThemeMode }) => {

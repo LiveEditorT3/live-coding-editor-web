@@ -15,7 +15,7 @@ import { useFirebaseContext } from "../../contexts/firebaseContext";
 import PeopleSelector from "../../components/inputs/selectors/peopleSelector";
 import Tab from "../../components/buttons/tab";
 import DisplayCard from "../../components/displayCard";
-import { LoginContext } from "../../hooks/login/index";
+import { LoginContext } from "../../contexts/loginContext";
 
 const AdminPanel = () => {
   const { user } = useContext(LoginContext);

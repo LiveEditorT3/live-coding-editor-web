@@ -1,12 +1,12 @@
 import { getDatabase, ref, set } from "firebase/database";
 import React, { useEffect, useState, createContext, useCallback } from "react";
 import { v4 } from "uuid";
-import { useFirebaseContext } from "../../contexts/firebaseContext";
-import userService from "../../services/userService";
-import Configuration from "../../config";
-import userReducer from "../../stores/user/reducer";
-import { actions } from "../../stores/user/actions";
-import { useSemiPersistentReducer } from "../useSemiPersistentReducer";
+import { useFirebaseContext } from "./firebaseContext";
+import userService from "../services/userService";
+import Configuration from "../config";
+import userReducer from "../stores/user/reducer";
+import { actions } from "../stores/user/actions";
+import { useSemiPersistentReducer } from "../hooks/useSemiPersistentReducer";
 
 const getCode = () => {
   const params = new URLSearchParams(window.location.search);

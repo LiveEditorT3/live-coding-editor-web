@@ -4,7 +4,7 @@ import Dialog from "..";
 import { useFluidContext } from "../../../contexts/fluidContext";
 import { getDatabase, ref, set } from "firebase/database";
 import { useFirebaseContext } from "../../../contexts/firebaseContext";
-import { LoginContext } from "../../../hooks/login/index";
+import { LoginContext } from "../../../contexts/loginContext";
 
 const NameDialog = ({ open, onClose }) => {
   const { setUser } = useContext(LoginContext);

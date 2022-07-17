@@ -12,7 +12,7 @@ import {
 import { useState, useContext } from "react";
 import { utils } from "../../../utils/utils";
 import Configuration from "../../../config";
-import { LoginContext } from "../../../hooks/login/index";
+import { LoginContext } from "../../../contexts/loginContext";
 
 const UserMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);

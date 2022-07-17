@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { createTheme } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
 import Layout from "./components/layout";
-import { LoginProvider } from "./hooks/login";
+import { LoginProvider } from "./contexts/loginContext";
 import Router from "./router/routes";
 import {
   CssBaseline,
