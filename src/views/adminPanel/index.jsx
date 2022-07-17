@@ -6,7 +6,6 @@ import FileSelector from "../../components/inputs/selectors/fileSelector";
 import { useFluidContext } from "../../contexts/fluidContext";
 import { selectEditorMode } from "../../models/languageModes";
 import RepoSelector from "../../components/inputs/selectors/repoSelector";
-import CreateRepoDialog from "../../components/dialog/createRepo";
 import CommitDialog from "../../components/dialog/commit";
 import { getDatabase, ref, remove } from "firebase/database";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
@@ -32,7 +31,6 @@ const AdminPanel = () => {
 
   const { sharedMap, audience } = useFluidContext();
   const { app } = useFirebaseContext();
-  const [open, setOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [peopleOpen, setPeopleOpen] = useState(false);
@@ -63,7 +61,6 @@ const AdminPanel = () => {
       }
       selectCurrentRepo(name);
     }
-    setOpen(false);
   };
 
   const handleCommit = async (event) => {
@@ -109,11 +106,6 @@ const AdminPanel = () => {
 
   return (
     <>
-      <CreateRepoDialog
-        open={open}
-        onClose={() => setOpen(false)}
-        onAccept={handleCreateRepo}
-      />
       <CommitDialog
         open={messageOpen}
         onClose={() => setMessageOpen(false)}
@@ -171,8 +163,8 @@ const AdminPanel = () => {
                   <RepoSelector
                     repo={repoName}
                     repos={reposList}
-                    onAdd={() => setOpen(true)}
                     onChange={handleChangeRepo}
+                    onAccept={handleCreateRepo}
                   />
                 </Grid>
                 <Grid item>
