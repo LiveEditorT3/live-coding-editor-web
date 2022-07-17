@@ -27,6 +27,7 @@ const AdminPanel = () => {
     reposList,
     selectCurrentRepo,
     selectCurrentFile,
+    refreshReposList,
   } = useContext(RepoContext);
 
   const { sharedMap, audience } = useFluidContext();
@@ -55,11 +56,14 @@ const AdminPanel = () => {
   const handleCreateRepo = async (name, isPrivate) => {
     if (!!name) {
       try {
-        await ReposService.create(name, isPrivate);
+        const response = await ReposService.create(name, isPrivate);
+        if (response.ok) {
+          refreshReposList();
+          selectCurrentRepo(name);
+        }
       } catch (err) {
         console.error(err);
       }
-      selectCurrentRepo(name);
     }
   };
 

@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
 import { LoginContext } from "./loginContext";
 import ReposService from "../services/ReposService";
 import reposReducer from "../stores/repos/reducer";
@@ -46,32 +52,34 @@ const RepoProvider = ({ children }) => {
     dispatchRepos({ type: actions.SET_FILE_CONTENT, payload: fileContent });
   }
 
+  const refreshReposList = useCallback(async () => {
+    try {
+      const res = await ReposService.get();
+      dispatchRepos({ type: actions.SET_REPOS_LIST, payload: res });
+    } catch (err) {
+      console.error(err);
+    }
+  }, [dispatchRepos]);
+
+  const refreshFilesList = useCallback(async () => {
+    try {
+      const res = await ReposService.getFiles(user.login, repos.repoName);
+      dispatchRepos({ type: actions.SET_FILES_LIST, payload: res });
+    } catch (err) {
+      console.error(err);
+    }
+  }, [dispatchRepos, user.login, repos.repoName]);
+
   useEffect(() => {
     // Get the list of repos if the current repo or the user changes
-    const getReposList = async () => {
-      try {
-        const res = await ReposService.get();
-        dispatchRepos({ type: actions.SET_REPOS_LIST, payload: res });
-      } catch (err) {
-        console.error(err);
-      }
-    };
     if (user && user.login) {
-      getReposList();
+      refreshReposList();
     }
     // Get the list of files in the repo if the current repo or the user changes
-    const getFiles = async () => {
-      try {
-        const res = await ReposService.getFiles(user.login, repos.repoName);
-        dispatchRepos({ type: actions.SET_FILES_LIST, payload: res });
-      } catch (err) {
-        console.error(err);
-      }
-    };
     if (user && user.login && repos.repoName) {
-      getFiles();
+      refreshFilesList();
     }
-  }, [user, repos.repoName]);
+  }, [user, repos.repoName, refreshReposList, refreshFilesList]);
 
   // Clear everything is the user signs out
   useEffect(() => {
@@ -89,6 +97,8 @@ const RepoProvider = ({ children }) => {
         setCommitMessage,
         setFileContent,
         clearFile,
+        refreshReposList,
+        refreshFilesList,
       }}
     >
       {children}
