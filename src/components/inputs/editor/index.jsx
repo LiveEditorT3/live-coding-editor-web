@@ -4,11 +4,32 @@ import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/mode/python/python";
 import "codemirror/theme/eclipse.css";
-import "codemirror/theme/colorforth.css";
+import "codemirror/theme/darcula.css";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/clike/clike";
 import "codemirror/mode/go/go";
+import "codemirror/mode/rust/rust";
+import "codemirror/mode/octave/octave";
+import "codemirror/mode/yaml/yaml";
+import "codemirror/mode/shell/shell";
 import "codemirror/keymap/sublime";
+import 'codemirror/addon/edit/closebrackets';
+import 'codemirror/addon/edit/closetag';
+import 'codemirror/addon/edit/matchbrackets';
+import 'codemirror/addon/edit/matchtags';
+import 'codemirror/addon/fold/brace-fold';
+import 'codemirror/addon/fold/indent-fold';
+import 'codemirror/addon/fold/xml-fold';
+import 'codemirror/addon/fold/foldcode';
+import 'codemirror/addon/fold/foldgutter';
+import 'codemirror/addon/fold/foldgutter.css';
+import 'codemirror/addon/scroll/simplescrollbars';
+import 'codemirror/addon/scroll/simplescrollbars.css';
+import 'codemirror/addon/search/match-highlighter';
+import 'codemirror/addon/scroll/annotatescrollbar';
+import 'codemirror/addon/search/matchesonscrollbar';
+import 'codemirror/addon/search/matchesonscrollbar.css';
+import 'codemirror/addon/search/searchcursor';
 import { useFluidContext } from "../../../contexts/fluidContext";
 import { useFirebaseContext } from "../../../contexts/firebaseContext";
 import { getDatabase, onValue, ref } from "firebase/database";
@@ -87,6 +108,13 @@ const Editor = ({ sharedStringHelper }) => {
         lineNumbers: true,
         keyMap: "sublime",
         mode: "python",
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        autoCloseTags: true,
+        matchTags: true,
+        foldGutter: true,
+        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+        highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true }
       }
     );
     editorComponent.on("change", handleChange);
@@ -103,7 +131,7 @@ const Editor = ({ sharedStringHelper }) => {
   useEffect(() => {
     editorRef.current.setOption(
       "theme",
-      theme.palette.mode === "light" ? "eclipse" : "colorforth"
+      theme.palette.mode === "light" ? "eclipse" : "darcula"
     );
   }, [theme]);
 
