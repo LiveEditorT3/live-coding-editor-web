@@ -2,7 +2,7 @@ import { getDatabase, ref, set } from "firebase/database";
 import React, { useEffect, useState, createContext, useCallback } from "react";
 import { v4 } from "uuid";
 import { useFirebaseContext } from "./firebaseContext";
-import userService from "../services/userService";
+import UserService from "../services/UserService";
 import Configuration from "../config";
 import userReducer from "../stores/user/reducer";
 import { actions } from "../stores/user/actions";
@@ -48,7 +48,7 @@ export const LoginProvider = ({ children }) => {
     const getAccessToken = async () => {
       var gitCode = getCode();
       if (!!gitCode) {
-        const res = await userService.Login(gitCode);
+        const res = await UserService.login(gitCode);
         setLoggedIn(!!res.access_token);
         localStorage.setItem(Configuration.TOKEN_KEY, res.access_token);
         window.location.replace(`${window.location.origin}/${v4()}`);
@@ -62,7 +62,7 @@ export const LoginProvider = ({ children }) => {
     const localUser = JSON.parse(localStorage.getItem("user"));
 
     const getUser = async () => {
-      const user = await userService.GetUser();
+      const user = await UserService.getUser();
       if (!!user) {
         const db = getDatabase(app);
         setUser(user);

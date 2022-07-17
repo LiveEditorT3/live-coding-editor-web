@@ -15,7 +15,7 @@ import PeopleSelector from "../../components/inputs/selectors/peopleSelector";
 import Tab from "../../components/buttons/tab";
 import DisplayCard from "../../components/displayCard";
 import { LoginContext } from "../../contexts/loginContext";
-import reposService from "../../services/reposService";
+import ReposService from "../../services/ReposService";
 
 const AdminPanel = () => {
   const { user } = useContext(LoginContext);
@@ -45,7 +45,7 @@ const AdminPanel = () => {
 
   useEffect(() => {
     const getRepos = async () => {
-      const res = await reposService.Get();
+      const res = await ReposService.get();
       setRepos(res);
     };
     getRepos();
@@ -69,7 +69,7 @@ const AdminPanel = () => {
 
   const handleCreate = async (event) => {
     try {
-      await reposService.Create(repoName, repoIsPrivate);
+      await ReposService.create(repoName, repoIsPrivate);
     } catch (err) {
       console.error(err);
     }
@@ -80,7 +80,7 @@ const AdminPanel = () => {
 
   const handleCommit = async (event) => {
     try {
-      await reposService.Commit(user, repo, {
+      await ReposService.commit(user, repo, {
         content: fileContent.content,
         path: filepath,
         message: commitMessage,

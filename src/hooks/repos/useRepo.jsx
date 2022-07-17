@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
-import reposService from "../../services/reposService";
+import ReposService from "../../services/ReposService";
 
 const useRepo = (name, user) => {
   const [files, setFiles] = useState([]);
 
   useEffect(() => {
     const getFiles = async () => {
-      const res = await reposService.GetFiles(user, name);
+      const res = await ReposService.getFiles(user, name);
       setFiles(res);
     };
     if (!!user && !!name) getFiles();
   }, [name, user]);
 
-  const getFile = (path) => reposService.GetFile(user, name, path);
+  const getFile = (path) => ReposService.getFile(user, name, path);
 
   return {
     files,

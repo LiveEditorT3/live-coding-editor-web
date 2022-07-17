@@ -1,29 +1,29 @@
 import Configuration from "../config";
 
-const _fetch = async (path, config, baseUrl = Configuration.BASE_URL) => {
-  const res = await fetch(`${baseUrl}${path}`, config);
-
-  if (res.status === 400 || !res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Request failed");
-  }
-
-  if (res.status === 401) {
-    localStorage.removeItem(Configuration.TOKEN_KEY);
-    window.location.replace(window.location.origin);
-    throw new Error("Not authenticated");
-  }
-
-  if (res.status === 204 || res.status === 201) {
-    return res;
-  }
-
-  return res.json();
-};
-
 export class HttpClient {
-  static Get = async (path, config) =>
-    await _fetch(path, {
+  static async _fetch(path, config, baseUrl = Configuration.BASE_URL) {
+    const res = await fetch(`${baseUrl}${path}`, config);
+
+    if (res.status === 400 || !res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Request failed");
+    }
+
+    if (res.status === 401) {
+      localStorage.removeItem(Configuration.TOKEN_KEY);
+      window.location.replace(window.location.origin);
+      throw new Error("Not authenticated");
+    }
+
+    if (res.status === 204 || res.status === 201) {
+      return res;
+    }
+
+    return res.json();
+  }
+
+  static get(path, config) {
+    return this._fetch(path, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -33,9 +33,10 @@ export class HttpClient {
       },
       ...config,
     });
+  }
 
-  static Post = async (path, data, config) =>
-    await _fetch(path, {
+  static post(path, data, config) {
+    return this._fetch(path, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -47,9 +48,10 @@ export class HttpClient {
       body: JSON.stringify(data),
       ...config,
     });
+  }
 
-  static Put = async (path, data, config) =>
-    await _fetch(path, {
+  static put(path, data, config) {
+    return this._fetch(path, {
       method: "PUT",
       credentials: "include",
       headers: {
@@ -60,9 +62,10 @@ export class HttpClient {
       body: JSON.stringify(data),
       ...config,
     });
+  }
 
-  static Delete = async (path, data, config) =>
-    await _fetch(path, {
+  static delete(path, data, config) {
+    return this._fetch(path, {
       method: "DELETE",
       credentials: "include",
       headers: {
@@ -73,4 +76,5 @@ export class HttpClient {
       body: data ? JSON.stringify(data) : null,
       ...config,
     });
+  }
 }
