@@ -1,5 +1,4 @@
 import { useEffect, useState, useContext } from "react";
-import useRepos from "../../hooks/repos/useRepos";
 import { Button, Grid } from "@mui/material";
 import { Save } from "@mui/icons-material";
 import { RepoContext } from "../../contexts/repoContext";
@@ -16,6 +15,7 @@ import PeopleSelector from "../../components/inputs/selectors/peopleSelector";
 import Tab from "../../components/buttons/tab";
 import DisplayCard from "../../components/displayCard";
 import { LoginContext } from "../../contexts/loginContext";
+import reposService from "../../services/reposService";
 
 const AdminPanel = () => {
   const { user } = useContext(LoginContext);
@@ -35,13 +35,21 @@ const AdminPanel = () => {
   const { sharedMap, audience } = useFluidContext();
   const { app } = useFirebaseContext();
   const [sent, setSent] = useState(false);
-  const { repos, createRepo, commitFile } = useRepos(sent);
+  const [repos, setRepos] = useState([]);
   const [repo, setRepo] = useState();
   const [open, setOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [peopleOpen, setPeopleOpen] = useState(false);
   const { files, getFile } = useRepo(repo, user?.login);
+
+  useEffect(() => {
+    const getRepos = async () => {
+      const res = await reposService.Get();
+      setRepos(res);
+    };
+    getRepos();
+  }, [sent]);
 
   useEffect(() => {
     if (!repo && !!repos && !!repos.length) {
@@ -59,20 +67,28 @@ const AdminPanel = () => {
     }
   }, [audience, app]);
 
-  const handleCreate = (event) => {
-    createRepo(repoName, repoIsPrivate);
+  const handleCreate = async (event) => {
+    try {
+      await reposService.Create(repoName, repoIsPrivate);
+    } catch (err) {
+      console.error(err);
+    }
     setSent(true);
     setRepo(repoName);
     setOpen(false);
   };
 
   const handleCommit = async (event) => {
-    await commitFile(user?.login, repo, {
-      content: fileContent.content,
-      filepath,
-      commitMessage,
-      fileSHA,
-    });
+    try {
+      await reposService.Commit(user, repo, {
+        content: fileContent.content,
+        path: filepath,
+        message: commitMessage,
+        sha: fileSHA,
+      });
+    } catch (err) {
+      console.error(err);
+    }
     setMessageOpen(false);
   };
 

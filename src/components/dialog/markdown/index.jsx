@@ -1,22 +1,25 @@
-import { Grid, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { Grid, TextField } from "@mui/material";
 import Dialog from "..";
 import { useFluidContext } from "../../../contexts/fluidContext";
-import useRepos from "../../../hooks/repos/useRepos";
+import reposService from "../../../services/reposService";
 
 const MarkdownDialog = ({ open, file, user, repo, onClose }) => {
   const [markdown, setMarkdown] = useState();
   const { sharedMap } = useFluidContext();
-  const { commitFile } = useRepos();
 
   const handleAccept = async (event) => {
-    await commitFile(user, repo, {
-      content: markdown,
-      path: file.path,
-      message: "Updated README.md",
-      sha: file.sha,
-    });
+    try {
+      await reposService.Commit(user, repo, {
+        content: markdown,
+        path: file.path,
+        message: "Updated README.md",
+        sha: file.sha,
+      });
+    } catch (err) {
+      console.error(err);
+    }
     sharedMap.set("markdown", markdown);
     onClose();
   };
