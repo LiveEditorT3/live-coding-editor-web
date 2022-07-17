@@ -129,12 +129,11 @@ const Editor = ({ sharedStringHelper }) => {
   useEffect(() => {
     if (fileContent.refresh) {
       const text = sharedStringHelper.getText();
-      if (text.length === 0) {
-        return;
-      }
       editorRef.current.setValue(fileContent.content);
       if (!!fileContent.content) {
         sharedStringHelper.replaceText(fileContent.content, 0, text.length);
+      } else if (text.length === 0) {
+        return;
       } else {
         sharedStringHelper.removeText(0, text.length);
       }
