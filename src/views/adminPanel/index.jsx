@@ -7,8 +7,6 @@ import { useFluidContext } from "../../contexts/fluidContext";
 import { selectEditorMode } from "../../models/languageModes";
 import RepoSelector from "../../components/inputs/selectors/repoSelector";
 import CommitDialog from "../../components/dialog/commit";
-import { getDatabase, ref, remove } from "firebase/database";
-import { useFirebaseContext } from "../../contexts/firebaseContext";
 import PeopleSelector from "../../components/inputs/selectors/peopleSelector";
 import Tab from "../../components/buttons/tab";
 import DisplayCard from "../../components/displayCard";
@@ -30,8 +28,7 @@ const AdminPanel = () => {
     refreshReposList,
   } = useContext(RepoContext);
 
-  const { sharedMap, audience } = useFluidContext();
-  const { app } = useFirebaseContext();
+  const { sharedMap } = useFluidContext();
   const [messageOpen, setMessageOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [peopleOpen, setPeopleOpen] = useState(false);
@@ -43,15 +40,6 @@ const AdminPanel = () => {
       selectCurrentRepo(reposList[0].name);
     }
   }, [repoName, reposList, selectCurrentRepo]);
-
-  useEffect(() => {
-    if (!!audience) {
-      audience.on("memberRemoved", (member) => {
-        const db = getDatabase(app);
-        remove(ref(db, `sessions${window.location.pathname}/${member.userId}`));
-      });
-    }
-  }, [audience, app]);
 
   const handleCreateRepo = async (name, isPrivate) => {
     if (!!name) {
@@ -184,7 +172,7 @@ const AdminPanel = () => {
                 <Grid item>
                   <FileSelector
                     files={filesList?.filter(
-                      (file) => file.name !== "README.md"
+                      (file) => file.name !== "README.md" && !file.name.startsWith(".") && file.type ==="file"
                     )}
                     onSelect={handleChangeFile}
                     onAddFile={handleAddFile}

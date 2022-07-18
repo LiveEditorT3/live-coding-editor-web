@@ -56,7 +56,7 @@ const Session = () => {
 
   useEffect(() => {
     const getReadme = async () => {
-      if (!!user && !!repoName && !!sharedMap) {
+      if (loggedIn() && !!user && !!repoName && !!sharedMap) {
         try {
           const file = await ReposService.getFile(
             user.login,

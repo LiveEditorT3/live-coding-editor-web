@@ -37,9 +37,28 @@ export const fileExtensionToEditorMode = (extension) => {
     case "go":
       return "go";
     case "js":
+    case "json":
       return "javascript";
     case "py":
       return "python";
+    case "c":
+    case "h":
+      return "text/x-csrc"
+    case "cpp":
+    case "cc":
+    case "hpp":
+    case "hh":
+      return "text/x-c++src"
+    case "java":
+    case "class":
+      return "text/x-java"
+    case "sh":
+      return "text/x-sh"
+    case "rs":
+    case "rslib":
+      return "text/x-rustsrc"
+    case "toml":
+      return "text/x-toml"
     default:
       return "null";
   }
