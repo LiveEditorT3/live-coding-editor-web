@@ -3,6 +3,7 @@ import { SharedMap } from "@fluidframework/map";
 import { SharedString } from "@fluidframework/sequence";
 import { SharedStringHelper } from "@fluid-experimental/react-inputs";
 import { createContext, useContext, useEffect, useState } from "react";
+import { TINYLICIOUS_DOMAIN, TINYLICIOUS_PORT } from "../config";
 
 const FluidContext = createContext({});
 const MODE_KEY = "mode";
@@ -34,7 +35,12 @@ export const useFluidContext = () => {
 };
 
 const FluidProvider = ({ children }) => {
-  const client = new TinyliciousClient();
+  const client = new TinyliciousClient({
+    connection: {
+      domain: TINYLICIOUS_DOMAIN,
+      port: TINYLICIOUS_PORT,
+    },
+  });
 
   const containerSchema = {
     initialObjects: { sharedMap: SharedMap, sharedString: SharedString },
