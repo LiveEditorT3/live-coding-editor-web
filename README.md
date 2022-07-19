@@ -67,10 +67,10 @@ Collaborative code editor developed for the course Taller de Programación III a
 
 - [React](https://reactjs.org/)
 - [MaterialUI](https://mui.com/)
-- [Fluid](https://fluidframework.com/)
-- [CodeMirror](https://firebase.google.com/)
-- [Firebase](https://nodejs.org/)
-- [Node](https://codemirror.net/)
+- [Fluid Framework](https://fluidframework.com/)
+- [CodeMirror](https://codemirror.net/)
+- [Firebase](https://firebase.google.com/)
+- [Node](https://nodejs.org/)
 - [Heroku](https://www.heroku.com)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
