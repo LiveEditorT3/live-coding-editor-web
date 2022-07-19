@@ -60,14 +60,15 @@ export const LoginProvider = ({ children }) => {
       const user = await UserService.getUser();
       if (!!user) {
         const db = getDatabase(app);
-        setUser(user);
-        set(ref(db, `sessions${window.location.pathname}/${user.id}`), {
+        const storedUser = {
           id: user.id,
           name: user.name,
           login: user?.login,
           write: loggedIn,
-          admin: loggedIn,
-        });
+          admin: window.location.pathname,
+        };
+        setUser({ ...storedUser, avatar_url: user.avatar_url });
+        set(ref(db, `sessions${window.location.pathname}/${user.id}`), storedUser);
       }
     };
 

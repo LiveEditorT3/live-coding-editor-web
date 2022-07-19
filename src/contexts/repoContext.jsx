@@ -3,18 +3,18 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useReducer,
 } from "react";
-import { LoginContext } from "./loginContext";
+import { loggedIn, LoginContext } from "./loginContext";
 import ReposService from "../services/ReposService";
 import reposReducer from "../stores/repos/reducer";
 import { actions } from "../stores/repos/actions";
+import { useSemiPersistentReducer } from "../hooks/useSemiPersistentReducer";
 
 export const RepoContext = createContext({});
 
 const RepoProvider = ({ children }) => {
   const { user } = useContext(LoginContext);
-  const [repos, dispatchRepos] = useReducer(reposReducer, {
+  const [repos, dispatchRepos] = useSemiPersistentReducer("repo", reposReducer, {
     repoName: undefined,
     repoIsPrivate: undefined,
     reposList: [],
@@ -72,11 +72,11 @@ const RepoProvider = ({ children }) => {
 
   useEffect(() => {
     // Get the list of repos if the current repo or the user changes
-    if (user && user.login) {
+    if (loggedIn() && user && user.login) {
       refreshReposList();
     }
     // Get the list of files in the repo if the current repo or the user changes
-    if (user && user.login && repos.repoName) {
+    if (loggedIn() && user && user.login && repos.repoName) {
       refreshFilesList();
     }
   }, [user, repos.repoName, refreshReposList, refreshFilesList]);

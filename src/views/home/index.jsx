@@ -1,7 +1,8 @@
-import { Button, Card, CardContent, CardHeader, FormHelperText, Grid, InputAdornment, OutlinedInput, Typography } from "@mui/material";
+import { Button, Card, CardContent, CardHeader, FormHelperText, Grid, ImageList, ImageListItem, InputAdornment, OutlinedInput, Typography } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogIntoGithubButton from "../../components/buttons";
+import { supportedLanguages } from "../../models/supportedLanguages";
 
 const Home = () => {
   const [session, setSession] = useState("");
@@ -23,17 +24,34 @@ const Home = () => {
   }
 
   return (
-    <Grid container spacing={1} justifyContent="center">
+    <Grid container spacing={1} justifyContent="center" sx={{ padding: "1%", marginTop:"1%"}}>
       <Grid item xs={7} container spacing={1}>
         <Grid item xs={12}>
-          <Typography variant="h3">
-            Welcome!
+          <Typography variant="h3" align="center">
+             Collaborative Code Editor 
+          </Typography>
+          <Typography variant="h5" align="center">
+            Store your session files on GitHub 
           </Typography>
         </Grid>
-        <Grid item xs={12}>
-          <Typography>
-            Texto
+        <Grid item container xs={12} justifyContent="center" direction="column" sx={{ alignContent: "center" }}>
+          <Typography align="center" variant="caption">
+            Supported languages:
           </Typography>
+          <ImageList variant="masonry" cols={3} gap={38} sx={{ margin: "5%", maxWidth: "20vw" }}>
+            {
+              supportedLanguages.map((lang) => (
+                <ImageListItem key={lang.name} cols={lang.cols || 1} rows={lang.rows || 1}>
+                  <img 
+                    src={`${lang.iconUrl}?w=248&fit=crop&auto=format`}
+                    srcSet={`${lang.iconUrl}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                    alt={lang.name}
+                    loading="lazy"
+                  />
+                </ImageListItem>
+              ))
+            }
+          </ImageList>
         </Grid>
       </Grid>
       <Grid item container xs={5} spacing={3} alignItems="center">

@@ -5,10 +5,13 @@ import {
   List,
   ListItem,
   ListItemButton,
+  ListItemIcon,
   ListItemText,
   TextField,
 } from "@mui/material";
 import { useState } from "react";
+import { extractFilenameAndExtension } from "../../../../models/languageModes";
+import { fileExtensionToIcon } from "../../../../models/supportedLanguages";
 
 const FileSelector = ({ files, onSelect, onAddFile }) => {
   const [open, setOpen] = useState(false);
@@ -55,6 +58,14 @@ const FileSelector = ({ files, onSelect, onAddFile }) => {
         files.map((file) => (
           <ListItem disableGutters dense key={file.sha}>
             <ListItemButton dense onClick={() => onSelect(file)}>
+              <ListItemIcon sx={{ minWidth: "25px" }}>
+                <img
+                  src={fileExtensionToIcon(extractFilenameAndExtension(file.name).extension)}
+                  alt={file.name}
+                  width={15}
+                  height={15}
+                />
+              </ListItemIcon>
               <ListItemText>{file.name}</ListItemText>
             </ListItemButton>
           </ListItem>

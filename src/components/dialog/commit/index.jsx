@@ -3,12 +3,13 @@ import { TextField } from "@mui/material";
 import Dialog from "..";
 import { RepoContext } from "../../../contexts/repoContext";
 
-const CommitDialog = ({ open, onClose, onAccept }) => {
+const CommitDialog = ({ open, loading, onClose, onAccept }) => {
   const { commitMessage, setCommitMessage } = useContext(RepoContext);
 
   return (
     <Dialog
       open={open}
+      loading={loading}
       title="Commit Changes"
       onClose={onClose}
       onAccept={onAccept}

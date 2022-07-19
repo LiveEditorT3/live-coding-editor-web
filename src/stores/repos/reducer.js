@@ -64,7 +64,7 @@ const reposReducer = (state, action) => {
       return {
         ...state,
         filepath: "",
-        fileContent: "",
+        fileContent: { content: "", refresh: true },
         fileSHA: "",
         commitMessage: "",
       };
