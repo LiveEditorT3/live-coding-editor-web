@@ -1,12 +1,11 @@
 import { getDatabase, ref, set } from "firebase/database";
-import React, { useEffect, useState, createContext, useCallback } from "react";
+import React, { useEffect, useState, createContext, useCallback, useReducer } from "react";
 import { v4 } from "uuid";
 import { useFirebaseContext } from "./firebaseContext";
 import UserService from "../services/UserService";
 import Configuration from "../config";
 import userReducer from "../stores/user/reducer";
 import { actions } from "../stores/user/actions";
-import { useSemiPersistentReducer } from "../hooks/useSemiPersistentReducer";
 
 const getCode = () => {
   const params = new URLSearchParams(window.location.search);
@@ -18,7 +17,7 @@ export const loggedIn = () => !!localStorage.getItem(Configuration.TOKEN_KEY);
 export const LoginContext = createContext();
 
 export const LoginProvider = ({ children }) => {
-  const [user, dispatchUser] = useSemiPersistentReducer("user", userReducer, {
+  const [user, dispatchUser] = useReducer(userReducer, {
     id: "",
     name: "",
     login: "",
@@ -54,8 +53,6 @@ export const LoginProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const localUser = JSON.parse(localStorage.getItem("user"));
-
     const getUser = async () => {
       const user = await UserService.getUser();
       if (!!user) {
@@ -74,15 +71,6 @@ export const LoginProvider = ({ children }) => {
 
     if (loggedIn && !user?.login) {
       getUser();
-    } else if (!!localUser && localUser.login !== user?.login) {
-      const db = getDatabase(app);
-      set(ref(db, `sessions${window.location.pathname}/${localUser.id}`), {
-        id: localUser.id,
-        name: localUser.name,
-        login: localUser.login,
-        write: loggedIn,
-      });
-      setUser(localUser);
     }
   }, [setUser, user, loggedIn, app]);
 

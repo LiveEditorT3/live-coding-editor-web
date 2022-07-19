@@ -3,18 +3,18 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useReducer,
 } from "react";
 import { loggedIn, LoginContext } from "./loginContext";
 import ReposService from "../services/ReposService";
 import reposReducer from "../stores/repos/reducer";
 import { actions } from "../stores/repos/actions";
-import { useSemiPersistentReducer } from "../hooks/useSemiPersistentReducer";
 
 export const RepoContext = createContext({});
 
 const RepoProvider = ({ children }) => {
   const { user } = useContext(LoginContext);
-  const [repos, dispatchRepos] = useSemiPersistentReducer("repo", reposReducer, {
+  const [repos, dispatchRepos] = useReducer(reposReducer, {
     repoName: undefined,
     repoIsPrivate: undefined,
     reposList: [],
@@ -86,7 +86,7 @@ const RepoProvider = ({ children }) => {
     if (!user && !user.login) {
       dispatchRepos({ type: actions.CLEAR_REPOS });
     }
-  }, [user]);
+  }, [user, dispatchRepos]);
 
   return (
     <RepoContext.Provider
