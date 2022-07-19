@@ -121,10 +121,7 @@ npm install npm@latest -g
    REACT_APP_FIREBASE_MEASUREMENT_ID=
    ```
 8. Start a local Fluid Framework server with `npx tinylicious`
-9. Start the API server following the instructions:
-
-   [https://github.com/LiveEditorT3/live-coding-editor-api](https://github.com/LiveEditorT3/live-coding-editor-api)
-
+9. Start the API server following the instructions in the [README](https://github.com/LiveEditorT3/live-coding-editor-api)
 10. Start the app in development mode
     ```sh
     npm run dev
