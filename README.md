@@ -91,8 +91,10 @@ npm install npm@latest -g
 
 ### Installation
 
-1. Follow these steps to get a free API Key and Client ID for a GitHub OAuth App: [https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app)
-2. Setup a free Firebase project for the app: [https://firebase.google.com/docs/web/setup](https://firebase.google.com/docs/web/setup)
+1. Follow these steps to get a free API Key and Client ID for a GitHub OAuth App:
+   [https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app)
+2. Setup a free Firebase project for the app:
+   [https://firebase.google.com/docs/web/setup](https://firebase.google.com/docs/web/setup)
 3. Clone the repo
    ```sh
    git clone https://github.com/LiveEditorT3/live-coding-editor-web.git
@@ -115,7 +117,8 @@ npm install npm@latest -g
    REACT_APP_FIREBASE_MEASUREMENT_ID=
    ```
 8. Start a local Fluid Framework server with `npx tinylicious`
-9. Start the API server following the instructions in [https://github.com/LiveEditorT3/live-coding-editor-api](https://github.com/LiveEditorT3/live-coding-editor-api)
+9. Start the API server following the instructions:
+   [https://github.com/LiveEditorT3/live-coding-editor-api](https://github.com/LiveEditorT3/live-coding-editor-api)
 10. Start the app in development mode
     ```sh
     npm run dev
@@ -152,9 +155,9 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## Contact
 
-Federico Álvarez - falvareza@fi.uba.ar
-Horacio Lisdero - hlisdero@fi.uba.ar
-Lucas Medrano - lnmedrano@fi.uba.ar
+- Federico Álvarez - falvareza@fi.uba.ar
+- Horacio Lisdero - hlisdero@fi.uba.ar
+- Lucas Medrano - lnmedrano@fi.uba.ar
 
 Project Link: [https://github.com/LiveEditorT3/live-coding-editor-web/](https://github.com/LiveEditorT3/live-coding-editor-web/)
 
