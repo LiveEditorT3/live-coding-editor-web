@@ -26,9 +26,12 @@ const AdminPanel = () => {
     selectCurrentRepo,
     selectCurrentFile,
     refreshReposList,
+    refreshFilesList,
+    setCommitMessage
   } = useContext(RepoContext);
 
   const { sharedMap } = useFluidContext();
+  const [loading, setLoading] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [peopleOpen, setPeopleOpen] = useState(false);
@@ -43,6 +46,7 @@ const AdminPanel = () => {
 
   const handleCreateRepo = async (name, isPrivate) => {
     if (!!name) {
+      setLoading(true);
       try {
         const response = await ReposService.create(name, isPrivate);
         if (response.ok) {
@@ -52,21 +56,28 @@ const AdminPanel = () => {
       } catch (err) {
         console.error(err);
       }
+      setLoading(false);
     }
   };
 
   const handleCommit = async (event) => {
+    setLoading(true);
     try {
-      await ReposService.commit(user.login, repoName, {
+      const response = await ReposService.commit(user.login, repoName, {
         content: fileContent.content,
         path: filepath,
         message: commitMessage,
         sha: fileSHA,
       });
+      if (response.ok) {
+        refreshFilesList();
+        setCommitMessage("");
+      }
     } catch (err) {
       console.error(err);
     }
     setMessageOpen(false);
+    setLoading(false);
   };
 
   const handleChangeRepo = (event) => {
@@ -100,6 +111,7 @@ const AdminPanel = () => {
     <>
       <CommitDialog
         open={messageOpen}
+        loading={loading}
         onClose={() => setMessageOpen(false)}
         onAccept={handleCommit}
       />

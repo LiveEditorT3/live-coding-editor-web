@@ -4,13 +4,14 @@ import { Lock, LockOpen } from "@mui/icons-material";
 import { Grid, Typography } from "@mui/material";
 import Dropdown from "../../dropdown";
 
-const RepoSelector = ({ repos, repo, onChange, onAccept }) => {
+const RepoSelector = ({ repos, repo, loading, onChange, onAccept }) => {
   const [openCreateRepoDialog, setOpenCreateRepoDialog] = useState(false);
 
   return (
     <>
       <CreateRepoDialog
         open={openCreateRepoDialog}
+        loading={loading}
         onClose={() => setOpenCreateRepoDialog(false)}
         onAccept={(name, isPrivate) => {
           onAccept(name, isPrivate);

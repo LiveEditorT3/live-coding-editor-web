@@ -15,6 +15,8 @@ import DisplayCard from "../../components/displayCard";
 import { LoginContext } from "../../contexts/loginContext";
 import { RepoContext } from "../../contexts/repoContext";
 import ReposService from "../../services/ReposService";
+import { fileExtensionToIcon } from "../../models/supportedLanguages";
+import { extractFilenameAndExtension } from "../../models/languageModes";
 
 const Session = () => {
   const { sharedStringHelper, sharedMap } = useFluidContext();
@@ -116,6 +118,14 @@ const Session = () => {
                   sx={{ borderRadius: 1.5 }}
                   label={path}
                   onDelete={loggedIn() ? handleClear : undefined}
+                  icon={
+                    <img
+                      src={fileExtensionToIcon(extractFilenameAndExtension(path).extension)}
+                      alt={path}
+                      width={15}
+                      height={15}
+                    />
+                  }
                 />
               </Grid>
             )}

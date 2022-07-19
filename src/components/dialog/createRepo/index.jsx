@@ -3,7 +3,7 @@ import { Lock, LockOpen } from "@mui/icons-material";
 import { Checkbox, Grid, TextField } from "@mui/material";
 import Dialog from "../index";
 
-const CreateRepoDialog = ({ open, onClose, onAccept }) => {
+const CreateRepoDialog = ({ open, loading, onClose, onAccept }) => {
   const [newRepoInput, setNewRepoInput] = useState({
     name: "",
     isPrivate: true,
@@ -11,6 +11,7 @@ const CreateRepoDialog = ({ open, onClose, onAccept }) => {
   return (
     <Dialog
       open={open}
+      loading={loading}
       title="Create Repo"
       onClose={onClose}
       onAccept={() => onAccept(newRepoInput.name, newRepoInput.isPrivate)}

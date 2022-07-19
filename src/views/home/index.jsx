@@ -34,11 +34,11 @@ const Home = () => {
             Store your session files on GitHub 
           </Typography>
         </Grid>
-        <Grid item container xs={12} justifyContent="center" direction="column">
+        <Grid item container xs={12} justifyContent="center" direction="column" sx={{ alignContent: "center" }}>
           <Typography align="center" variant="caption">
             Supported languages:
           </Typography>
-          <ImageList variant="masonry" cols={3} gap={38} sx={{ margin: "5%", maxWidth: "20vw", justifyContent: "center"}}>
+          <ImageList variant="masonry" cols={3} gap={38} sx={{ margin: "5%", maxWidth: "20vw" }}>
             {
               supportedLanguages.map((lang) => (
                 <ImageListItem key={lang.name} cols={lang.cols || 1} rows={lang.rows || 1}>
