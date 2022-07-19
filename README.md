@@ -79,7 +79,7 @@ Collaborative code editor developed for the course Taller de Programación III a
 
 ## Getting Started
 
-To get a local copy up and running follow these simple example steps.
+To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
@@ -92,9 +92,13 @@ npm install npm@latest -g
 ### Installation
 
 1. Follow these steps to get a free API Key and Client ID for a GitHub OAuth App:
+
    [https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app)
+
 2. Setup a free Firebase project for the app:
+
    [https://firebase.google.com/docs/web/setup](https://firebase.google.com/docs/web/setup)
+
 3. Clone the repo
    ```sh
    git clone https://github.com/LiveEditorT3/live-coding-editor-web.git
@@ -118,7 +122,9 @@ npm install npm@latest -g
    ```
 8. Start a local Fluid Framework server with `npx tinylicious`
 9. Start the API server following the instructions:
+
    [https://github.com/LiveEditorT3/live-coding-editor-api](https://github.com/LiveEditorT3/live-coding-editor-api)
+
 10. Start the app in development mode
     ```sh
     npm run dev
