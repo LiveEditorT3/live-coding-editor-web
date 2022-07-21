@@ -3,7 +3,6 @@ import { Button, Grid } from "@mui/material";
 import { Save } from "@mui/icons-material";
 import { RepoContext } from "../../contexts/repoContext";
 import FileSelector from "../../components/inputs/selectors/fileSelector";
-import { useFluidContext } from "../../contexts/fluidContext";
 import { selectEditorMode } from "../../models/languageModes";
 import RepoSelector from "../../components/inputs/selectors/repoSelector";
 import CommitDialog from "../../components/dialog/commit";
@@ -12,6 +11,8 @@ import Tab from "../../components/buttons/tab";
 import DisplayCard from "../../components/displayCard";
 import { LoginContext } from "../../contexts/loginContext";
 import ReposService from "../../services/ReposService";
+import { useFirebaseContext } from "../../contexts/firebaseContext";
+import { getDatabase, ref, set } from "firebase/database";
 
 const AdminPanel = () => {
   const { user } = useContext(LoginContext);
@@ -30,7 +31,7 @@ const AdminPanel = () => {
     setCommitMessage
   } = useContext(RepoContext);
 
-  const { sharedMap } = useFluidContext();
+  const { app } = useFirebaseContext();
   const [loading, setLoading] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
@@ -83,7 +84,9 @@ const AdminPanel = () => {
   const handleChangeRepo = (event) => {
     const selectedRepoName = event.target.value;
     selectCurrentRepo(selectedRepoName);
-    sharedMap.set("markdown", "");
+    const db = getDatabase(app);
+    const pathRef = ref(db, `sessions${window.location.pathname}/path`)
+    set(pathRef, "");
   };
 
   const handleChangeFile = async (file) => {
@@ -94,8 +97,11 @@ const AdminPanel = () => {
         { content: res.content, refresh: true },
         res.sha
       );
-      sharedMap.set("mode", selectEditorMode(file.name));
-      sharedMap.set("file", file.name);
+      const db = getDatabase(app);
+      const modeRef = ref(db, `sessions${window.location.pathname}/mode`);
+      const pathRef = ref(db, `sessions${window.location.pathname}/path`);
+      set(modeRef, selectEditorMode(file.name));
+      set(pathRef, file.name);
     } catch (err) {
       console.error(err);
     }
@@ -103,8 +109,11 @@ const AdminPanel = () => {
 
   const handleAddFile = (newFilepath) => {
     selectCurrentFile(newFilepath, { content: "", refresh: true }, "");
-    sharedMap.set("mode", selectEditorMode(newFilepath));
-    sharedMap.set("file", newFilepath);
+    const db = getDatabase(app);
+    const modeRef = ref(db, `sessions${window.location.pathname}/mode`);
+    const pathRef = ref(db, `sessions${window.location.pathname}/path`);
+    set(modeRef, selectEditorMode(newFilepath));
+    set(pathRef, newFilepath);
   };
 
   return (
@@ -171,16 +180,19 @@ const AdminPanel = () => {
                     onAccept={handleCreateRepo}
                   />
                 </Grid>
-                <Grid item>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    endIcon={<Save />}
-                    onClick={() => setMessageOpen(true)}
-                  >
-                    Save
-                  </Button>
-                </Grid>
+                {
+                  !!filepath &&
+                  <Grid item>
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      endIcon={<Save />}
+                      onClick={() => setMessageOpen(true)}
+                    >
+                      Save
+                    </Button>
+                  </Grid>
+                }
                 <Grid item>
                   <FileSelector
                     files={filesList?.filter(

@@ -65,7 +65,7 @@ export const LoginProvider = ({ children }) => {
           admin: window.location.pathname,
         };
         setUser({ ...storedUser, avatar_url: user.avatar_url });
-        set(ref(db, `sessions${window.location.pathname}/${user.id}`), storedUser);
+        set(ref(db, `participants${window.location.pathname}/${user.id}`), storedUser);
       }
     };
 

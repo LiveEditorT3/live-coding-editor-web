@@ -23,9 +23,8 @@ import 'codemirror/addon/fold/xml-fold';
 import 'codemirror/addon/fold/foldcode';
 import 'codemirror/addon/fold/foldgutter';
 import 'codemirror/addon/fold/foldgutter.css';
-import { useFluidContext } from "../../../contexts/fluidContext";
 import { useFirebaseContext } from "../../../contexts/firebaseContext";
-import { getDatabase, onValue, ref } from "firebase/database";
+import { getDatabase, off, onValue, ref } from "firebase/database";
 import { loggedIn } from "../../../contexts/loginContext";
 import { useTheme } from "@mui/styles";
 import { LoginContext } from "../../../contexts/loginContext";
@@ -35,7 +34,6 @@ const Editor = ({ sharedStringHelper }) => {
   const theme = useTheme();
   const { fileContent, setFileContent } = useContext(RepoContext);
   const { app } = useFirebaseContext();
-  const { sharedMap } = useFluidContext();
   const { user } = useContext(LoginContext);
 
   const editorRef = useRef(null);
@@ -125,18 +123,14 @@ const Editor = ({ sharedStringHelper }) => {
   }, [theme]);
 
   useEffect(() => {
-    if (sharedMap !== undefined) {
-      const syncView = () =>
-        editorRef.current.setOption("mode", sharedMap.get("mode") || "python");
+    const db = getDatabase(app);
+    const modeRef = ref(db, `sessions${window.location.pathname}/mode`);
+    onValue(modeRef, (snapshot) => {
+      editorRef.current.setOption("mode", snapshot.val() || "python");
+    });
 
-      syncView();
-      sharedMap.on("valueChanged", syncView);
-      // turn off listener when component is unmounted
-      return () => {
-        sharedMap.off("valueChanged", syncView);
-      };
-    }
-  }, [sharedMap]);
+    return () => off(modeRef);
+  }, [app]);
 
   const handleChange = (instance, changeObj) => {
     if (changeObj.origin === "setValue") return;
@@ -148,7 +142,7 @@ const Editor = ({ sharedStringHelper }) => {
   };
 
   useEffect(() => {
-    if (fileContent.refresh) {
+    if (fileContent.refresh && loggedIn()) {
       const text = sharedStringHelper.getText();
       editorRef.current.setValue(fileContent.content);
       if (!!fileContent.content) {
@@ -191,7 +185,7 @@ const Editor = ({ sharedStringHelper }) => {
       const db = getDatabase(app);
       const membersRef = ref(
         db,
-        `sessions${window.location.pathname}/${user.id}/write`
+        `participants${window.location.pathname}/${user.id}/write`
       );
       onValue(membersRef, (snapshot) => {
         const data = snapshot.val();

@@ -19,7 +19,7 @@ const NameDialog = ({ open, onClose }) => {
     const fluidUser = audience.getMyself();
     const user = { name, id: fluidUser.userId, login: "" };
     const db = getDatabase(app);
-    set(ref(db, `sessions${window.location.pathname}/${user.id}`), {
+    set(ref(db, `participants${window.location.pathname}/${user.id}`), {
       ...user,
       write: false,
     });

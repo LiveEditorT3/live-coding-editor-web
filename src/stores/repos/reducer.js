@@ -24,6 +24,10 @@ const reposReducer = (state, action) => {
         ...state,
         repoName: selectedRepo.name,
         repoIsPrivate: selectedRepo.private,
+        filepath: undefined,
+        fileContent: { content: "", refresh: true },
+        fileSHA: undefined,
+        commitMessage: "",
       };
     }
     case actions.SET_REPOS_LIST: {

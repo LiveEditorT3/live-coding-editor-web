@@ -27,7 +27,7 @@ const PeopleSelector = () => {
 
   useEffect(() => {
     const db = getDatabase(app);
-    const membersRef = ref(db, `sessions${window.location.pathname}`);
+    const membersRef = ref(db, `participants${window.location.pathname}`);
     onChildAdded(membersRef, (member) => {
       setPeople((prev) => [...prev, member.val()]);
     });
@@ -48,7 +48,7 @@ const PeopleSelector = () => {
 
   const handleToggleWrite = (id, checked) => {
     const db = getDatabase(app);
-    const membersRef = ref(db, `sessions${window.location.pathname}/${id}`);
+    const membersRef = ref(db, `participants${window.location.pathname}/${id}`);
     update(membersRef, { write: checked });
   };
 
