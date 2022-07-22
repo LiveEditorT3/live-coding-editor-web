@@ -48,7 +48,6 @@ async function getFluidData() {
 export const FluidContext = createContext({});
 
 const FluidProvider = ({ children }) => {
-  const [sharedString, setSharedString] = useState();
   const [sharedStringHelper, setSharedStringHelper] = useState();
   const [audience, setAudience] = useState();
 
@@ -58,7 +57,6 @@ const FluidProvider = ({ children }) => {
   useEffect(() => {
     const getData = async () => {
       const { sharedString, audience } = await getFluidData();
-      setSharedString(sharedString);
       setSharedStringHelper(new SharedStringHelper(sharedString));
       setAudience(audience);
     };
@@ -68,7 +66,6 @@ const FluidProvider = ({ children }) => {
   return (
     <FluidContext.Provider
       value={{
-        sharedString,
         sharedStringHelper,
         audience,
       }}
