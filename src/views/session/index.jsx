@@ -1,25 +1,25 @@
 import { useContext, useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { Chip, Grid, Typography } from "@mui/material";
+import { Code, Edit, Visibility, VisibilityOff } from "@mui/icons-material";
+import { getDatabase, off, onValue, ref, remove, set } from "firebase/database";
+import { FirebaseContext } from "../../contexts/firebaseContext";
 import { LoginContext } from "../../contexts/loginContext";
-import { useFluidContext } from "../../contexts/fluidContext";
+import { FluidContext } from "../../contexts/fluidContext";
 import { RepoContext } from "../../contexts/repoContext";
 import ReposService from "../../services/ReposService";
 import Editor from "../../components/inputs/editor";
 import { loggedIn } from "../../contexts/loginContext";
 import AdminPanel from "../adminPanel";
-import ReactMarkdown from "react-markdown";
 import MarkdownDialog from "../../components/dialog/markdown";
-import { Code, Edit, Visibility, VisibilityOff } from "@mui/icons-material";
 import Chat from "../../components/chat";
 import NameDialog from "../../components/dialog/name";
-import { FirebaseContext } from "../../contexts/firebaseContext";
-import { getDatabase, off, onValue, ref, remove, set } from "firebase/database";
 import DisplayCard from "../../components/displayCard";
 import { fileExtensionToIcon } from "../../models/supportedLanguages";
 import { extractFilenameAndExtension } from "../../models/languageModes";
 
 const Session = () => {
-  const { sharedStringHelper } = useFluidContext();
+  const { sharedStringHelper } = useContext(FluidContext);
   const { repoName, clearFile } = useContext(RepoContext);
   const [path, setPath] = useState();
   const [markdown, setMarkdown] = useState();
