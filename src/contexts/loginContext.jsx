@@ -1,15 +1,16 @@
-import { getDatabase, ref, set } from "firebase/database";
-import React, {
+import {
   createContext,
   useCallback,
+  useContext,
   useEffect,
   useReducer,
   useState,
 } from "react";
+import { getDatabase, ref, set } from "firebase/database";
+import { FirebaseContext } from "./firebaseContext";
 import { v4 } from "uuid";
-import { useFirebaseContext } from "./firebaseContext";
-import UserService from "../services/UserService";
 import Configuration from "../config";
+import UserService from "../services/UserService";
 import userReducer from "../stores/user/reducer";
 import { actions } from "../stores/user/actions";
 
@@ -26,7 +27,7 @@ export const LoginProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(
     !!localStorage.getItem(Configuration.TOKEN_KEY)
   );
-  const { app } = useFirebaseContext();
+  const { app } = useContext(FirebaseContext);
 
   const setUser = useCallback(
     (user) => {

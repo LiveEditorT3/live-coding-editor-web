@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Grid, TextField } from "@mui/material";
-import Dialog from "..";
-import ReposService from "../../../services/ReposService";
-import { useFirebaseContext } from "../../../contexts/firebaseContext";
 import { getDatabase, ref, set } from "firebase/database";
+import { FirebaseContext } from "../../../contexts/firebaseContext";
+import ReposService from "../../../services/ReposService";
+import Dialog from "..";
 
 const MarkdownDialog = ({ open, file, user, repo, onClose }) => {
   const [markdown, setMarkdown] = useState();
-  const { app } = useFirebaseContext();
+  const { app } = useContext(FirebaseContext);
 
   const handleAccept = async (event) => {
     try {
@@ -59,4 +59,5 @@ const MarkdownDialog = ({ open, file, user, repo, onClose }) => {
     </Dialog>
   );
 };
+
 export default MarkdownDialog;

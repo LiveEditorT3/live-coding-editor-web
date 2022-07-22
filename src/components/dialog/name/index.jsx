@@ -3,12 +3,12 @@ import { useState, useContext } from "react";
 import Dialog from "..";
 import { useFluidContext } from "../../../contexts/fluidContext";
 import { getDatabase, ref, set } from "firebase/database";
-import { useFirebaseContext } from "../../../contexts/firebaseContext";
+import { FirebaseContext } from "../../../contexts/firebaseContext";
 import { LoginContext } from "../../../contexts/loginContext";
 
 const NameDialog = ({ open, onClose }) => {
   const { setUser } = useContext(LoginContext);
-  const { app } = useFirebaseContext();
+  const { app } = useContext(FirebaseContext);
   const [name, setName] = useState("");
   const [error, setError] = useState(false);
   const { audience } = useFluidContext();
@@ -41,4 +41,5 @@ const NameDialog = ({ open, onClose }) => {
     </Dialog>
   );
 };
+
 export default NameDialog;

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useContext } from "react";
+import { useTheme } from "@mui/styles";
 import CodeMirror from "codemirror";
 import "codemirror/keymap/sublime";
 import "codemirror/lib/codemirror.css";
@@ -13,27 +14,25 @@ import "codemirror/mode/toml/toml";
 import "codemirror/mode/octave/octave";
 import "codemirror/mode/yaml/yaml";
 import "codemirror/mode/shell/shell";
-import 'codemirror/addon/edit/closebrackets';
-import 'codemirror/addon/edit/closetag';
-import 'codemirror/addon/edit/matchbrackets';
-import 'codemirror/addon/edit/matchtags';
-import 'codemirror/addon/fold/brace-fold';
-import 'codemirror/addon/fold/indent-fold';
-import 'codemirror/addon/fold/xml-fold';
-import 'codemirror/addon/fold/foldcode';
-import 'codemirror/addon/fold/foldgutter';
-import 'codemirror/addon/fold/foldgutter.css';
-import { useFirebaseContext } from "../../../contexts/firebaseContext";
+import "codemirror/addon/edit/closebrackets";
+import "codemirror/addon/edit/closetag";
+import "codemirror/addon/edit/matchbrackets";
+import "codemirror/addon/edit/matchtags";
+import "codemirror/addon/fold/brace-fold";
+import "codemirror/addon/fold/indent-fold";
+import "codemirror/addon/fold/xml-fold";
+import "codemirror/addon/fold/foldcode";
+import "codemirror/addon/fold/foldgutter";
+import "codemirror/addon/fold/foldgutter.css";
 import { getDatabase, off, onValue, ref } from "firebase/database";
-import { loggedIn } from "../../../contexts/loginContext";
-import { useTheme } from "@mui/styles";
-import { LoginContext } from "../../../contexts/loginContext";
+import { FirebaseContext } from "../../../contexts/firebaseContext";
 import { RepoContext } from "../../../contexts/repoContext";
+import { LoginContext, loggedIn } from "../../../contexts/loginContext";
 
 const Editor = ({ sharedStringHelper }) => {
   const theme = useTheme();
   const { fileContent, setFileContent } = useContext(RepoContext);
-  const { app } = useFirebaseContext();
+  const { app } = useContext(FirebaseContext);
   const { user } = useContext(LoginContext);
 
   const editorRef = useRef(null);

@@ -1,20 +1,20 @@
+import { useContext, useEffect, useState } from "react";
 import { Chip, Grid, Typography } from "@mui/material";
+import { LoginContext } from "../../contexts/loginContext";
+import { useFluidContext } from "../../contexts/fluidContext";
+import { RepoContext } from "../../contexts/repoContext";
+import ReposService from "../../services/ReposService";
 import Editor from "../../components/inputs/editor";
 import { loggedIn } from "../../contexts/loginContext";
 import AdminPanel from "../adminPanel";
-import { useFluidContext } from "../../contexts/fluidContext";
-import { useEffect, useState, useContext } from "react";
 import ReactMarkdown from "react-markdown";
 import MarkdownDialog from "../../components/dialog/markdown";
 import { Code, Edit, Visibility, VisibilityOff } from "@mui/icons-material";
 import Chat from "../../components/chat";
 import NameDialog from "../../components/dialog/name";
-import { useFirebaseContext } from "../../contexts/firebaseContext";
+import { FirebaseContext } from "../../contexts/firebaseContext";
 import { getDatabase, off, onValue, ref, remove, set } from "firebase/database";
 import DisplayCard from "../../components/displayCard";
-import { LoginContext } from "../../contexts/loginContext";
-import { RepoContext } from "../../contexts/repoContext";
-import ReposService from "../../services/ReposService";
 import { fileExtensionToIcon } from "../../models/supportedLanguages";
 import { extractFilenameAndExtension } from "../../models/languageModes";
 
@@ -29,7 +29,7 @@ const Session = () => {
   const [markdownFile, setMarkdownFile] = useState();
   const [nameOpen, setNameOpen] = useState(true);
   const { user } = useContext(LoginContext);
-  const { app } = useFirebaseContext();
+  const { app } = useContext(FirebaseContext);
 
   useEffect(() => {
     const db = getDatabase(app);
@@ -46,7 +46,7 @@ const Session = () => {
     return () => {
       off(pathRef);
       off(markdownRef);
-    }
+    };
   }, [app]);
 
   useEffect(() => {
@@ -61,7 +61,10 @@ const Session = () => {
   useEffect(() => {
     const getReadme = async () => {
       const db = getDatabase(app);
-      const markdownRef = ref(db, `sessions${window.location.pathname}/markdown`);
+      const markdownRef = ref(
+        db,
+        `sessions${window.location.pathname}/markdown`
+      );
       if (loggedIn() && !!user && !!repoName) {
         try {
           const file = await ReposService.getFile(
@@ -126,7 +129,9 @@ const Session = () => {
                   onDelete={loggedIn() ? handleClear : undefined}
                   icon={
                     <img
-                      src={fileExtensionToIcon(extractFilenameAndExtension(path).extension)}
+                      src={fileExtensionToIcon(
+                        extractFilenameAndExtension(path).extension
+                      )}
                       alt={path}
                       width={15}
                       height={15}
@@ -175,19 +180,27 @@ const Session = () => {
                   marginTop: "7px",
                 }}
               >
-                {
-                  !!path && !!sharedStringHelper ?
-                  <Editor sharedStringHelper={sharedStringHelper} /> :
-                  <Grid container spacing={5} >
+                {!!path && !!sharedStringHelper ? (
+                  <Editor sharedStringHelper={sharedStringHelper} />
+                ) : (
+                  <Grid container spacing={5}>
                     <Grid item xs={2} container justifyContent="flex-end">
-                      <Code sx={{ fontSize: "50pt", color: "gray" }}/>
+                      <Code sx={{ fontSize: "50pt", color: "gray" }} />
                     </Grid>
                     <Grid item xs={10}>
-                      <Typography color="gray" variant="h4">{loggedIn() ? "Get Started" : "Session will start shortly"}</Typography>
-                      <Typography color="gray">{loggedIn() ? "Select or create a file and start editing" : "Waiting for the host to choose a file!"}</Typography>
+                      <Typography color="gray" variant="h4">
+                        {loggedIn()
+                          ? "Get Started"
+                          : "Session will start shortly"}
+                      </Typography>
+                      <Typography color="gray">
+                        {loggedIn()
+                          ? "Select or create a file and start editing"
+                          : "Waiting for the host to choose a file!"}
+                      </Typography>
                     </Grid>
                   </Grid>
-                }
+                )}
               </Grid>
             }
             <Grid
