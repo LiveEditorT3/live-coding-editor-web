@@ -1,17 +1,14 @@
 import TinyliciousClient from "@fluidframework/tinylicious-client";
-import { SharedMap } from "@fluidframework/map";
 import { SharedString } from "@fluidframework/sequence";
 import { SharedStringHelper } from "@fluid-experimental/react-inputs";
 import { createContext, useContext, useEffect, useState } from "react";
 import Configuration from "../config";
 
 const FluidContext = createContext({});
-const MODE_KEY = "mode";
 
 export const useFluidContext = () => {
   const { getFluidData } = useContext(FluidContext);
   const [sharedString, setSharedString] = useState();
-  const [sharedMap, setSharedMap] = useState();
   const [sharedStringHelper, setSharedStringHelper] = useState();
   const [audience, setAudience] = useState();
 
@@ -20,7 +17,6 @@ export const useFluidContext = () => {
       const data = await getFluidData();
       setSharedString(data.sharedString);
       setSharedStringHelper(new SharedStringHelper(data.sharedString));
-      setSharedMap(data.sharedMap);
       setAudience(data.audience);
     };
     getData();
@@ -29,7 +25,6 @@ export const useFluidContext = () => {
   return {
     sharedString,
     sharedStringHelper,
-    sharedMap,
     audience,
   };
 };
@@ -43,7 +38,7 @@ const FluidProvider = ({ children }) => {
   });
 
   const containerSchema = {
-    initialObjects: { sharedMap: SharedMap, sharedString: SharedString },
+    initialObjects: { sharedString: SharedString },
   };
 
   const getFluidData = async () => {
@@ -52,7 +47,6 @@ const FluidProvider = ({ children }) => {
     const containerId = window.location.hash.substring(1);
     if (!containerId) {
       ({ container, services } = await client.createContainer(containerSchema));
-      container.initialObjects.sharedMap.set(MODE_KEY, "python");
       const id = await container.attach();
       window.location.hash = id;
     } else {

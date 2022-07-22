@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Grid, TextField } from "@mui/material";
 import Dialog from "..";
-import { useFluidContext } from "../../../contexts/fluidContext";
 import ReposService from "../../../services/ReposService";
+import { useFirebaseContext } from "../../../contexts/firebaseContext";
+import { getDatabase, ref, set } from "firebase/database";
 
 const MarkdownDialog = ({ open, file, user, repo, onClose }) => {
   const [markdown, setMarkdown] = useState();
-  const { sharedMap } = useFluidContext();
+  const { app } = useFirebaseContext();
 
   const handleAccept = async (event) => {
     try {
@@ -20,7 +21,9 @@ const MarkdownDialog = ({ open, file, user, repo, onClose }) => {
     } catch (err) {
       console.error(err);
     }
-    sharedMap.set("markdown", markdown);
+    const db = getDatabase(app);
+    const markdownRef = ref(db, `sessions${window.location.pathname}/markdown`);
+    set(markdownRef, markdown);
     onClose();
   };
 

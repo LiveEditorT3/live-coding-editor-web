@@ -1,4 +1,4 @@
-import { Chip, Grid } from "@mui/material";
+import { Chip, Grid, Typography } from "@mui/material";
 import Editor from "../../components/inputs/editor";
 import { loggedIn } from "../../contexts/loginContext";
 import AdminPanel from "../adminPanel";
@@ -6,11 +6,11 @@ import { useFluidContext } from "../../contexts/fluidContext";
 import { useEffect, useState, useContext } from "react";
 import ReactMarkdown from "react-markdown";
 import MarkdownDialog from "../../components/dialog/markdown";
-import { Edit, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Code, Edit, Visibility, VisibilityOff } from "@mui/icons-material";
 import Chat from "../../components/chat";
 import NameDialog from "../../components/dialog/name";
 import { useFirebaseContext } from "../../contexts/firebaseContext";
-import { getDatabase, ref, remove } from "firebase/database";
+import { getDatabase, off, onValue, ref, remove, set } from "firebase/database";
 import DisplayCard from "../../components/displayCard";
 import { LoginContext } from "../../contexts/loginContext";
 import { RepoContext } from "../../contexts/repoContext";
@@ -19,7 +19,7 @@ import { fileExtensionToIcon } from "../../models/supportedLanguages";
 import { extractFilenameAndExtension } from "../../models/languageModes";
 
 const Session = () => {
-  const { sharedStringHelper, sharedMap } = useFluidContext();
+  const { sharedStringHelper } = useFluidContext();
   const { repoName, clearFile } = useContext(RepoContext);
   const [path, setPath] = useState();
   const [markdown, setMarkdown] = useState();
@@ -32,33 +32,37 @@ const Session = () => {
   const { app } = useFirebaseContext();
 
   useEffect(() => {
-    if (sharedMap !== undefined) {
-      const syncView = () => {
-        setPath(sharedMap.get("file"));
-        setMarkdown(sharedMap.get("markdown"));
-      };
+    const db = getDatabase(app);
+    const pathRef = ref(db, `sessions${window.location.pathname}/path`);
+    const markdownRef = ref(db, `sessions${window.location.pathname}/markdown`);
+    onValue(pathRef, (snapshot) => {
+      setPath(snapshot.val());
+    });
 
-      syncView();
-      sharedMap.on("valueChanged", syncView);
-      // turn off listener when component is unmounted
-      return () => {
-        sharedMap.off("valueChanged", syncView);
-      };
+    onValue(markdownRef, (snapshot) => {
+      setMarkdown(snapshot.val());
+    });
+
+    return () => {
+      off(pathRef);
+      off(markdownRef);
     }
-  }, [sharedMap]);
+  }, [app]);
 
   useEffect(() => {
     window.addEventListener("beforeunload", () => {
       if (!loggedIn() && !!user.id) {
         const db = getDatabase(app);
-        remove(ref(db, `sessions${window.location.pathname}/${user.id}`));
+        remove(ref(db, `participants${window.location.pathname}/${user.id}`));
       }
     });
   }, [app, user]);
 
   useEffect(() => {
     const getReadme = async () => {
-      if (loggedIn() && !!user && !!repoName && !!sharedMap) {
+      const db = getDatabase(app);
+      const markdownRef = ref(db, `sessions${window.location.pathname}/markdown`);
+      if (loggedIn() && !!user && !!repoName) {
         try {
           const file = await ReposService.getFile(
             user.login,
@@ -66,18 +70,20 @@ const Session = () => {
             "README.md"
           );
           setMarkdownFile(file);
-          sharedMap.set("markdown", file.content);
+          set(markdownRef, file.content);
         } catch (e) {
           setMarkdownFile({ path: "README.md" });
-          sharedMap.set("markdown", "");
+          set(markdownRef, "");
         }
       }
     };
     getReadme();
-  }, [user, repoName, sharedMap]);
+  }, [user, repoName, app]);
 
   const handleClear = (event) => {
-    sharedMap.set("file", "");
+    const db = getDatabase(app);
+    const pathRef = ref(db, `sessions${window.location.pathname}/path`);
+    set(pathRef, "");
     clearFile();
   };
 
@@ -169,9 +175,19 @@ const Session = () => {
                   marginTop: "7px",
                 }}
               >
-                {sharedStringHelper && (
-                  <Editor sharedStringHelper={sharedStringHelper} />
-                )}
+                {
+                  !!path && !!sharedStringHelper ?
+                  <Editor sharedStringHelper={sharedStringHelper} /> :
+                  <Grid container spacing={5} >
+                    <Grid item xs={2} container justifyContent="flex-end">
+                      <Code sx={{ fontSize: "50pt", color: "gray" }}/>
+                    </Grid>
+                    <Grid item xs={10}>
+                      <Typography color="gray" variant="h4">{loggedIn() ? "Get Started" : "Session will start shortly"}</Typography>
+                      <Typography color="gray">{loggedIn() ? "Select or create a file and start editing" : "Waiting for the host to choose a file!"}</Typography>
+                    </Grid>
+                  </Grid>
+                }
               </Grid>
             }
             <Grid
