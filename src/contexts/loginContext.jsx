@@ -1,16 +1,18 @@
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import { getDatabase, ref, set } from "firebase/database";
-import React, { useEffect, useState, createContext, useCallback, useReducer } from "react";
+import { FirebaseContext } from "./firebaseContext";
 import { v4 } from "uuid";
-import { useFirebaseContext } from "./firebaseContext";
-import UserService from "../services/UserService";
 import Configuration from "../config";
+import UserService from "../services/UserService";
 import userReducer from "../stores/user/reducer";
 import { actions } from "../stores/user/actions";
-
-const getCode = () => {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("code");
-};
 
 export const loggedIn = () => !!localStorage.getItem(Configuration.TOKEN_KEY);
 
@@ -25,7 +27,7 @@ export const LoginProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(
     !!localStorage.getItem(Configuration.TOKEN_KEY)
   );
-  const { app } = useFirebaseContext();
+  const { app } = useContext(FirebaseContext);
 
   const setUser = useCallback(
     (user) => {
@@ -40,11 +42,16 @@ export const LoginProvider = ({ children }) => {
 
   useEffect(() => {
     const getAccessToken = async () => {
-      var gitCode = getCode();
+      // Parse the temporary code from the URL
+      const params = new URLSearchParams(window.location.search);
+      let gitCode = params.get("code");
+
       if (!!gitCode) {
+        // Obtain the access token
         const res = await UserService.login(gitCode);
         setLoggedIn(!!res.access_token);
         localStorage.setItem(Configuration.TOKEN_KEY, res.access_token);
+        // Redirect to a new session
         window.location.replace(`${window.location.origin}/${v4()}`);
       }
     };
@@ -65,7 +72,10 @@ export const LoginProvider = ({ children }) => {
           admin: window.location.pathname,
         };
         setUser({ ...storedUser, avatar_url: user.avatar_url });
-        set(ref(db, `participants${window.location.pathname}/${user.id}`), storedUser);
+        set(
+          ref(db, `participants${window.location.pathname}/${user.id}`),
+          storedUser
+        );
       }
     };
 

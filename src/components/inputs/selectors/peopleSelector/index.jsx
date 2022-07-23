@@ -1,4 +1,4 @@
-import { EditOffSharp, EditSharp, Security } from "@mui/icons-material";
+import { useContext, useEffect, useState } from "react";
 import {
   Avatar,
   Checkbox,
@@ -7,6 +7,7 @@ import {
   ListItemAvatar,
   ListItemText,
 } from "@mui/material";
+import { EditOffSharp, EditSharp, Security } from "@mui/icons-material";
 import {
   getDatabase,
   off,
@@ -16,13 +17,11 @@ import {
   ref,
   update,
 } from "firebase/database";
-import { useEffect } from "react";
-import { useState } from "react";
-import { useFirebaseContext } from "../../../../contexts/firebaseContext";
+import { FirebaseContext } from "../../../../contexts/firebaseContext";
 import { utils } from "../../../../utils/utils";
 
 const PeopleSelector = () => {
-  const { app } = useFirebaseContext();
+  const { app } = useContext(FirebaseContext);
   const [people, setPeople] = useState([]);
 
   useEffect(() => {
@@ -84,4 +83,5 @@ const PeopleSelector = () => {
     </List>
   );
 };
+
 export default PeopleSelector;

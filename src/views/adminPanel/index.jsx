@@ -1,7 +1,11 @@
-import { useEffect, useState, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button, Grid } from "@mui/material";
 import { Save } from "@mui/icons-material";
+import { getDatabase, ref, set } from "firebase/database";
+import { FirebaseContext } from "../../contexts/firebaseContext";
+import { LoginContext } from "../../contexts/loginContext";
 import { RepoContext } from "../../contexts/repoContext";
+import ReposService from "../../services/ReposService";
 import FileSelector from "../../components/inputs/selectors/fileSelector";
 import { selectEditorMode } from "../../models/languageModes";
 import RepoSelector from "../../components/inputs/selectors/repoSelector";
@@ -9,10 +13,6 @@ import CommitDialog from "../../components/dialog/commit";
 import PeopleSelector from "../../components/inputs/selectors/peopleSelector";
 import Tab from "../../components/buttons/tab";
 import DisplayCard from "../../components/displayCard";
-import { LoginContext } from "../../contexts/loginContext";
-import ReposService from "../../services/ReposService";
-import { useFirebaseContext } from "../../contexts/firebaseContext";
-import { getDatabase, ref, set } from "firebase/database";
 
 const AdminPanel = () => {
   const { user } = useContext(LoginContext);
@@ -28,10 +28,9 @@ const AdminPanel = () => {
     selectCurrentFile,
     refreshReposList,
     refreshFilesList,
-    setCommitMessage
+    setCommitMessage,
   } = useContext(RepoContext);
-
-  const { app } = useFirebaseContext();
+  const { app } = useContext(FirebaseContext);
   const [loading, setLoading] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
@@ -85,7 +84,7 @@ const AdminPanel = () => {
     const selectedRepoName = event.target.value;
     selectCurrentRepo(selectedRepoName);
     const db = getDatabase(app);
-    const pathRef = ref(db, `sessions${window.location.pathname}/path`)
+    const pathRef = ref(db, `sessions${window.location.pathname}/path`);
     set(pathRef, "");
   };
 
@@ -180,8 +179,7 @@ const AdminPanel = () => {
                     onAccept={handleCreateRepo}
                   />
                 </Grid>
-                {
-                  !!filepath &&
+                {!!filepath && (
                   <Grid item>
                     <Button
                       variant="outlined"
@@ -192,11 +190,14 @@ const AdminPanel = () => {
                       Save
                     </Button>
                   </Grid>
-                }
+                )}
                 <Grid item>
                   <FileSelector
                     files={filesList?.filter(
-                      (file) => file.name !== "README.md" && !file.name.startsWith(".") && file.type ==="file"
+                      (file) =>
+                        file.name !== "README.md" &&
+                        !file.name.startsWith(".") &&
+                        file.type === "file"
                     )}
                     onSelect={handleChangeFile}
                     onAddFile={handleAddFile}

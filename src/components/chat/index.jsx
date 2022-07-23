@@ -1,4 +1,10 @@
-import { Send } from "@mui/icons-material";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Card,
   CardContent,
@@ -9,20 +15,14 @@ import {
   OutlinedInput,
   Paper,
 } from "@mui/material";
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
-import { useFirebaseContext } from "../../contexts/firebaseContext";
+import { Send } from "@mui/icons-material";
 import { getDatabase, off, onChildAdded, push, ref } from "firebase/database";
-import Message from "./message";
+import { FirebaseContext } from "../../contexts/firebaseContext";
 import { LoginContext } from "../../contexts/loginContext";
+import Message from "./message";
 
 const Chat = ({ compact }) => {
-  const { app } = useFirebaseContext();
+  const { app } = useContext(FirebaseContext);
   const { user } = useContext(LoginContext);
   const [messages, setMessages] = useState([]);
   const [messageToSend, setMessageToSend] = useState("");
@@ -132,4 +132,5 @@ const Chat = ({ compact }) => {
     </Card>
   );
 };
+
 export default Chat;
